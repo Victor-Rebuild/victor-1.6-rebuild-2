@@ -158,6 +158,8 @@ public:
 
   void EnableStopOnCliff(const bool enable);
 
+  void StartDoom();
+
 private:
   // let the test classes access robot directly
   friend class BehaviorFactoryCentroidExtractor;

@@ -567,6 +567,11 @@ void Process_textToSpeechCancel(const RobotInterface::TextToSpeechCancel& msg)
   _animEngine->HandleMessage(msg);
 }
 
+void Process_startDoom(const RobotInterface::StartDoom& msg)
+{
+  _animEngine->HandleMessage(msg);
+}
+
 void Process_setConnectionStatus(const Anki::Vector::SwitchboardInterface::SetConnectionStatus& msg)
 {
   using namespace SwitchboardInterface;
@@ -796,6 +801,7 @@ void AnimProcessMessages::ProcessMessageFromRobot(const RobotInterface::RobotToE
     break;
     case RobotInterface::RobotToEngine::Tag_state:
     {
+      _animEngine->HandleMessage( msg.state );
       HandleRobotStateUpdate(msg.state);
       const bool onChargerContacts = (msg.state.status & (uint32_t)RobotStatusFlag::IS_ON_CHARGER);
       _animStreamer->SetOnCharger(onChargerContacts);

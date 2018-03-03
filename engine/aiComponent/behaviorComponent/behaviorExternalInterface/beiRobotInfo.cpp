@@ -391,6 +391,13 @@ void BEIRobotInfo::EnableStopOnCliff(const bool enable)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void BEIRobotInfo::StartDoom()
+{
+  RobotInterface::StartDoom msg;
+  _robot.SendMessage(RobotInterface::EngineToRobot(std::move(msg)));
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 u32 BEIRobotInfo::GetHeadSerialNumber() const
 {
   return _robot.GetHeadSerialNumber();

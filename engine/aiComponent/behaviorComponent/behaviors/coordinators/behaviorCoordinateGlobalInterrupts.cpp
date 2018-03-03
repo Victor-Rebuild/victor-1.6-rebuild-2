@@ -13,6 +13,7 @@
 
 #include "engine/aiComponent/behaviorComponent/behaviors/coordinators/behaviorCoordinateGlobalInterrupts.h"
 
+#include "coretech/common/engine/utils/data/dataPlatform.h"
 #include "engine/aiComponent/behaviorComponent/activeBehaviorIterator.h"
 #include "engine/aiComponent/behaviorComponent/behaviorContainer.h"
 #include "engine/aiComponent/behaviorComponent/behaviorExternalInterface/delegationComponent.h"
@@ -22,11 +23,13 @@
 #include "engine/aiComponent/behaviorComponent/behaviors/reactions/behaviorReactToVoiceCommand.h"
 #include "engine/aiComponent/behaviorComponent/behaviors/simpleFaceBehaviors/behaviorDriveToFace.h"
 #include "engine/aiComponent/behaviorComponent/behaviors/timer/behaviorTimerUtilityCoordinator.h"
+#include "engine/aiComponent/behaviorComponent/behaviorExternalInterface/beiRobotInfo.h"
 #include "engine/aiComponent/behaviorComponent/userIntentComponent.h"
 #include "engine/aiComponent/beiConditions/beiConditionFactory.h"
 #include "engine/aiComponent/beiConditions/iBEICondition.h"
 #include "engine/components/mics/micComponent.h"
 #include "engine/components/photographyManager.h"
+#include "engine/components/movementComponent.h"
 
 #include "util/helpers/boundedWhile.h"
 
@@ -150,7 +153,7 @@ BehaviorCoordinateGlobalInterrupts::DynamicVariables::DynamicVariables()
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 BehaviorCoordinateGlobalInterrupts::BehaviorCoordinateGlobalInterrupts(const Json::Value& config)
-: BehaviorDispatcherPassThrough(config)
+: ICozmoBehavior(config)
 {
 }
 
@@ -163,231 +166,27 @@ BehaviorCoordinateGlobalInterrupts::~BehaviorCoordinateGlobalInterrupts()
 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void BehaviorCoordinateGlobalInterrupts::InitPassThrough()
+void BehaviorCoordinateGlobalInterrupts::GetAllDelegates(std::set<IBehavior*>& delegates) const
 {
-  const auto& BC = GetBEI().GetBehaviorContainer();
-  _iConfig.wakeWordBehavior         = BC.FindBehaviorByID(BEHAVIOR_ID(TriggerWordDetected));
 
-  for( const auto& id : kBehaviorIDsToSuppressWhenMeetVictor ) {
-    _iConfig.toSuppressWhenMeetVictor.push_back( BC.FindBehaviorByID(id) );
-  }
-  for( const auto& id : kBehaviorIDsToSuppressWhenDancingToTheBeat ) {
-    _iConfig.toSuppressWhenDancingToTheBeat.push_back( BC.FindBehaviorByID(id) );
-  }
-  for( const auto& id : kBehaviorIDsToSuppressWhenGoingHome ) {
-    _iConfig.toSuppressWhenGoingHome.push_back( BC.FindBehaviorByID(id) );
-  }
-  
-  for( const auto& id : kBehaviorIDsToSuppressWhenInAnPerformance ) {
-    _iConfig.toSuppressWhenInAnPerformance.push_back( BC.FindBehaviorByID(id) );
-  }
-
-  for( const auto& id : kBehaviorIDsToSuppressWhileDetectingPets ) {
-    _iConfig.toSuppressWhileDetectingPets.push_back( BC.FindBehaviorByID(id) );
-  }
-
-  BC.FindBehaviorByIDAndDowncast(BEHAVIOR_ID(TimerUtilityCoordinator),
-                                 BEHAVIOR_CLASS(TimerUtilityCoordinator),
-                                 _iConfig.timerCoordBehavior);
-  BC.FindBehaviorByIDAndDowncast(BEHAVIOR_ID(TriggerWordDetected),
-                                 BEHAVIOR_CLASS(ReactToVoiceCommand),
-                                 _iConfig.reactToVoiceCommandBehavior);
-
-  _iConfig.triggerWordPendingCond = BEIConditionFactory::CreateBEICondition(BEIConditionType::TriggerWordPending, GetDebugLabel());
-  _iConfig.triggerWordPendingCond->Init(GetBEI());
-
-  _iConfig.reactToObstacleBehavior = BC.FindBehaviorByID(BEHAVIOR_ID(ReactToObstacle));
-  _iConfig.meetVictorBehavior = BC.FindBehaviorByID(BEHAVIOR_ID(MeetVictor));
-  _iConfig.danceToTheBeatBehavior = BC.FindBehaviorByID(BEHAVIOR_ID(DanceToTheBeat));
-  _iConfig.intentionalPerformanceBehavior = BC.FindBehaviorByID(BEHAVIOR_ID(PossibleIntentionalPerformance));
-  _iConfig.unintentionalPerformanceBehavior = BC.FindBehaviorByID(BEHAVIOR_ID(PossibleUnintentionalPerformance));
-  _iConfig.petDetectionBehavior = BC.FindBehaviorByID(BEHAVIOR_ID(PetDetection));
-
-  _iConfig.behaviorsThatShouldntReactToUnexpectedMovement.AddBehavior(BC, BEHAVIOR_CLASS(BumpObject));
-  _iConfig.behaviorsThatShouldntReactToUnexpectedMovement.AddBehavior(BC, BEHAVIOR_CLASS(ClearChargerArea));
-  _iConfig.behaviorsThatShouldntReactToUnexpectedMovement.AddBehavior(BC, BEHAVIOR_CLASS(ReactToHand));
-  _iConfig.behaviorsThatShouldntReactToUnexpectedMovement.AddBehavior(BC, BEHAVIOR_CLASS(PetDetection));
-  _iConfig.behaviorsThatShouldntReactToUnexpectedMovement.AddBehavior(BC, BEHAVIOR_CLASS(PossiblePerformance));
-  _iConfig.reactToUnexpectedMovementBehavior = BC.FindBehaviorByID(BEHAVIOR_ID(ReactToUnexpectedMovement));
-
-  _iConfig.reactToSoundAwakeBehavior = BC.FindBehaviorByID(BEHAVIOR_ID(ReactToSoundAwake));
-  for(const auto& behaviorClass : kBehaviorClassesToSuppressReactToSound){
-    _iConfig.behaviorsThatShouldntReactToSoundAwake.AddBehavior(BC, behaviorClass);
-  }
-
-  _iConfig.reactToTouchPettingBehavior = BC.FindBehaviorByID(BEHAVIOR_ID(ReactToTouchPetting));
-  for(const auto& behaviorClass : kBehaviorClassesToSuppressTouch){
-    _iConfig.behaviorsThatShouldntReactToTouch.AddBehavior(BC, behaviorClass);
-  }
-
-  for(const auto& behaviorClass : kBehaviorClassesToSuppressTimerAntics){
-    _iConfig.behaviorsThatShouldSuppressTimerAntics.AddBehavior(BC, behaviorClass);
-  }
-
-  _iConfig.reactToCliffBehavior = BC.FindBehaviorByID(BEHAVIOR_ID(ReactToCliff));
-  for(const auto& behaviorClass : kBehaviorClassesToSuppressCliff){
-    _iConfig.behaviorsThatShouldntReactToCliff.AddBehavior(BC, behaviorClass);
-  }
-
-  std::set<ICozmoBehaviorPtr> driveToFaceBehaviors = BC.FindBehaviorsByClass(BEHAVIOR_CLASS(DriveToFace));
-  _iConfig.driveToFaceBehaviors.reserve( driveToFaceBehaviors.size() );
-  for( const auto& ptr : driveToFaceBehaviors ) {
-    auto beh = std::dynamic_pointer_cast<BehaviorDriveToFace>(ptr);
-    if( beh != nullptr ) {
-      _iConfig.driveToFaceBehaviors.push_back( beh );
-    }
-  }
 }
 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void BehaviorCoordinateGlobalInterrupts::OnPassThroughActivated()
+bool BehaviorCoordinateGlobalInterrupts::WantsToBeActivatedBehavior() const
 {
-  _iConfig.triggerWordPendingCond->SetActive(GetBEI(), true);
-
-  if( ANKI_DEV_CHEATS ) {
-    CreateConsoleVars();
-  }
+  return true;
 }
 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void BehaviorCoordinateGlobalInterrupts::PassThroughUpdate()
+void BehaviorCoordinateGlobalInterrupts::OnBehaviorActivated()
 {
-  if(!IsActivated()){
-    return;
-  }
+  auto& robotInfo = GetBEI().GetRobotInfo();
+  robotInfo.StartDoom();
 
-  // todo: generalize "if X is running then suppress Y"
-
-  // suppress during meet victor
-  {
-    if( _iConfig.meetVictorBehavior->IsActivated() ) {
-      for( const auto& beh : _iConfig.toSuppressWhenMeetVictor ) {
-        beh->SetDontActivateThisTick(GetDebugLabel());
-      }
-    }
-  }
-
-  // Suppress behaviors if dancing to the beat
-  if( _iConfig.danceToTheBeatBehavior->IsActivated() ) {
-    for( const auto& beh : _iConfig.toSuppressWhenDancingToTheBeat ) {
-      beh->SetDontActivateThisTick(GetDebugLabel());
-    }
-  }
-
-
-  // Stop certain behaviors from interrupting performances
-  if( _iConfig.intentionalPerformanceBehavior->IsActivated() || 
-      _iConfig.unintentionalPerformanceBehavior->IsActivated() ) {
-    for( const auto& beh : _iConfig.toSuppressWhenInAnPerformance ) {
-      beh->SetDontActivateThisTick(GetDebugLabel());
-    }
-  }
-
-  if( _iConfig.petDetectionBehavior->IsActivated() ) {
-    for( const auto& beh : _iConfig.toSuppressWhileDetectingPets ) {
-      beh->SetDontActivateThisTick(GetDebugLabel());
-    }
-  }
-
-  // Suppress ReactToObstacle if needed
-  if( ShouldSuppressProxReaction() ) {
-    _iConfig.reactToObstacleBehavior->SetDontActivateThisTick(GetDebugLabel());
-  }
-
-  // Suppress behaviors disabled via console vars
-  if( ANKI_DEV_CHEATS ) {
-    for( const auto& behPair : _iConfig.devActivatableOverrides ) {
-      if( !behPair.second && (behPair.first != nullptr) ) {
-        behPair.first->SetDontActivateThisTick( "CV:" + GetDebugLabel() );
-      }
-    }
-  }
-
-  // Suppress timer antics if necessary
-  if(_iConfig.behaviorsThatShouldSuppressTimerAntics.AreBehaviorsActivated() ) {
-    const auto tickCount = BaseStationTimer::getInstance()->GetTickCount();
-    _iConfig.timerCoordBehavior->SuppressAnticThisTick(tickCount);
-  }
-
-  // this will suppress the streaming POST-wakeword pending
-  // the "do a fist bump" part of "hey victor"
-  SmartPopResponseToTriggerWord();
-
-  {
-    auto& uic = GetBehaviorComp<UserIntentComponent>();
-
-    bool shouldSuppressTurn = false;
-
-    // certain intents do not want to turn vector after the wakeword was heard so that they can go
-    // directly into their behavior facing the same direction he was when the wakeword was heard.
-    for( const UserIntentTag& tag : kUserIntentTagsToSuppressWakeWordTurn ) {
-      shouldSuppressTurn |= uic.IsUserIntentPending(tag);
-    }
-
-    // If we are responding to "take a photo", and the user is not requesting a selfie
-    // Disable the react to voice command turn so that Victor takes the photo in his current direction
-    // Exception: If storage is full we want to turn towards the user to let them know
-    UserIntent photoIntent;
-    const bool isPhotoPending = uic.IsUserIntentPending(USER_INTENT(take_a_photo), photoIntent);
-    if(isPhotoPending){
-      const auto& takeAPhoto = photoIntent.Get_take_a_photo();
-      const bool isNotASelfie = takeAPhoto.empty_or_selfie.empty();
-      const bool isStorageFull = GetBEI().GetPhotographyManager().IsPhotoStorageFull();
-      shouldSuppressTurn |= (isNotASelfie && !isStorageFull);
-    }
-
-    if (shouldSuppressTurn) {
-      const EngineTimeStamp_t ts = BaseStationTimer::getInstance()->GetCurrentTimeStamp();
-      _iConfig.reactToVoiceCommandBehavior->DisableTurnForTimestamp(ts);
-    }
-
-    const bool isGoHomeActive = uic.IsUserIntentActive(USER_INTENT(system_charger));
-    if( isGoHomeActive ) {
-      for( const auto& beh : _iConfig.toSuppressWhenGoingHome ) {
-        beh->SetDontActivateThisTick(GetDebugLabel() + ": going home");
-      }
-    }
-  }
-
-  // disable ReactToUnexpectedMovement when intentionally bumping things
-  {
-    if( _iConfig.behaviorsThatShouldntReactToUnexpectedMovement.AreBehaviorsActivated() ) {
-      _iConfig.reactToUnexpectedMovementBehavior->SetDontActivateThisTick(GetDebugLabel());
-    }
-  }
-
-  // Suppress ReactToSoundAwake if needed
-  {
-    if( _iConfig.behaviorsThatShouldntReactToSoundAwake.AreBehaviorsActivated() ) {
-      _iConfig.reactToSoundAwakeBehavior->SetDontActivateThisTick(GetDebugLabel());
-    }
-  }
-
-  // Suppress ReactToTouchPetting if needed
-  {
-    if( _iConfig.behaviorsThatShouldntReactToTouch.AreBehaviorsActivated() ) {
-      _iConfig.reactToTouchPettingBehavior->SetDontActivateThisTick(GetDebugLabel());
-    }
-  }
-
-  // Suppress ReactToCliff if needed
-  {
-    if( _iConfig.behaviorsThatShouldntReactToCliff.AreBehaviorsActivated() ) {
-      _iConfig.reactToCliffBehavior->SetDontActivateThisTick(GetDebugLabel());
-    }
-  }
-
-  // tell BehaviorDriveToFace whenever a cliff interruption behavior is active, so that it knows when
-  // it is reasonable to resume-i-mean-wants-to-be-activated-sorry-kevin
-  {
-    if( _iConfig.reactToCliffBehavior->IsActivated() ) {
-      for( const auto& driveToFaceBehavior : _iConfig.driveToFaceBehaviors ) {
-        driveToFaceBehavior->SetInterruptionEndTick( BaseStationTimer::getInstance()->GetTickCount() );
-      }
-    }
-  }
+  robotInfo.GetMoveComponent().EnableLiftPower(false);
+  robotInfo.GetMoveComponent().EnableHeadPower(false);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -418,39 +217,33 @@ bool BehaviorCoordinateGlobalInterrupts::ShouldSuppressProxReaction()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void BehaviorCoordinateGlobalInterrupts::OnPassThroughDeactivated()
-{
-  _iConfig.triggerWordPendingCond->SetActive(GetBEI(), false);
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void BehaviorCoordinateGlobalInterrupts::CreateConsoleVars()
-{
-  // deque can contain non-copyable objects. its kept here to keep the header cleaner
-  static std::deque<Anki::Util::ConsoleVar<bool>> vars;
-  if( !vars.empty() ) {
-    return;
-  }
-  const auto& BC = GetBEI().GetBehaviorContainer();
-  std::set<IBehavior*> passThroughList;
-  GetLinkedActivatableScopeBehaviors( passThroughList );
-  if( !passThroughList.empty() ) {
-    std::set<IBehavior*> globalInterruptions;
-    (*passThroughList.begin())->GetAllDelegates( globalInterruptions );
-    for( const auto* delegate : globalInterruptions ) {
-      const auto* cozmoDelegate = dynamic_cast<const ICozmoBehavior*>( delegate );
-      if( cozmoDelegate != nullptr ) {
-        BehaviorID id = cozmoDelegate->GetID();
-        auto pairIt = _iConfig.devActivatableOverrides.emplace( BC.FindBehaviorByID(id), true );
-        std::string name = std::string{"Toggle_"} + BehaviorTypesWrapper::BehaviorIDToString( id );
-        vars.emplace_back( pairIt.first->second,
-                           name.c_str(),
-                           "BehaviorCoordinateGlobalInterrupts",
-                           true );
-      }
-    }
-  }
-}
+// void BehaviorCoordinateGlobalInterrupts::CreateConsoleVars()
+// {
+//   // deque can contain non-copyable objects. its kept here to keep the header cleaner
+//   static std::deque<Anki::Util::ConsoleVar<bool>> vars;
+//   if( !vars.empty() ) {
+//     return;
+//   }
+//   const auto& BC = GetBEI().GetBehaviorContainer();
+//   std::set<IBehavior*> passThroughList;
+//   GetLinkedActivatableScopeBehaviors( passThroughList );
+//   if( !passThroughList.empty() ) {
+//     std::set<IBehavior*> globalInterruptions;
+//     (*passThroughList.begin())->GetAllDelegates( globalInterruptions );
+//     for( const auto* delegate : globalInterruptions ) {
+//       const auto* cozmoDelegate = dynamic_cast<const ICozmoBehavior*>( delegate );
+//       if( cozmoDelegate != nullptr ) {
+//         BehaviorID id = cozmoDelegate->GetID();
+//         auto pairIt = _iConfig.devActivatableOverrides.emplace( BC.FindBehaviorByID(id), true );
+//         std::string name = std::string{"Toggle_"} + BehaviorTypesWrapper::BehaviorIDToString( id );
+//         vars.emplace_back( pairIt.first->second,
+//                            name.c_str(),
+//                            "BehaviorCoordinateGlobalInterrupts",
+//                            true );
+//       }
+//     }
+//   }
+// }
 
 
 

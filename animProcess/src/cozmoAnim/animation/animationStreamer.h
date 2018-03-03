@@ -25,6 +25,7 @@
 #include "cannedAnimLib/cannedAnims/animationMessageWrapper.h"
 #include "cannedAnimLib/baseTypes/track.h"
 #include "clad/types/keepFaceAliveParameters.h"
+class DoomPort;
 
 namespace Anki {
 namespace Vision{
@@ -43,6 +44,7 @@ namespace Vector {
 
   namespace Audio {
     class AnimationAudioClient;
+    class CozmoAudioController;
     class ProceduralAudioClient;
   }
 
@@ -58,6 +60,9 @@ namespace Anim {
   {
   public:
     using NewAnimationCallback = std::function<void()>;
+
+    void StartGame(const std::string& path, Anki::Vector::Audio::CozmoAudioController* audioController);
+    void HandleMessage(const Anki::Vector::RobotState& robotState);
 
     using Tag = AnimationTag;
     using FaceTrack = Animations::Track<ProceduralFaceKeyFrame>;
@@ -290,6 +295,10 @@ namespace Anim {
 
     // Time to wait before forcing KeepFaceAlive() after the latest stream has stopped
     f32 _longEnoughSinceLastStreamTimeout_s;
+
+
+    void DrawGameScreen();
+    std::unique_ptr<DoomPort> _doom;
 
     // Image buffer that is fed directly to face display (in RGB565 format)
     Vision::ImageRGB565 _faceDrawBuf;

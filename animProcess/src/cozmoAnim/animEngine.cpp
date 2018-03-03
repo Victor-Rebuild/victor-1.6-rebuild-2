@@ -32,6 +32,7 @@
 
 #include "coretech/common/engine/opencvThreading.h"
 #include "coretech/common/engine/utils/timer.h"
+#include "coretech/common/engine/utils/data/dataPlatform.h"
 #include "audioEngine/multiplexer/audioMultiplexer.h"
 
 #include "webServerProcess/src/webService.h"
@@ -106,12 +107,12 @@ Result AnimEngine::Init()
 
   OSState::getInstance()->SetUpdatePeriod(1000);
 
-  RobotDataLoader * dataLoader = _context->GetDataLoader();
-  dataLoader->LoadConfigData();
-  dataLoader->LoadNonConfigData();
+  // RobotDataLoader * dataLoader = _context->GetDataLoader();
+  // dataLoader->LoadConfigData();
+  // dataLoader->LoadNonConfigData();
 
   _ttsComponent = std::make_unique<TextToSpeechComponent>(_context.get());
-  _context->GetMicDataSystem()->Init(*dataLoader);
+  // _context->GetMicDataSystem()->Init(*dataLoader);
 
   // animation streamer must be initialized after loading non config data (otherwise there are no animations loaded)
   _animationStreamer->Init(_ttsComponent.get());
@@ -135,8 +136,10 @@ Result AnimEngine::Init()
 
   AnimProcessMessages::Init(this, _animationStreamer.get(), _streamingAnimationModifier.get(), audioInput, _context.get());
 
+  Json::Value jsonConfig;
+  jsonConfig["port"] = "8889";
   _context->GetWebService()->Start(_context->GetDataPlatform(),
-                                   _context->GetDataLoader()->GetWebServerAnimConfig());
+                                   jsonConfig);
   FaceInfoScreenManager::getInstance()->Init(_context.get(), _animationStreamer.get());
 
   _context->GetAlexa()->Init(_context.get());
@@ -276,6 +279,18 @@ void AnimEngine::HandleMessage(const RobotInterface::TextToSpeechCancel & msg)
 {
   DEV_ASSERT(_ttsComponent, "AnimEngine.TextToSpeechCancel.InvalidTTSComponent");
   _ttsComponent->HandleMessage(msg);
+}
+
+void AnimEngine::HandleMessage(const RobotInterface::StartDoom & msg)
+{
+  const auto* dp = _context->GetDataPlatform();
+  const auto& path = dp->pathToResource(Util::Data::Scope::Resources, "config/engine/doom");
+  _animationStreamer->StartGame(path, _context->GetAudioController() );
+}
+
+void AnimEngine::HandleMessage(const Anki::Vector::RobotState& robotState)
+{
+  _animationStreamer->HandleMessage(robotState);
 }
 
 void AnimEngine::HandleMessage(const RobotInterface::SetLocale & msg)

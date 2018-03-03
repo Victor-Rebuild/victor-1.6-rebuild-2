@@ -28,7 +28,7 @@ class BehaviorReactToVoiceCommand;
 class BehaviorTimerUtilityCoordinator;
 
 
-class BehaviorCoordinateGlobalInterrupts : public BehaviorDispatcherPassThrough
+class BehaviorCoordinateGlobalInterrupts : public ICozmoBehavior
 {
 public:
   virtual ~BehaviorCoordinateGlobalInterrupts();
@@ -38,10 +38,16 @@ protected:
   friend class BehaviorFactory;  
   BehaviorCoordinateGlobalInterrupts(const Json::Value& config);
 
-  virtual void InitPassThrough() override;
-  virtual void OnPassThroughActivated() override;
-  virtual void PassThroughUpdate() override;
-  virtual void OnPassThroughDeactivated() override;
+  virtual void GetAllDelegates(std::set<IBehavior*>& delegates) const override;
+
+  virtual void GetBehaviorOperationModifiers(BehaviorOperationModifiers& modifiers) const override {}
+  virtual void GetBehaviorJsonKeys(std::set<const char*>& expectedKeys) const override {}
+
+  //virtual void InitBehavior() override;
+  virtual void OnBehaviorActivated() override;
+  //virtual void OnBehaviorDeactivated() override;
+  //virtual void BehaviorUpdate() override;
+  virtual bool WantsToBeActivatedBehavior() const override;
 
 private:
   
@@ -49,43 +55,6 @@ private:
   
   struct InstanceConfig{
     InstanceConfig();
-    IBEIConditionPtr  triggerWordPendingCond;
-    ICozmoBehaviorPtr wakeWordBehavior;
-    std::shared_ptr<BehaviorTimerUtilityCoordinator> timerCoordBehavior;
-    AreBehaviorsActivatedHelper behaviorsThatShouldSuppressTimerAntics;
-
-    std::shared_ptr<BehaviorReactToVoiceCommand> reactToVoiceCommandBehavior;
-    ICozmoBehaviorPtr reactToObstacleBehavior;
-
-    ICozmoBehaviorPtr meetVictorBehavior;
-    std::vector<ICozmoBehaviorPtr> toSuppressWhenMeetVictor;
-    
-    ICozmoBehaviorPtr danceToTheBeatBehavior;
-    std::vector<ICozmoBehaviorPtr> toSuppressWhenDancingToTheBeat;
-
-    ICozmoBehaviorPtr intentionalPerformanceBehavior;
-    ICozmoBehaviorPtr unintentionalPerformanceBehavior;
-    std::vector<ICozmoBehaviorPtr> toSuppressWhenInAnPerformance;
-
-    ICozmoBehaviorPtr petDetectionBehavior;
-    std::vector<ICozmoBehaviorPtr> toSuppressWhileDetectingPets;
-    
-    AreBehaviorsActivatedHelper behaviorsThatShouldntReactToUnexpectedMovement;
-    ICozmoBehaviorPtr reactToUnexpectedMovementBehavior;
-
-    AreBehaviorsActivatedHelper behaviorsThatShouldntReactToSoundAwake;
-    ICozmoBehaviorPtr reactToSoundAwakeBehavior;
-
-    AreBehaviorsActivatedHelper behaviorsThatShouldntReactToTouch;
-    ICozmoBehaviorPtr reactToTouchPettingBehavior;
-
-    AreBehaviorsActivatedHelper behaviorsThatShouldntReactToCliff;
-    ICozmoBehaviorPtr reactToCliffBehavior;
-    std::vector<std::shared_ptr<BehaviorDriveToFace>> driveToFaceBehaviors;
-
-    std::vector<ICozmoBehaviorPtr> toSuppressWhenGoingHome;
-    
-    std::unordered_map<ICozmoBehaviorPtr, bool> devActivatableOverrides;
   };
 
   struct DynamicVariables{

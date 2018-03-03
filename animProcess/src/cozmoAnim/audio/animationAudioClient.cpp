@@ -61,6 +61,13 @@ void AnimationAudioClient::InitAnimation()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void AnimationAudioClient::Update() const
+{
+  if ( _audioController == nullptr ) { return; }
+  _audioController->Update();
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void AnimationAudioClient::PlayAudioKeyFrame( const RobotAudioKeyFrame& keyFrame, Util::RandomGenerator* randomGen )
 {
   // Set states, switches and parameters before events events.

@@ -519,6 +519,11 @@ message SetFaceHue
     float_32 hue // [0,1]
 }
 
+message StartDoom
+{
+
+}
+
 // SetFaceSaturation
 message SetFaceSaturation
 {
@@ -878,7 +883,7 @@ union EngineToRobot
   SetDebugConsoleVarMessage     setDebugConsoleVarMessage   = 0x90,
   RunDebugConsoleFuncMessage    runDebugConsoleFuncMessage  = 0x91,
   TextToSpeechPrepare           textToSpeechPrepare         = 0x92,
-  // Available                                              = 0x93,
+  StartDoom                     startDoom                   = 0x93,
   TextToSpeechPlay              textToSpeechPlay            = 0x94,
   TextToSpeechCancel            textToSpeechCancel          = 0x95,
 

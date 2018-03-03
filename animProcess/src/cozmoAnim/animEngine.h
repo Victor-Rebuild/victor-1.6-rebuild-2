@@ -30,6 +30,7 @@ namespace Anki {
       class CozmoAudioController;
       class MicrophoneAudioClient;
     } // Audio
+    struct RobotState;
     namespace RobotInterface {
       struct SetLocale;
       struct ExternalAudioChunk;
@@ -39,6 +40,7 @@ namespace Anki {
       struct TextToSpeechPrepare;
       struct TextToSpeechPlay;
       struct TextToSpeechCancel;
+      struct StartDoom;
     } // RobotInterface
   } // Vector
   namespace Util {
@@ -78,6 +80,8 @@ public:
   void HandleMessage(const RobotInterface::TextToSpeechPrepare& msg);
   void HandleMessage(const RobotInterface::TextToSpeechPlay& msg);
   void HandleMessage(const RobotInterface::TextToSpeechCancel& msg);
+  void HandleMessage(const RobotInterface::StartDoom& msg);
+  void HandleMessage(const Anki::Vector::RobotState& robotState);
   
 protected:
 
