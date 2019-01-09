@@ -30,7 +30,6 @@
 namespace Anki {
 namespace Vector {
 
-
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 BehaviorCubeDrive::InstanceConfig::InstanceConfig()
 {
