@@ -39,6 +39,7 @@ structure UserIntent_WeatherResponse
   string  temperature,
   string  temperatureUnit,
   string  localDateTime,
+  string  dayOrNight,
   string  rawCondition
 }
 
