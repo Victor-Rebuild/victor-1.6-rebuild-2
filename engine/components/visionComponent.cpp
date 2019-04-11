@@ -235,6 +235,10 @@ namespace Vector {
     SetLiftCrossBar();
 
     SetupVisionModeConsoleVars();
+
+    // Turn on auto exposure and white balance
+    EnableAutoExposure(true);
+    EnableWhiteBalance(true);
   }
 
   void VisionComponent::ReadVisionConfig(const Json::Value& config)
@@ -539,7 +543,7 @@ namespace Vector {
         LOG_INFO("VisionComponent.Update.WaitingForState",
                  "CapturedImageTime:%u NewestStateInHistory:%u",
                  buffer.GetTimestamp(), (TimeStamp_t)_robot->GetStateHistory()->GetNewestTimeStamp());
-  
+
         ReleaseImage(buffer);
         return;
       }
@@ -646,7 +650,7 @@ namespace Vector {
       _visionSystemInput.locked = true;
     }
     _imageReadyCondition.notify_all();
-  
+
     if(_isSynchronous)
     {
       // Process image now
@@ -912,7 +916,7 @@ namespace Vector {
           if (RESULT_OK != (this->*handler)(result))
           {
             std::string modeStr = modes.ToString();
-            
+
             LOG_ERROR("VisionComponent.UpdateAllResults.LocalHandlerFailed",
                       "For mode(s):%s", modeStr.c_str());
             anyFailures = true;
@@ -1315,7 +1319,7 @@ namespace Vector {
                 "ExpTime:%dms ExpGain:%f GainR:%f GainG:%f GainB:%f",
                 params.exposureTime_ms, params.gain,
                 params.whiteBalanceGainR, params.whiteBalanceGainG, params.whiteBalanceGainB);
-      
+
       auto cameraService = CameraService::getInstance();
 
       const bool isWhiteBalanceEnabled = procResult.modesProcessed.Contains(VisionMode::WhiteBalance);
@@ -2390,7 +2394,7 @@ namespace Vector {
     LOG_INFO("VisionComponent.SetCameraCaptureFormat.RequestingSwitch",
              "From %s to %s",
              ImageEncodingToString(currentFormat), ImageEncodingToString(_desiredImageFormat));
-    
+
     return true;
   }
 
@@ -2421,7 +2425,7 @@ namespace Vector {
 
           LOG_INFO("VisionComponent.UpdateCaptureFormatChange.SwitchToWaitForFrame",
                    "Now in %s", ImageEncodingToString(_desiredImageFormat));
-          
+
           _captureFormatState = CaptureFormatState::WaitingForFrame;
         }
 
@@ -2433,7 +2437,7 @@ namespace Vector {
       case CaptureFormatState::WaitingForFrame:
       {
         LOG_INFO("VisionComponent.UpdateCaptureFormatChange.WaitingForFrameWithNewFormat", "");
-        
+
         s32 expectedNumRows = 0;
         switch(_desiredImageFormat)
         {
@@ -2461,7 +2465,7 @@ namespace Vector {
 
           LOG_INFO("VisionComponent.UpdateCaptureFormatChange.FormatChangeComplete",
                    "New format: %s, NumRows=%d", ImageEncodingToString(_desiredImageFormat), gotNumRows);
-          
+
           _captureFormatState = CaptureFormatState::None;
           _desiredImageFormat = Vision::ImageEncoding::NoneImageEncoding;
           Pause(false); // now that state/format are updated, un-pause the vision system
@@ -2573,12 +2577,12 @@ namespace Vector {
                                   currentParams.whiteBalanceGainR,
                                   currentParams.whiteBalanceGainG,
                                   currentParams.whiteBalanceGainB);
-      
+
       LOG_INFO("VisionComponent.HandleSetCameraSettings.Manual",
                "Setting camera params to: Exp:%dms / %.3f, WB:%.3f,%.3f,%.3f",
                params.exposureTime_ms, params.gain,
                params.whiteBalanceGainR, params.whiteBalanceGainG, params.whiteBalanceGainB);
-      
+
       SetAndDisableCameraControl(params);
     }
   }
