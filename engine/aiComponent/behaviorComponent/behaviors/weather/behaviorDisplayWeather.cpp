@@ -14,7 +14,7 @@
 #include "engine/aiComponent/behaviorComponent/behaviors/weather/behaviorDisplayWeather.h"
 
 #include "clad/audio/audioSwitchTypes.h"
-#include "components/textToSpeech/textToSpeechCoordinator.h"
+#include "clad/types/featureGateTypes.h"
 #include "engine/actions/animActions.h"
 #include "engine/aiComponent/behaviorComponent/behaviorContainer.h"
 #include "engine/aiComponent/behaviorComponent/behaviorExternalInterface/beiRobotInfo.h"
@@ -25,6 +25,7 @@
 #include "engine/components/animationComponent.h"
 #include "engine/components/dataAccessorComponent.h"
 #include "engine/components/localeComponent.h"
+#include "engine/components/textToSpeech/textToSpeechCoordinator.h"
 #include "engine/components/settingsManager.h"
 #include "engine/faceWorld.h"
 #include "engine/utils/cozmoFeatureGate.h"
@@ -34,7 +35,6 @@
 #include "coretech/common/engine/utils/timer.h"
 #include "coretech/vision/shared/compositeImage/compositeImage.h"
 
-#include "clad/types/featureGateTypes.h"
 #include "util/logging/logging.h"
 
 
@@ -675,7 +675,7 @@ void BehaviorDisplayWeather::StartTTSGeneration()
     auto & ttsCoordinator = bei.GetTextToSpeechCoordinator();
     const UtteranceTriggerType triggerType = UtteranceTriggerType::Manual;
     const AudioTtsProcessingStyle style = AudioTtsProcessingStyle::Default_Processed;
-    _dVars.utteranceID = ttsCoordinator.CreateUtterance(ttsString, triggerType, style, 1.0f, callback);
+    _dVars.utteranceID = ttsCoordinator.CreateUtterance(ttsString, triggerType, style, callback);
   }
 
   if (kInvalidUtteranceID == _dVars.utteranceID) {
