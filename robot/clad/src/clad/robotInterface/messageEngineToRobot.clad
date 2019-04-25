@@ -444,7 +444,7 @@ message StartPlaybackAudio
 message StartWakeWordlessStreaming
 {
   uint_8 streamType,
-  bool   playGetInFromAnimProcess 
+  bool   playGetInFromAnimProcess
 }
 
 message SetTriggerWordResponse
@@ -612,7 +612,8 @@ message RunDebugConsoleFuncMessage {
 //
 message TextToSpeechPrepare {
   AudioMetaData::SwitchState::Robot_Vic_External_Processing style, // Audio processing style
-  float_32 durationScalar,             // Duration adjustment
+  float_32 durationScalar,             // Duration adjustment (0.5 = slow, 5.0 = fast)
+  float_32 pitchScalar,                // Pitch adjustment (-1.0 = low, +1.0 = high)
   TextToSpeechTriggerMode triggerMode, // Trigger mode
   uint_8 ttsID,                        // ID of utterance
   int_8 text[1024]                     // Text to be pronounced
@@ -865,7 +866,7 @@ union EngineToRobot
   AudioEngine::Multiplexer::PostAudioGameState    postAudioGameState   = 0x72,
   AudioEngine::Multiplexer::PostAudioSwitchState  postAudioSwitchState = 0x73,
   AudioEngine::Multiplexer::PostAudioParameter    postAudioParameter   = 0x74,
-  
+
   ExternalAudioPrepare          externalAudioPrepare        = 0x75,
   ExternalAudioChunk            externalAudioChunk          = 0x76,
   ExternalAudioComplete         externalAudioComplete       = 0x77,
