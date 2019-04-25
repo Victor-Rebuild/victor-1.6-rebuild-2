@@ -948,6 +948,7 @@ void SDKComponent::SayText(const AnkiEvent<external_interface::GatewayWrapper>& 
   else {
     processingStyle = AudioMetaData::SwitchState::Robot_Vic_External_Processing::Unprocessed;
   }
+
   auto ttsCallback = [this](const UtteranceState& state) {
     external_interface::SayTextResponse* response =
       new external_interface::SayTextResponse{nullptr, (external_interface::SayTextResponse::UtteranceState) state};
@@ -960,7 +961,7 @@ void SDKComponent::SayText(const AnkiEvent<external_interface::GatewayWrapper>& 
                                  UtteranceTriggerType::Immediate,
                                  processingStyle,
                                  request.duration_scalar(),
-                                 0.f,
+                                 request.pitch_scalar(),
                                  ttsCallback);
 }
 
