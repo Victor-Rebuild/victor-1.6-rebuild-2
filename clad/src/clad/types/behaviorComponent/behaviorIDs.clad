@@ -193,6 +193,7 @@ enum uint_16 BehaviorID {
 
   // victorBehaviorTree/highLevelDelegates/heldInPalm
   ReactToJoltInPalm,
+  ForceStuckOnPalmEdge,
   HeldInPalmDispatcher,
   HeldInPalmResponses,
   InitialHeldInPalmReaction,
@@ -202,11 +203,13 @@ enum uint_16 BehaviorID {
   LookInPlaceHeadUpInPalm,
   LookingNervousInPalmAnim,
   NestlingAndSleepingInPalmDispatcher,
+  ReactToPalmEdge,
   ReactToPalmTilt,
   ReactToPickupFromPalm,
   ReactToPutDownFromPalm,
   ReactToPutDownFromPalmAnimSelector,
   SleepWhileHeldInPalm,
+  StuckOnPalmEdge,
 
   // victorBehaviorTree/highLevelDelegates
   InitialPickupAnimation,
