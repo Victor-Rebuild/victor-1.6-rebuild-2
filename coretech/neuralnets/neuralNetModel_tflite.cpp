@@ -16,6 +16,7 @@
 #include "coretech/vision/engine/image_impl.h"
 #include <list>
 #include <queue>
+#include <sys/stat.h>
 
 #include "util/fileUtils/fileUtils.h"
 #include "util/logging/logging.h"
@@ -23,9 +24,14 @@
 #include "opencv2/imgcodecs/imgcodecs.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 
-#include "tensorflow/contrib/lite/kernels/register.h"
-#include "tensorflow/contrib/lite/model.h"
-#include "tensorflow/contrib/lite/string_util.h"
+#include "tensorflow/lite/model.h"
+#include "tensorflow/lite/interpreter.h"
+#include "tensorflow/lite/interpreter_builder.h"
+#include "tensorflow/lite/kernels/register.h"
+#include "tensorflow/lite/string_util.h"
+#include "tensorflow/lite/profiling/profiler.h"
+#include "tensorflow/lite/profiling/profile_buffer.h"
+#include "tensorflow/lite/delegates/gpu/delegate.h"
 
 namespace Anki {
 namespace NeuralNets {
@@ -35,10 +41,11 @@ namespace NeuralNets {
 // TODO: Make this a parameter in config?
 constexpr int kNumThreads = 1;
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 namespace {
+  TfLiteDelegate* gpu_delegate = nullptr;
+}
 
-// A TFLite error reporter that uses our error logging system
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 struct TFLiteLogReporter : public tflite::ErrorReporter {
   int Report(const char* format, va_list args) override
   {
@@ -52,14 +59,15 @@ struct TFLiteLogReporter : public tflite::ErrorReporter {
 
 TFLiteLogReporter gLogReporter;
 
-} // anonymous namespace
-
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TFLiteModel::TFLiteModel() = default;
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TFLiteModel::~TFLiteModel()
 {
+  if (gpu_delegate) {
+    TfLiteGpuDelegateV2Delete(gpu_delegate);
+    gpu_delegate = nullptr;
+  }
   LOG_DEBUG("TFLiteModel.Destructor", "");
 }
 
@@ -84,7 +92,7 @@ Result TFLiteModel::LoadModelInternal(const std::string& modelPath, const Json::
     return RESULT_FAIL;
   }
 
-  _model = tflite::FlatBufferModel::BuildFromFile(graphFileName.c_str(), &gLogReporter);
+  _model = tflite::FlatBufferModel::BuildFromFile(graphFileName.c_str());
 
   if (!_model)
   {
@@ -94,9 +102,6 @@ Result TFLiteModel::LoadModelInternal(const std::string& modelPath, const Json::
 
   LOG_INFO("TFLiteModel.LoadModelInternal.Success", "Loaded: %s",
            graphFileName.c_str());
-
-  //_model->error_reporter();
-  //LOG_INFO("TFLiteModel.LoadModelInternal.ResolvedReporter", "");
 
 #ifdef TFLITE_CUSTOM_OPS_HEADER
   tflite::MutableOpResolver resolver;
@@ -116,6 +121,26 @@ Result TFLiteModel::LoadModelInternal(const std::string& modelPath, const Json::
   {
     _interpreter->SetNumThreads(kNumThreads);
   }
+
+//  mkdir("/data/tflite-cache", 0755);
+
+  // wire
+  // {
+  //   TfLiteGpuDelegateOptionsV2 gpu_opts = TfLiteGpuDelegateOptionsV2Default();
+  //   gpu_opts.inference_preference = TFLITE_GPU_INFERENCE_PREFERENCE_SUSTAINED_SPEED;
+  //   gpu_opts.inference_priority1 = TFLITE_GPU_INFERENCE_PRIORITY_MIN_LATENCY;
+  //   gpu_opts.inference_priority2 = TFLITE_GPU_INFERENCE_PRIORITY_AUTO;
+  //   gpu_opts.inference_priority3 = TFLITE_GPU_INFERENCE_PRIORITY_AUTO;
+  //   // gpu_opts.experimental_flags = TFLITE_GPU_EXPERIMENTAL_FLAGS_ENABLE_SERIALIZATION;
+  //   gpu_opts.max_delegated_partitions = 1;
+  //   // gpu_opts.serialization_dir = "/data/tflite-cache/";
+  //   // gpu_opts.model_token = "anki";
+  //   gpu_delegate = TfLiteGpuDelegateV2Create(&gpu_opts);
+  //   if (gpu_delegate && !_interpreter->ModifyGraphWithDelegate(gpu_delegate)) {
+  //     LOG_ERROR("TFLiteModel.LoadModelInternal.GPUDelegateFailureFrownyFace", "");
+  //   }
+  // }
+  // wireend
 
   const int input = _interpreter->inputs()[0];
   _interpreter->ResizeInputTensor(input, sizes);
@@ -186,48 +211,11 @@ Result TFLiteModel::Detect(Vision::ImageRGB& img, std::list<Vision::SalientPoint
   // Scale image, subtract mean, divide by standard deviation and store in the interpreter's input tensor
   ScaleImage(img);
 
-  if (_params.benchmarkRuns == 0){
-    const auto invokeResult = _interpreter->Invoke();
-    if (kTfLiteOk != invokeResult)
-    {
-      LOG_ERROR("TFLiteModel.Detect.FailedToInvoke", "");
-      return RESULT_FAIL;
-    }
-  }
-  else
+  const auto invokeResult = _interpreter->Invoke();
+  if (kTfLiteOk != invokeResult)
   {
-    tflite::profiling::Profiler profiler;
-
-    _interpreter->SetProfiler(&profiler);
-
-    profiler.StartProfiling();
-    {
-      tflite::profiling::ScopedProfile profile(&profiler, "benchmarkRuns");
-      for (uint32_t i = 0; i < _params.benchmarkRuns; ++i)
-      {
-        const auto invokeResult = _interpreter->Invoke();
-        if (kTfLiteOk != invokeResult) {
-          LOG_ERROR("TFLiteModel.Detect.FailedToInvokeBenchmark", "");
-          return RESULT_FAIL;
-        }
-      }
-    }
-    profiler.StopProfiling();
-    // TODO: Upgrade to TF r1.10 in order to build profile_summarizer.cc for detailed timing
-    auto profile_events = profiler.GetProfileEvents();
-    for (auto const& e : profile_events)
-    {
-      auto op_index = e->event_metadata;
-      const auto node_and_registration =
-          _interpreter->node_and_registration(op_index);
-      const TfLiteRegistration registration = node_and_registration->second;
-      LOG_INFO("TFLiteModel.Detect.Profiling", "Num Runs: %d, Avg: %f ms, Node: %u, OpCode: %i, %s \n",
-              _params.benchmarkRuns,
-              (e->end_timestamp_us - e->begin_timestamp_us) / (1000.0 * _params.benchmarkRuns),
-              op_index, registration.builtin_code,
-              EnumNameBuiltinOperator(
-                static_cast<tflite::BuiltinOperator>(registration.builtin_code)));
-    }
+    LOG_ERROR("TFLiteModel.Detect.FailedToInvoke", "");
+    return RESULT_FAIL;
   }
 
   switch(_params.outputType)
