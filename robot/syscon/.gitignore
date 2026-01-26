@@ -1,0 +1,11 @@
+__pycache__
+.DS_Store
+*.uvguix.*
+*.uvgui.*
+build
+RTE
+*.TMP
+*.pyc
+JLinkLog.txt
+JLinkSettings.ini
+node_modules

@@ -1,0 +1,59 @@
+// Text-To-Speech Type Declarations
+//  for the C-Like Abstract Data language
+//
+// Copyright: Anki Inc (c) 2018
+
+namespace Anki {
+namespace Vector {
+
+  //
+  // Text To Speech Trigger Mode
+  //
+  // TTS trigger mode determines when audio data will be enqueued and triggered for playback.
+  //
+  // If trigger mode is "immediate", audio data will be enqueued and triggered automatically
+  // when generated audio becomes playable.  Callers do not need to send an explicit
+  // TextToSpeechPlay request.
+  //
+  // If trigger mode is "manual", audio data will be generated and kept in memory until the caller
+  // sends a corresponding TextToSpeechPlay request.  TextToSpeechPlay will enqueue audio data
+  // and post a TTS trigger event to start playback.
+  //
+  // If trigger mode is "keyframe", audio data will be generated and kept in memory until the caller
+  // sends a corresponding TextToSpeechPlay request.  TextToSpeechPlay will enqueue audio data.
+  // The caller is expected to trigger playback by performing an animation containing an embedded
+  // TTS trigger event.
+  //
+  enum uint_8 TextToSpeechTriggerMode
+  {
+    Invalid = 0,
+    Immediate,
+    Manual,
+    Keyframe
+  }
+
+  //
+  // Text To Speech processing state
+  //
+  // Note that streaming audio samples may be played before they are completely generated.
+  //
+  // When audio generation begins, the TTS engine will send a "Preparing" event.
+  //
+  // When audio generation reaches a playable state, the TTS engine will send a "Playable" event
+  // with estimated duration of audio (in milliseconds).
+  //
+  // When audio generation is complete, the TTS engine will send a "Prepared" event with total
+  // duration of audio (in milliseconds).
+  //
+  enum uint_8 TextToSpeechState
+  {
+    Invalid = 0, // Initial state
+    Preparing,   // Audio generation in progress
+    Playable,    // Audio generation has reached a playable state
+    Prepared,    // Audio generation complete
+    Playing,     // Audio playback in progress
+    Finished     // Audio playback complete
+  }
+
+} // namespace Vector
+} // namespace Anki

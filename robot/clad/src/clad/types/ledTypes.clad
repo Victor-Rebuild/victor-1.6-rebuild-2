@@ -1,0 +1,135 @@
+/** Types and structures for controlling LEDs on the robot and accessories
+ * ROBOT_CLAD_SHARED
+ */
+
+namespace Anki {
+namespace Vector {
+
+// Layer to set the animations for
+enum uint_8 BackpackLightLayer {
+  BPL_USER = 0, // Do not change, lest be eaten by a grue
+  BPL_ANIMATION,
+  BPL_NUM_LAYERS
+}
+
+// Health / direction bar on the top of the backpack
+// TODO: Need to sync with HAL::LEDId
+enum uint_8 LEDId {
+  LED_BACKPACK_FRONT = 0,
+  LED_BACKPACK_MIDDLE,
+  LED_BACKPACK_BACK,
+
+  NUM_BACKPACK_LEDS
+}
+
+// The color format is identical to HTML Hex Triplets (RGBA)
+enum uint_32 LEDColor {
+  LED_CURRENT_COLOR = 0xffffffff, // Don't change color: leave as is
+  LED_OFF =   0x00000000,
+  LED_RED =   0xff000000,
+  LED_GREEN = 0x00ff0000,
+  LED_YELLOW= 0xffff0000,
+  LED_BLUE =  0x0000ff00,
+  LED_PURPLE= 0xff00ff00,
+  LED_CYAN =  0x00ffff00,
+  LED_WHITE = 0xffffff00,
+}
+
+// TODO: Replace one in hal.h
+enum uint_8 LEDColorShift {
+  LED_RED_SHIFT = 24,
+  LED_GRN_SHIFT = 16,
+  LED_BLU_SHIFT = 8,
+}
+
+/** Light state information to transmit to the robot.
+ * frames are assumed to be 30ms for this purpose.
+ * Note this structure must align to allow arrays of it
+ */
+structure CubeLightState
+{
+  uint_32  onColor = 0,
+  uint_32  offColor = 0,
+  uint_8   onFrames = 0,
+  uint_8   offFrames = 0,
+  uint_8   transitionOnFrames = 0,
+  uint_8   transitionOffFrames = 0,
+  uint_8   offset = 0,
+  int_8    padding1 = 0, // Padding only necessary because messages that contain
+  int_16   padding2 = 0  // an array of LightStates complain about alignment
+}
+
+structure CubeLights
+{
+  CubeLightState lights[4],
+  bool       rotate = 0,    // Should the pattern rotate through all LEDS on the cube?
+  bool       playOnce = 0,  // Play the cube light animation once then stop
+}
+
+// Specify LEDs, relative to block's top face (as determined by accelerometer)
+// Looking down at top face (and through to bottom face), LEDs are
+// numbered as follows, with each value corresponding to a bit in a u8:
+// Note that the face labels are done such that they match the way Blocks'
+// faces are defined (imagine the robot is looking along the x axis, facing
+// the "Front" of the block, then it makes sense...)
+// NOTE: In the orientation displayed below, the Top marker is rightside up on screen
+//
+//
+//                 (Left)             Y
+//                 ---1---            ^
+//                |   ^   |           |
+//        (Front) 2  TOP  0 (Back)    |
+//                |       |           +----> X
+//                 ---3---
+//                 (Right)
+//
+//  When the block is on its side, FRONT is synonymous with the upper LED.
+enum uint_8 WhichCubeLEDs
+{
+  NONE = 0x00,
+  ALL  = 0xff,
+  // Individual LEDs masked by bit
+  BACK  = 0x01,
+  LEFT  = 0x02,
+  FRONT = 0x04,
+  RIGHT = 0x08,
+  // Corner groups
+  FRONT_LEFT  = 0x06, // Front | left
+  FRONT_RIGHT = 0x0c, // Front | right
+  BACK_LEFT   = 0x03, // Back  | left
+  BACK_RIGHT  = 0x09, // Back  | right
+
+  // Charger lights
+  CHARGER_BACK   = 0x01,
+  CHARGER_MIDDLE = 0x02,
+  CHARGER_FRONT  = 0x04
+}
+
+enum uint_8 MakeRelativeMode
+{
+  RELATIVE_LED_MODE_OFF = 0,
+  RELATIVE_LED_MODE_BY_CORNER,
+  RELATIVE_LED_MODE_BY_SIDE
+}
+
+enum int_32 CubeConstants 
+{
+  NUM_CUBE_LEDS = 4,
+}
+
+// LightState struct for body backpack lights
+structure LightState
+{
+  uint_32  onColor = 0,
+  uint_32  offColor = 0,
+  uint_16  onPeriod_ms = 0,
+  uint_16  offPeriod_ms = 0,
+  uint_16  transitionOnPeriod_ms = 0,
+  uint_16  transitionOffPeriod_ms = 0,
+  int_16   offset_ms = 0,
+  uint_16  padding = 0
+}
+
+
+} // namespace Vector
+} // namespace Anki

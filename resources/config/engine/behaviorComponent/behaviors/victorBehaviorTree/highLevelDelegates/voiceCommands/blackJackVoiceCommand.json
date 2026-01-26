@@ -1,0 +1,19 @@
+{
+  "behaviorID" : "BlackJackVoiceCommand",
+  "behaviorClass" : "DispatcherQueue",
+
+  "respondToUserIntents" : [
+    {
+      "type" : "play_blackjack"
+    }
+  ],
+
+  "autoShutOffIntentFeedback": true,
+
+  "behaviors": [
+    "BlackJack"
+  ],
+
+  "postBehaviorSuggestion": "Socialize"
+
+}

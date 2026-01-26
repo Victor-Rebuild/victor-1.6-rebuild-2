@@ -1,0 +1,50 @@
+/** Clad enum that maps to CompositeImageLayout resource assets
+*/
+
+
+namespace Anki {
+namespace Vision {
+
+
+enum uint_8 CompositeImageLayout
+{
+  // Layouts for weather temperature
+  TemperatureDoubleDig,
+  TemperatureNegDoubleDig,
+  TemperatureSingleDig,
+  TemperatureNegSingleDig,
+  TemperatureTripleDig,
+  TemperatureNegTripleDig,
+
+  // Same but for 2.0
+  TemperatureDoubleDig_Xray,
+  TemperatureNegDoubleDig_Xray,
+  TemperatureSingleDig_Xray,
+  TemperatureNegSingleDig_Xray,
+  TemperatureTripleDig_Xray,
+  TemperatureNegTripleDig_Xray,
+
+  // Layouts for weather conditions
+  WeatherCondCloudy_01,
+  WeatherCondColdClear_01,
+  WeatherCondRain_01,
+  WeatherCondSnow_01,
+  WeatherCondStars_01,
+  WeatherCondSunny_01,
+  WeatherCondThunderstorms_01,
+  WeatherCondWindy_01,
+
+  // Layouts for Blackjack
+  PlayerCardLayout,
+  DealerCardLayout,
+
+  // Same but for 2.0
+  PlayerCardLayout_Xray,
+  DealerCardLayout_Xray,
+
+  // Must be last element
+  Count
+}
+
+} // namespace Vision
+} // namespace Anki

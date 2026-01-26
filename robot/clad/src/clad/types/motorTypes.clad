@@ -1,0 +1,50 @@
+/** Types and structures for controlling LEDs on the robot and accessories
+ * ROBOT_CLAD_SHARED
+ */
+
+namespace Anki {
+namespace Vector {
+
+enum uint_8 MotorID {
+  MOTOR_LEFT_WHEEL = 0,
+  MOTOR_RIGHT_WHEEL,
+  MOTOR_LIFT,
+  MOTOR_HEAD,
+  MOTOR_COUNT
+}
+
+message MotorCalibration
+{
+  MotorID motorID,
+  bool calibStarted,
+  bool autoStarted,
+}
+
+// This message is sent if a motor is automatically enabled/disabled
+// As of 08-2016, only the lift motor will automatically disable if
+// someone messes with the lift.
+message MotorAutoEnabled
+{
+  MotorID motorID,
+  bool enabled
+}
+
+enum uint_8 MotorCalibrationReason
+{
+  Startup,
+  Playpen,
+  SelfTest,
+  Game,
+  LiftMotorBurnoutProtection,
+  HeadMotorBurnoutProtection,
+  PowerSaveEnteringActiveMode,
+  BehaviorReactToUncalibratedHeadAndLift,
+  BehaviorReactToOnFace,
+  BehaviorReactToOnBack,
+  BehaviorReactToPlacedOnSlope,
+  BehaviorReactToPutDown,
+  BehaviorReactToCliff
+}
+
+} // namespace Vector
+} // namespace Anki

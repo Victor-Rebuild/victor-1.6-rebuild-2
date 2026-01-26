@@ -1,0 +1,20 @@
+{
+  "behaviorID": "PickUpCubeVoiceCommand",
+  "behaviorClass": "DispatcherQueue",
+
+  "respondToUserIntents" : [
+    {
+      "type" : "play_pickupcube"
+    }
+  ],
+
+  "wantsToBeActivatedCondition" : {
+    "conditionType" : "FeatureGate",
+    "feature" : "MoveCube"
+  },
+
+  "behaviors": [
+    "FindCube",
+    "MoveCube"
+  ]
+}

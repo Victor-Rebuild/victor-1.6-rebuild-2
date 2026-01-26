@@ -1,0 +1,115 @@
+// Available Game States in project
+
+namespace Anki {
+namespace AudioMetaData {
+namespace GameState {
+
+enum uint_32 GenericState
+{
+  Invalid = 0,
+}
+
+enum uint_32 Mood
+{
+  Angry = 1206605712,
+  Curious = 620622945,
+  Happy = 1427264549,
+  Invalid = 0,
+  Neutral = 670611050,
+  Sad = 443572635,
+  Surprised = 2662801688,
+}
+
+enum uint_32 Robot_Alexa_Locale
+{
+  En_Au = 1906015505,
+  En_De = 1855682766,
+  En_Fr = 1889237923,
+  En_Uk = 2107346979,
+  En_Us = 2107347003,
+  Invalid = 0,
+}
+
+enum uint_32 Robot_Vic_External_Language
+{
+  English = 3383237639,
+  French = 3133094709,
+  German = 4290373403,
+  Invalid = 0,
+  Japanese = 2008704848,
+}
+
+enum uint_32 Robot_Vic_External_Processing
+{
+  Invalid = 0,
+  Robot_Vic_External_Processed = 1575276615,
+  Robot_Vic_External_Unit_Test_Mock = 203897895,
+  Robot_Vic_External_Unprocessed = 3289079812,
+}
+
+enum uint_32 Robot_Vic_Low_Power_Mode
+{
+  Invalid = 0,
+  Low_Power_Mode_Off = 3340184725,
+  Low_Power_Mode_On = 1712112425,
+}
+
+enum uint_32 Robot_Vic_Petting_Level
+{
+  Invalid = 0,
+  Robot_Vic_Petting_Level_01 = 4289156881,
+  Robot_Vic_Petting_Level_02 = 4289156882,
+  Robot_Vic_Petting_Level_03 = 4289156883,
+  Robot_Vic_Petting_Level_04 = 4289156884,
+}
+
+enum uint_32 Robot_Vic_Quiet
+{
+  Invalid = 0,
+  Robot_Vic_Quiet_Off = 2503617831,
+  Robot_Vic_Quiet_On = 3604654675,
+}
+
+enum uint_32 Robot_Vic_System_Tests
+{
+  App_Run = 2777662008,
+  Invalid = 0,
+  Unit_Test = 522293050,
+}
+
+enum uint_32 Robot_Vic_Vc
+{
+  Invalid = 0,
+  Robot_Vic_Vc_Off = 1551477384,
+  Robot_Vic_Vc_On = 3189356050,
+}
+
+enum uint_32 Robot_Vic_Volume
+{
+  High = 3550808449,
+  Invalid = 0,
+  Low = 545371365,
+  Medium = 2849147824,
+  Mediumhigh = 3176515060,
+  Mediumlow = 1216798262,
+  Mute = 2974103762,
+}
+
+enum uint_32 StateGroupType
+{
+  Invalid = 0,
+  Mood = 3128647864,
+  Robot_Alexa_Locale = 1812603720,
+  Robot_Vic_External_Language = 2984487667,
+  Robot_Vic_External_Processing = 475135532,
+  Robot_Vic_Low_Power_Mode = 1633231277,
+  Robot_Vic_Petting_Level = 3399985269,
+  Robot_Vic_Quiet = 3765614597,
+  Robot_Vic_System_Tests = 1822792682,
+  Robot_Vic_Vc = 3929179650,
+  Robot_Vic_Volume = 3279659965,
+}
+
+} // GameState
+} // AudioMetaData
+} // Anki

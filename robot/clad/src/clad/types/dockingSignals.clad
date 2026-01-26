@@ -1,0 +1,147 @@
+/** Docking control signals
+ */
+ 
+#include "clad/types/robotStatusAndActions.clad"
+ 
+namespace Anki {
+namespace Vector {
+
+enum uint_8 DockingMethod
+{
+  // Only use the first error signal to do dock corrections
+  // Still needs to receive error signals while docking but does not do anything with them
+  BLIND_DOCKING,
+
+  // Continuously uses error signals to adjust docking
+  TRACKER_DOCKING,
+
+  // Combines BLIND and TRACKER docking, will check error signals but only adjust docking
+  // if the error signals indicate too much change
+  HYBRID_DOCKING,
+  
+  // Like HYBRID_DOCKING but it doesn't try to plan a path that ends up square with the marker.
+  // Instead it just always follows a straight line between the robot's current pose and the marker's center.
+  HYBRID_DOCKING_BEELINE,
+
+  // Only ever needs to receive one error signal (to start), therefore docking will always complete
+  // once it starts
+  EVEN_BLINDER_DOCKING,
+}
+
+message DockWithObject
+{
+  float_32   horizontalOffset_mm, // Offset wrt to docking object. Don't know if this will work yet.
+  float_32   speed_mmps,          // Docking speed/accel
+  float_32   accel_mmps2,
+  float_32   decel_mmps2,
+  DockAction action,
+  uint_8     numRetries,
+  DockingMethod dockingMethod,
+  bool       doLiftLoadCheck,
+  bool       backUpWhileLiftingCube,
+}
+
+message AbortDocking
+{
+}
+
+message PlaceObjectOnGround
+{
+  float_32 rel_x_mm,  // Distance of object face center in forward axis
+  float_32 rel_y_mm,  // Distance of object face center in horizontal axis. (Left of robot is +ve)
+  float_32 rel_angle, // Angle between of object face normal and robot. (Block normal pointing right of robot is +ve)
+  float_32 speed_mmps,// Docking speed/accel
+  float_32 accel_mmps2,
+  float_32 decel_mmps2,
+}
+
+
+message DockingErrorSignal
+{
+  uint_32  timestamp,
+  float_32 x_distErr,
+  float_32 y_horErr,
+  float_32 z_height,
+  float_32 angleErr,
+  bool didTrackingSucceed,
+  bool isApproximate,
+}
+
+enum int_8 DockingResult
+{
+  DOCK_UNKNOWN,
+  DOCK_INTERRUPTED,
+  DOCK_SUCCESS,
+  DOCK_SUCCESS_RETRY,
+  DOCK_SUCCESS_HANNS_MANEUVER,
+  DOCK_FAILURE,
+  DOCK_FAILURE_TOO_LONG_WITHOUT_BLOCKPOSE,
+  DOCK_FAILURE_TOO_HIGH,
+  DOCK_FAILURE_RETRY,
+}
+
+enum int_8 Status
+{
+  STATUS_BACKING_UP,
+  STATUS_DOING_HANNS_MANEUVER,
+}
+
+message DockingStatus
+{
+  uint_32 timestamp,
+  Status status,
+}
+
+enum int_8 BlockStatus
+{
+  NO_BLOCK,
+  BLOCK_PLACED,
+  BLOCK_PICKED_UP
+}
+
+message PickAndPlaceResult
+{
+  uint_32 timestamp,
+  bool didSucceed,
+  DockingResult result,
+  BlockStatus blockStatus
+}
+
+message MovingLiftPostDock
+{
+  DockAction action
+}
+
+message ChargerMountComplete
+{		
+  uint_32  timestamp,
+  bool didSucceed,
+}
+
+enum int_8 CliffAlignResult
+{
+  CLIFF_ALIGN_SUCCESS,
+  CLIFF_ALIGN_FAILURE_TIMEOUT,
+  CLIFF_ALIGN_FAILURE_NO_TURNING,
+  CLIFF_ALIGN_FAILURE_OVER_TURNING,
+  CLIFF_ALIGN_FAILURE_NO_WHITE,
+  CLIFF_ALIGN_FAILURE_STOPPED
+}
+
+// Not really a docking action in the sense that it doesn't
+// care about a visual marker. Uses cliff sensors only.
+message CliffAlignComplete
+{		
+  uint_32  timestamp,
+  CliffAlignResult result
+}
+
+structure GoalPose
+{
+  RobotPose pose,
+  bool followingMarkerNormal, 
+}
+
+
+} // namespace Vector
+} // namespace Anki

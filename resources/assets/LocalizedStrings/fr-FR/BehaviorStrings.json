@@ -1,0 +1,126 @@
+{
+  "smartling": {
+    "translate_paths": [
+      "*/translation"
+    ],
+    "variants_enabled": true,
+    "translate_mode": "custom",
+    "placeholder_format_custom": [
+      "%%[^%]+?%%",
+      "%[^%]+?%",
+      "##[^#]+?##",
+      "__[^_]+?__",
+      "[$]\\{[^\\}\\{]+?\\}",
+      "\\{\\{[^\\}\\{]+?\\}\\}",
+      "(?<!\\{)\\{[^\\}\\{]+?\\}(?!\\})"
+    ],
+    "source_key_paths": [
+      "/{*}"
+    ]
+  },
+  "behavior.DevTest1": {
+    "translation": "Je suis Vector"
+  },
+  "behavior.DevTest2": {
+    "translation": "Je suis {0}"
+  },
+  "BehaviorDisplayWeather.Cloudy": {
+    "translation": "{0} degrés et nuageux"
+  },
+  "BehaviorDisplayWeather.Cold": {
+    "translation": "{0} degrés et gel"
+  },
+  "BehaviorDisplayWeather.Rain": {
+    "translation": "{0} degrés et pluvieux"
+  },
+  "BehaviorDisplayWeather.Snow": {
+    "translation": "{0} degrés et neige"
+  },
+  "BehaviorDisplayWeather.Stars": {
+    "translation": "{0} degrés et nuit étoilée"
+  },
+  "BehaviorDisplayWeather.Sunny": {
+    "translation": "{0} degrés et ensoleillé"
+  },
+  "BehaviorDisplayWeather.Thunderstorms": {
+    "translation": "{0} degrés avec orages"
+  },
+  "BehaviorDisplayWeather.Windy": {
+    "translation": "{0} degrés et venteux"
+  },
+  "BehaviorEnrollFace.HaveWeMetBefore": {
+    "translation": "Nous sommes-nous déjà rencontrés, {0}?"
+  },
+  "BehaviorEnrollFace.AlreadyKnowVowelName": {
+    "translation": "Je connais déjà un {0}"
+  },
+  "BehaviorEnrollFace.AlreadyKnowConsonantName": {
+    "translation": "je connais déjà un {0}"
+  },
+  "BehaviorEnrollFace.AlreadyKnowYou": {
+    "translation": "Je te connais déjà!"
+  },
+  "BehaviorEnrollFace.AlreadyKnowFace": {
+    "translation": "Tu es {0}, non {1}"
+  },
+    "BehaviorHowOldAreYou.OneDay": {
+    "translation": "Un jour!"
+  },
+  "BehaviorHowOldAreYou.SomeDays": {
+    "translation": "{0} jours vieux!"
+  },
+  "BehaviorHowOldAreYou.OneMonth": {
+    "translation": "Age d'un mois!"
+  },
+  "BehaviorHowOldAreYou.AndOneMonth": {
+    "translation": "et un mois!"
+  },
+  "BehaviorHowOldAreYou.SomeMonths": {
+    "translation": "{0} mois!"
+  },
+  "BehaviorHowOldAreYou.AndSomeMonths": {
+    "translation": "et {0} mois!"
+  },
+  "BehaviorHowOldAreYou.OneYear": {
+    "translation": "Un an!"
+  },
+  "BehaviorHowOldAreYou.SomeYears": {
+    "translation": "{0} ans!"
+  },
+  "BehaviorHowOldAreYou.OneYearAndMonth": {
+    "translation": "Un an"
+  },
+  "BehaviorHowOldAreYou.SomeYearsAndMonth": {
+    "translation": "{0} ans"
+  },
+  "BehaviorKnowledgeGraphQuestion.Ready": {
+    "translation": "Prêt"
+  },
+  "BehaviorLeaveAMessage.NoRecipient": {
+    "translation": "Je n'ai pas entendu le nom"
+  },
+  "BehaviorLeaveAMessage.UnknownRecipient": {
+    "translation": "Je ne connais pas de {0}"
+  },
+  "BehaviorLeaveAMessage.MailboxFull": {
+    "translation": "La messagerie vocale est pleine."
+  },
+  "BehaviorPlaybackMessage.AnnounceSingle": {
+    "translation": "Un message pour {0}"
+  },
+  "BehaviorPlaybackMessage.AnnouncePlural": {
+    "translation": "{1} messages pour {0}"
+  },
+  "BehaviorPlaybackMessage.NoRecipient": {
+    "translation": "Je n'ai pas entendu le nom"
+  },
+  "BehaviorPlaybackMessage.NoMessages": {
+    "translation": "Je n'ai aucun message pour {0}"
+  },
+  "BehaviorSayName.DontKnow": {
+    "translation": "Je ne sais pas"
+  },
+  "BehaviorRespondToName.ImX": {
+    "translation": "Je suis"
+  }
+}

@@ -1,0 +1,8 @@
+{
+	"jdocs": "anki2.ca:8081",
+	"tms": "anki2.ca:8081",
+	"chipper": "anki2.ca:8081",
+	"check": "anki2.ca:443/ok",
+	"logfiles": "s3://anki-device-logs-prod/victor",
+	"appkey": "oDoa0quieSeir6goowai7f"
+}

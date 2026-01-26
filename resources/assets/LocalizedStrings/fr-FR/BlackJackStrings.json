@@ -1,0 +1,72 @@
+{
+  "smartling": {
+    "translate_paths": [
+      "*/translation"
+    ],
+    "variants_enabled": true,
+    "translate_mode": "custom",
+    "placeholder_format_custom": [
+      "%%[^%]+?%%",
+      "%[^%]+?%",
+      "##[^#]+?##",
+      "__[^_]+?__",
+      "[$]\\{[^\\}\\{]+?\\}",
+      "\\{\\{[^\\}\\{]+?\\}\\}",
+      "(?<!\\{)\\{[^\\}\\{]+?\\}(?!\\})"
+    ],
+    "source_key_paths": [
+      "/{*}"
+    ]
+  },
+  "BlackJack.DealerGoodLuck": {
+    "translation": "Bonne chance!"
+  },
+  "BlackJack.DealerScore": {
+    "translation": "{0}"
+  },
+  "BlackJack.DealerScoreBusted": {
+    "translation": "{0}. Le trafiquant arrêté."
+  },
+  "BlackJack.DealerScorePush": {
+    "translation": "{0}. Pousser."
+  },
+  "BlackJack.DealerScoreDealerWins": {
+    "translation": "{0}. Le croupier gagne!"
+  },
+  "BlackJack.DealerScorePlayerWins": {
+    "translation": "{0}. Vous gagnez!"
+  },
+  "BlackJack.DealerTwentyOne": {
+    "translation": "21!"
+  },
+  "BlackJack.DealerTurn": {
+    "translation": "Au tour du croupier!"
+  },
+  "BlackJack.DrawQuestion": {
+    "translation": "Une autre carte?"
+  },
+  "BlackJack.PlayQuestion": {
+    "translation": "Jouez une partie de Blackjack!"
+  },
+  "BlackJack.PlayAgainQuestion": {
+    "translation": "Jouer un autre tour?"
+  },
+  "BlackJack.PlayerScore": {
+    "translation": "{0}"
+  },
+  "BlackJack.PlayerScoreBusted": {
+    "translation": "{0}. Vous avez éclaté!"
+  },
+  "BlackJack.PlayerTwentyOne": {
+    "translation": "21!"
+  },
+  "BlackJack.PlayerWinsBlackJack": {
+    "translation": "Blackjack, vous avez gagné!"
+  },
+  "BlackJack.PlayerWinsNaturalBlackJack": {
+    "translation": "BlackJack!"
+  },
+  "BlackJack.PlayerWinsFiveCardCharlie": {
+    "translation": "Charlie aux 5 cartes! Tu as gagné!"
+  }
+}

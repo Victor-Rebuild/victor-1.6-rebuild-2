@@ -1,0 +1,13 @@
+
+cxx_project(
+    name = 'utilUnitTest',
+    srcs = cxx_src_glob(['.'], excludes = ['tests/testPTree*','tests/testPtree*']),
+    platform_srcs = [
+        ('mac', glob(['**/*_iososx.mm']))
+    ],
+    headers = cxx_header_glob(['.'], excludes = ['tests/testPTree*','tests/testPtree*']),
+    platform_headers = [
+        ('mac', glob(['**/*_iososx.h']))
+    ]
+)
+

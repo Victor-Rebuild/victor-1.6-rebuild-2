@@ -1,0 +1,72 @@
+{
+  "smartling": {
+    "translate_paths": [
+      "*/translation"
+    ],
+    "variants_enabled": true,
+    "translate_mode": "custom",
+    "placeholder_format_custom": [
+      "%%[^%]+?%%",
+      "%[^%]+?%",
+      "##[^#]+?##",
+      "__[^_]+?__",
+      "[$]\\{[^\\}\\{]+?\\}",
+      "\\{\\{[^\\}\\{]+?\\}\\}",
+      "(?<!\\{)\\{[^\\}\\{]+?\\}(?!\\})"
+    ],
+    "source_key_paths": [
+      "/{*}"
+    ]
+  },
+  "BlackJack.DealerGoodLuck": {
+    "translation": "幸運を!"
+  },
+  "BlackJack.DealerScore": {
+    "translation": "{0}"
+  },
+  "BlackJack.DealerScoreBusted": {
+    "translation": "{0}. ディーラーは逮捕された。"
+  },
+  "BlackJack.DealerScorePush": {
+    "translation": "{0}. 押す。"
+  },
+  "BlackJack.DealerScoreDealerWins": {
+    "translation": "{0}. ディーラーが勝ちました!"
+  },
+  "BlackJack.DealerScorePlayerWins": {
+    "translation": "{0}. あなたが勝ちます!"
+  },
+  "BlackJack.DealerTwentyOne": {
+    "translation": "21!"
+  },
+  "BlackJack.DealerTurn": {
+    "translation": "ディーラーの番です!"
+  },
+  "BlackJack.DrawQuestion": {
+    "translation": "別のカード?"
+  },
+  "BlackJack.PlayQuestion": {
+    "translation": "ブラックジャックをプレイしましょう!"
+  },
+  "BlackJack.PlayAgainQuestion": {
+    "translation": "別のラウンドをプレイしますか?"
+  },
+  "BlackJack.PlayerScore": {
+    "translation": "{0}"
+  },
+  "BlackJack.PlayerScoreBusted": {
+    "translation": "{0}. 潰れたよ!"
+  },
+  "BlackJack.PlayerTwentyOne": {
+    "translation": "21!"
+  },
+  "BlackJack.PlayerWinsBlackJack": {
+    "translation": "ブラックジャック、君の勝ちだ!"
+  },
+  "BlackJack.PlayerWinsNaturalBlackJack": {
+    "translation": "ブラックジャック!"
+  },
+  "BlackJack.PlayerWinsFiveCardCharlie": {
+    "translation": "5カードチャーリー! 君の勝ちだ!"
+  }
+}

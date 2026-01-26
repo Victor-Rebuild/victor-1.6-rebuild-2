@@ -1,0 +1,14 @@
+cxx_project(
+    name = 'gateway_grpc',
+    srcs = ['../tools/protobuf/gateway/public/external_interface.proto']
+)
+
+cxx_project(
+    name = 'gateway_proto',
+    srcs = glob(['../tools/protobuf/gateway/public/*.proto'])
+)
+
+cxx_project(
+    name = 'vision_proto',
+    srcs = glob(['../tools/protobuf/vision/private/*.proto'])
+)

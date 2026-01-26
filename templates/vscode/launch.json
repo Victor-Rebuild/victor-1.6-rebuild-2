@@ -1,0 +1,149 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "victor:attach:vic-robot",
+            "type": "lldb",
+            "request": "attach",
+            "program": "vic-robot",
+            "initCommands": [
+                "platform select remote-linux",
+                "platform connect connect://victor:55001",
+                "settings set target.exec-search-paths ${workspaceRoot}/_build/vicos/Release/bin ${workspaceRoot}/_build/vicos/Release/lib"
+            ]
+        },
+        {
+            "name": "victor:attach:vic-anim",
+            "type": "lldb",
+            "request": "attach",
+            "program": "vic-anim",
+            "initCommands": [
+                "platform select remote-linux",
+                "platform connect connect://victor:55001",
+                "settings set target.exec-search-paths ${workspaceRoot}/_build/vicos/Release/bin ${workspaceRoot}/_build/vicos/Release/lib"
+            ]
+        },
+        {
+            "name": "victor:attach:vic-engine",
+            "type": "lldb",
+            "request": "attach",
+            "program": "vic-engine",
+            "initCommands": [
+                "platform select remote-linux",
+                "platform connect connect://victor:55001",
+                "settings set target.exec-search-paths ${workspaceRoot}/_build/vicos/Release/bin ${workspaceRoot}/_build/vicos/Release/lib",
+            ]
+        },
+        {
+            // Note that process launch requires write permission on the filesystem:
+            //   mount -o rw,remount /
+            "name": "victor:launch:vic-robot",
+            "type": "lldb",
+            "request": "launch",
+            "program": "/anki/bin/vic-robot",
+            "initCommands": [
+                "platform select remote-linux",
+                "platform connect connect://victor:55001",
+                "settings set target.exec-search-paths ${workspaceRoot}/_build/vicos/Release/bin ${workspaceRoot}/_build/vicos/Release/lib"
+            ]
+        },
+        {
+            // Note that process launch requires write permission on the filesystem:
+            //   mount -o rw,remount /
+            "name": "victor:launch:vic-anim",
+            "type": "lldb",
+            "request": "launch",
+            "program": "/anki/bin/vic-anim",
+            "env": {
+                "VIC_ANIM_CONFIG": "/anki/etc/config/platform_config.json"
+            },
+            "initCommands": [
+                "platform select remote-linux",
+                "platform connect connect://victor:55001",
+                "settings set target.exec-search-paths ${workspaceRoot}/_build/vicos/Release/bin ${workspaceRoot}/_build/vicos/Release/lib"
+            ]
+        },
+        {
+            // Note that process launch requires write permission on the filesystem:
+            //   mount -o rw,remount /
+            "name": "victor:launch:vic-engine",
+            "type": "lldb",
+            "request": "launch",
+            "program": "/anki/bin/vic-engine",
+            "env": {
+                "VIC_ENGINE_CONFIG": "/anki/etc/config/platform_config.json"
+            },
+            "initCommands": [
+                "platform select remote-linux",
+                "platform connect connect://victor:55001",
+                "settings set target.exec-search-paths ${workspaceRoot}/_build/vicos/Release/bin ${workspaceRoot}/_build/vicos/Release/lib",
+            ]
+        },
+        {
+            "name": "mac:launch:test_engine",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceRoot}/_build/mac/Debug/bin/test_engine",
+            "env": {
+                "GTEST_FILTER": "-BlockWorld*:-Localization*",
+                "ANKIWORKROOT": "_build/tmp",
+                "ANKICONFIGROOT": "_build/mac/Debug/test/engine",
+                "DYLD_LIBRARY_PATH": "_build/mac/Debug/lib:/Applications/Webots.app/lib"
+            },
+            "stopOnEntry": false,
+            "initCommands": [
+                "settings set target.exec-search-paths ${workspaceRoot}/_build/mac/Debug/lib"
+            ]
+        },
+        {
+            "name": "webots:attach:webotsCtrlRobot2",
+            "type": "lldb",
+            "request": "attach",
+            "waitFor": true,
+            "program": "webotsCtrlRobot2",
+            "stopOnEntry": false
+        },
+        {
+            "name": "webots:attach:webotsCtrlAnim",
+            "type": "lldb",
+            "request": "attach",
+            "waitFor": true,
+            "program": "webotsCtrlAnim",
+            "stopOnEntry": false
+        },
+        {
+            "name": "webots:attach:webotsCtrlGameEngine2",
+            "type": "lldb",
+            "request": "attach",
+            "waitFor": true,
+            "program": "webotsCtrlGameEngine2",
+            "stopOnEntry": false
+        }
+    ],
+    "compounds": [
+        {
+            "name": "victor:attach:all",
+            "configurations": [
+                "victor:attach:vic-robot",
+                "victor:attach:vic-anim",
+                "victor:attach:vic-engine"
+            ]
+        },
+        {
+            "name": "victor:launch:all",
+            "configurations": [
+                "victor:launch:vic-robot",
+                "victor:launch:vic-anim",
+                "victor:launch:vic-engine"
+            ]
+        },
+        {
+            "name": "webots:attach:all",
+            "configurations": [
+                "webots:attach:webotsCtrlRobot2",
+                "webots:attach:webotsCtrlAnim",
+                "webots:attach:webotsCtrlEngine2"
+            ]
+        }
+    ]
+}

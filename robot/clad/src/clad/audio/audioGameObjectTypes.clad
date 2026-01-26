@@ -1,0 +1,27 @@
+
+namespace Anki {
+namespace AudioMetaData {
+
+
+enum uint_64 GameObjectType
+{
+
+  Invalid = 0,
+  Default,
+  Victor_Listener,   // DO NOT USE - This is default listener
+  Procedural,
+  Animation,
+  Behavior,
+  TextToSpeech,
+  VoiceRecording,
+  Alexa,
+  AlexaVoice,
+  AlexaMedia,
+  AlexaNotifications,
+  AlexaAlerts,
+  End, // Need end val so I can enumerate through GameObjects
+
+}
+
+} // AudioMetaData
+} // Anki

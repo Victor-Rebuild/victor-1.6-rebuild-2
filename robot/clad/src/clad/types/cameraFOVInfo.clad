@@ -1,0 +1,13 @@
+
+
+namespace Anki {
+namespace Vector {
+
+message CameraFOVInfo
+{
+  float_32 horizontalFOV,
+  float_32 verticalFOV
+}
+
+}
+}

@@ -1,0 +1,15 @@
+
+#include "clad/audio/audioMessage.clad"
+#include "clad/audio/audioCallbackMessage.clad"
+
+namespace Anki {
+namespace AudioEngine {
+namespace Multiplexer {
+
+// an explicit auto-union that includes all messages in this file
+// if you do not want to include messages in this union, use the keyword "structure" instead of "message"
+autounion MessageAudioClient { }
+
+} // Multiplexer
+} // AudioEngine
+} // Anki

@@ -1,0 +1,126 @@
+{
+  "smartling": {
+    "translate_paths": [
+      "*/translation"
+    ],
+    "variants_enabled": true,
+    "translate_mode": "custom",
+    "placeholder_format_custom": [
+      "%%[^%]+?%%",
+      "%[^%]+?%",
+      "##[^#]+?##",
+      "__[^_]+?__",
+      "[$]\\{[^\\}\\{]+?\\}",
+      "\\{\\{[^\\}\\{]+?\\}\\}",
+      "(?<!\\{)\\{[^\\}\\{]+?\\}(?!\\})"
+    ],
+    "source_key_paths": [
+      "/{*}"
+    ]
+  },
+  "behavior.DevTest1": {
+    "translation": "私はベクターです"
+  },
+  "behavior.DevTest2": {
+    "translation": "私は {0}"
+  },
+  "BehaviorDisplayWeather.Cloudy": {
+    "translation": "{0} 度で曇り"
+  },
+  "BehaviorDisplayWeather.Cold": {
+    "translation": "{0} 度および氷点下"
+  },
+  "BehaviorDisplayWeather.Rain": {
+    "translation": "{0} 度で雨"
+  },
+  "BehaviorDisplayWeather.Snow": {
+    "translation": "{0} 度で雪が降っています"
+  },
+  "BehaviorDisplayWeather.Stars": {
+    "translation": "{0} 度と星空の夜"
+  },
+  "BehaviorDisplayWeather.Sunny": {
+    "translation": "{0} 度、晴れ"
+  },
+  "BehaviorDisplayWeather.Thunderstorms": {
+    "translation": "{0} 雷雨を伴う度"
+  },
+  "BehaviorDisplayWeather.Windy": {
+    "translation": "{0} 度で風が強い"
+  },
+  "BehaviorEnrollFace.HaveWeMetBefore": {
+    "translation": "以前会ったことがありますか, {0}?"
+  },
+  "BehaviorEnrollFace.AlreadyKnowVowelName": {
+    "translation": "私はすでに知っています {0}"
+  },
+  "BehaviorEnrollFace.AlreadyKnowConsonantName": {
+    "translation": "私はすでに知っています {0}"
+  },
+  "BehaviorEnrollFace.AlreadyKnowYou": {
+    "translation": "私はもうあなたを知っています!"
+  },
+  "BehaviorEnrollFace.AlreadyKnowFace": {
+    "translation": "あなたは {0}, ない {1}"
+  },
+  "BehaviorHowOldAreYou.OneDay": {
+    "translation": "一日経った！"
+  },
+  "BehaviorHowOldAreYou.SomeDays": {
+    "translation": "{0} 何日も経ってます!"
+  },
+  "BehaviorHowOldAreYou.OneMonth": {
+    "translation": "生後1ヶ月!"
+  },
+  "BehaviorHowOldAreYou.AndOneMonth": {
+    "translation": "そして生後1ヶ月になりました!"
+  },
+  "BehaviorHowOldAreYou.SomeMonths": {
+    "translation": "{0} 生後数カ月!"
+  },
+  "BehaviorHowOldAreYou.AndSomeMonths": {
+    "translation": "そして {0} 生後数カ月!"
+  },
+  "BehaviorHowOldAreYou.OneYear": {
+    "translation": "1歳になりました!"
+  },
+  "BehaviorHowOldAreYou.SomeYears": {
+    "translation": "{0} 歳!"
+  },
+  "BehaviorHowOldAreYou.OneYearAndMonth": {
+    "translation": "1年"
+  },
+  "BehaviorHowOldAreYou.SomeYearsAndMonth": {
+    "translation": "{0} 年"
+  },
+  "BehaviorKnowledgeGraphQuestion.Ready": {
+    "translation": "準備ができて"
+  },
+  "BehaviorLeaveAMessage.NoRecipient": {
+    "translation": "名前は聞き取れなかった"
+  },
+  "BehaviorLeaveAMessage.UnknownRecipient": {
+    "translation": "私は知らない {0}"
+  },
+  "BehaviorLeaveAMessage.MailboxFull": {
+    "translation": "ボイスメールボックスがいっぱいです"
+  },
+  "BehaviorPlaybackMessage.AnnounceSingle": {
+    "translation": "宛先への 1 つのメッセージ {0}"
+  },
+  "BehaviorPlaybackMessage.AnnouncePlural": {
+    "translation": "{1} へのメッセージ {0}"
+  },
+  "BehaviorPlaybackMessage.NoRecipient": {
+    "translation": "名前は聞き取れなかった"
+  },
+  "BehaviorPlaybackMessage.NoMessages": {
+    "translation": "メッセージはありません {0}"
+  },
+  "BehaviorSayName.DontKnow": {
+    "translation": "わからない"
+  },
+  "BehaviorRespondToName.ImX": {
+    "translation": "私は"
+  }
+}

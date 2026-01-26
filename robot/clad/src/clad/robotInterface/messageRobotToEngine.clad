@@ -1,0 +1,287 @@
+/** Clad definitions of all messages sent from the Cozmo robot to the Cozmo engine
+ * This file is used on both the RTIP and WiFi chips on the robot but because we use explicit union tags, we don't have
+ * to recompile the code in lock step.
+ */
+
+
+#include "clad/types/alexaTypes.clad"
+#include "clad/audio/audioCallbackMessage.clad"
+#include "clad/types/beatDetectorTypes.clad"
+#include "clad/types/robotStatusAndActions.clad"
+#include "clad/types/motorTypes.clad"
+#include "clad/types/dockingSignals.clad"
+#include "clad/types/imu.clad"
+#include "clad/types/proxMessages.clad"
+#include "clad/robotInterface/messageFromAnimProcess.clad"
+#include "clad/types/pathEventTypes.clad"
+#include "clad/types/robotToSwitchboard.clad"
+#include "clad/robotInterface/factoryMessages.clad"
+
+namespace Anki {
+namespace Vector {
+namespace RobotInterface {
+
+message SyncRobotAck
+{
+  uint_8 sysconVersion[16] // Must match VersionInfo::app_version in schema/messages.h
+}
+
+message RobotServerDisconnect
+{
+}
+
+// Message for HAL to send to anim when it's taking 
+// a little too long to get data from spine
+message StillAlive
+{
+}
+
+message PrepForShutdown
+{
+  ShutdownReason reason
+}
+
+message RobotPoked
+{
+}
+
+message AlexaAuthChanged {
+  AlexaAuthState state,
+  string extra,
+}
+
+message AlexaUXChanged {
+  AlexaUXState state,
+}
+
+// Indicates the robot has heard the trigger word
+message TriggerWordDetected
+{
+  uint_32 triggerScore,
+  uint_16 direction,
+  bool isButtonPress,
+  bool fromMute,
+  bool willOpenStream,
+}
+
+message MicDirection
+{
+  uint_32   timestamp,
+  uint_16   direction,
+  int_16    confidence,
+  uint_16   selectedDirection,
+  int_16    selectedConfidence,
+  float_32  confidenceList[13],
+  int_32    activeState,
+  float_32  latestPowerValue,
+  float_32  latestNoiseFloor,
+}
+
+message MicDataState
+{
+  float_32 rawBufferFullness
+}
+
+// This message indicates that the robot experienced a freefall event
+message FallingEvent {
+  uint_32 timestamp,       // When the fall started (as a robot timestamp)
+  uint_32 duration_ms      // The approximate freefall duration
+}
+
+message FallImpactEvent 
+{
+}
+
+message RobotStopped
+{
+  StopReason reason,
+  uint_8 cliffDetectedFlags,
+  uint_8 whiteDetectedFlags
+}
+
+message PathFollowingEvent
+{
+  uint_16        pathID,
+  PathEventType  eventType
+}
+
+message LiftLoad
+{
+  bool hasLoad
+}
+
+// Returned in response to receiving a head, lift, or turn-in-place command
+message MotorActionAck
+{
+  uint_8  actionID,
+}
+
+message MicData
+{
+  int_16  data[640], // one 10ms chunks of 160 samples, times 4 audio channels
+  uint_32 timestamp,
+  uint_32 robotStatusFlags, // RobotStatusFlag packs as a uint_32
+  float_32 robotRotationAngle,
+}
+
+message AudioPlaybackBegin
+{
+  string path
+}
+
+message AudioPlaybackEnd
+{
+  string path
+}
+
+message MicRecordingComplete
+{
+  string path
+}
+
+message AudioFFTResult
+{
+  uint_32 result[4]
+}
+
+// Anim process applies a bunch of filters/modifications on face data
+// This message broadcasts back the final face that will be displayed on robot
+// Image is broadcast in 600 pixel chunks until the full image has been sent back
+// Format: 600 pixels, 16-bits each (RGB565)
+message DisplayedFaceImageRGBChunk {
+    uint_16  faceData[600],   // TODO: Make size a clad const
+    uint_16  numPixels,       // Number of pixels in faceData
+    uint_8   imageId,         // ID for this image, used only to track chunks of the same image
+    uint_8   chunkIndex
+}
+
+message BeatDetectorState
+{
+  BeatInfo latestBeat
+}
+
+message StartSelfTest
+{
+
+}
+
+message SendRangeData
+{
+  bool enable
+}
+
+/// *************** Overall message pipe ******************************* ///
+
+/** Pipe from robot to engine.
+ * This cannot be an auto union because we need explicit tag values by destination. The tag space is shared with
+ * messageEngineToRobot.clad
+ * 0xB0 and up going to the engine
+ */
+union RobotToEngine {
+  // ==== 0xB0 to 0xEF: Reliable messages to the Engine ====
+  //               NOTE: Messages are currently only reliable between the
+  //                     animation process and the engine.
+  //                     Everything between the anim and robot processes is UNRELIABLE!
+
+  // Init / Debug
+  SyncRobotAck               syncRobotAck           = 0xB0,
+  PrepForShutdown            prepForShutdown        = 0xB1,
+  MotorActionAck             motorActionAck         = 0xB2,
+
+  // Motors / Driving
+  MotorCalibration           motorCalibration       = 0xB3,
+  RobotStopped               robotStopped           = 0xB4,
+  MotorAutoEnabled           motorAutoEnabled       = 0xB5,
+  PathFollowingEvent         pathFollowingEvent     = 0xB6,
+
+  // Docking
+  GoalPose                   goalPose               = 0xB7,
+  DockingStatus              dockingStatus          = 0xB8,
+  MovingLiftPostDock         movingLiftPostDock     = 0xB9,
+  LiftLoad                   liftLoad               = 0xBA,
+  PickAndPlaceResult         pickAndPlaceResult     = 0xBB,
+  ChargerMountComplete       chargerMountCompleted  = 0xBC,
+  CliffAlignComplete         cliffAlignComplete     = 0xBD,
+
+  // Sensors
+  FallImpactEvent            fallImpactEvent        = 0xC1,
+  IMUDataChunk               imuDataChunk           = 0xC2,
+  IMURawDataChunk            imuRawDataChunk        = 0xC3,
+  IMUTemperature             imuTemperature         = 0xC4,
+  CliffEvent                 cliffEvent             = 0xC5,
+  PotentialCliff             potentialCliff         = 0xC6,
+  FallingEvent               fallingEvent           = 0xC7,
+  RobotPoked                 robotPoked             = 0xC8,
+
+  RunFactoryTest             runFactoryTest         = 0xCA,
+  StartSelfTest              startSelfTest          = 0xCB,
+
+  RobotServerDisconnect      robotServerDisconnect  = 0xCD,
+
+  StillAlive                 stillAlive             = 0xCE,
+
+
+  // Messages from animation process to engine
+  StartShutdownAnim          startShutdownAnim      = 0xD0,
+
+  ReportCloudConnectivity    reportCloudConnectivity = 0xD1,
+
+  AnimationAdded             animAdded              = 0xD3,
+  RobotAvailable             robotAvailable         = 0xD4,
+  AnimationEvent             animEvent              = 0xD5,
+  AnimationStarted           animStarted            = 0xD6,
+  AnimationEnded             animEnded              = 0xD7,
+
+  AudioFFTResult             audioFFTResult         = 0xD8,
+
+  // Messages relating to trigger word detection
+  TriggerWordDetected        triggerWordDetected    = 0xD9,
+  MicDirection               micDirection           = 0xDA,
+
+  TextToSpeechEvent          textToSpeechEvent      = 0xDB,
+
+  SwitchboardInterface::EnterPairing  enterPairing  = 0xDC,
+  SwitchboardInterface::ExitPairing   exitPairing   = 0xDD,
+  StreamCameraImages         streamCameraImages     = 0xDE,
+  DebugScreenMode            debugScreenMode        = 0xDF,
+
+  // Audio
+  AudioEngine::Multiplexer::AudioCallbackDuration audioCallbackDuration = 0xE0,
+  AudioEngine::Multiplexer::AudioCallbackMarker   audioCallbackMarker   = 0xE1,
+  AudioEngine::Multiplexer::AudioCallbackComplete audioCallbackComplete = 0xE2,
+  AudioEngine::Multiplexer::AudioCallbackError    audioCallbackError    = 0xE3,
+
+  DisplayedFaceImageRGBChunk displayedFaceImageRGBChunk = 0xE4,
+
+  BeatDetectorState          beatDetectorState      = 0xE5,
+
+  AudioPlaybackBegin         audioPlaybackBegin     = 0xE6,
+  AudioPlaybackEnd           audioPlaybackEnd       = 0xE7,
+  MicRecordingComplete       micRecordingComplete   = 0xE8,
+  MicDataState               micDataState           = 0xE9,
+
+  SendRangeData              sendRangeData          = 0xEA,
+
+  // SDK Streaming Audio Playback
+  AudioStreamStatusEvent     audioStreamStatusEvent = 0xEB,
+
+  // Alexa
+  AlexaAuthChanged           alexaAuthChanged       = 0xEC,
+  AlexaUXChanged             alexaUXChanged         = 0xED,
+
+
+  // ====== 0xF0 to 0x FE: Unreliable message to the Engine =====
+  // From robot process
+  RobotState                 state                  = 0xF0,
+  // FREE SLOT
+  MicData                    micData                = 0xF2,
+
+  // From anim process
+  AnimationState             animState              = 0xF3,
+
+}
+
+
+} // namespace RobotInterface
+} // namespace Vector
+} // namespace Anki

@@ -1,0 +1,3 @@
+[submodule "EXTERNALS"]
+	path = EXTERNALS
+	url = https://github.com/Victor-Rebuild/victor-1.6-rebuild-externals

@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# Quick wrapper script to determine if Vector should show the regular bootanim or the verbose boot anim
+
+INDEV_OR_RELEASE="$(cat /etc/rebuild-dev-or-indev)"
+
+if [ ! -f /bin/vic-verbose ]; then
+    /anki/bin/vic-bootAnim-stock
+fi
+
+if [ -d /anki-devtools ] || [[ "$INDEV_OR_RELEASE" == "indev" ]] || [[ "$INDEV_OR_RELEASE" == "internal" ]] || [ -f /etc/use-vic-verbose ]; then
+    /bin/vic-verbose
+else
+    /anki/bin/vic-bootAnim-stock
+fi
