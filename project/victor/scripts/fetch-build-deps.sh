@@ -7,7 +7,7 @@ SCRIPT_PATH=$(dirname $([ -L $0 ] && echo "$(dirname $0)/$(readlink -n $0)" || e
 set +e
 CURRENT_EXTERNALS_VERSION=$(cat "EXTERNALS/VERSION") >> /dev/null
 set -e
-EXTERNALS_VERSION_LATEST=13
+EXTERNALS_VERSION_LATEST=15
 
 GIT=`which git`
 if [ -z $GIT ]; then

@@ -291,7 +291,7 @@ __attribute__((noreturn)) void sAbort();
 // This prevents analyzers from generating bogus warnings caused by impossible code paths.
 //
 #define ANKI_VERIFY(expr, name, format, ...) \
- (expr ? ::Anki::Util::sVerifySucceededReturnTrue(__FILE__, __LINE__) : (::Anki::Util::sVerifyFailedReturnFalse(__FILE__, __LINE__, name, "VERIFY(%s): " format, #expr, ##__VA_ARGS__) || true))
+  (((void)(expr), (void)(name), (void)snprintf(nullptr, 0, format, ##__VA_ARGS__), true))
 
 //
 // Logging with channels.

@@ -287,6 +287,8 @@ namespace Vector {
   class SpriteSequenceKeyFrame : public IKeyFrame
   {
   public:
+    static constexpr TimeStamp_t SPRITE_FRAME_INTERVAL_MS = 33;
+
     SpriteSequenceKeyFrame(Vision::SpriteHandle spriteHandle,
                            TimeStamp_t triggerTime_ms, 
                            bool shouldRenderInEyeHue = true);
@@ -405,7 +407,7 @@ namespace Vector {
     
     TimeStamp_t  _internalUpdateInterval_ms = ANIM_TIME_STEP_MS;
     TimeStamp_t _keyframeActiveDuration_ms = 0;
-
+    mutable u32 _lastDisplayedFrame = 0;
     
   }; // class SpriteSequenceKeyFrame
 

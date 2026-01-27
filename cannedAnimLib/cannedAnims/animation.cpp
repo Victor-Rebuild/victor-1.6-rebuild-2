@@ -189,7 +189,7 @@ Result Animation::DefineFromFlatBuf(const std::string& name,
       }
 
       // Construct a keyframe for this sprite sequence
-      const u32 frameInterval_ms = ANIM_TIME_STEP_MS;
+      const u32 frameInterval_ms = SpriteSequenceKeyFrame::SPRITE_FRAME_INTERVAL_MS;
       const bool shouldRenderInEyeHue = true;
       SpriteSequenceKeyFrame kf(spriteSeq, triggerTime_ms, frameInterval_ms, shouldRenderInEyeHue);
 

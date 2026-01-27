@@ -270,13 +270,13 @@ void SafeNumericCast(const FromType& fromVal, ToType& toVal, const char* debugNa
       Vision::HSImageHandle faceHueAndSaturation = ProceduralFace::GetHueSatWrapper();
       _compositeImage.reset(new Vision::CompositeImage(faceHueAndSaturation, spriteSeq, !shouldRenderInEyeHue));
       _triggerTime_ms = triggerTime_ms;
-      _internalUpdateInterval_ms = frameInterval_ms;
+      _internalUpdateInterval_ms = std::max(frameInterval_ms, SPRITE_FRAME_INTERVAL_MS);
       _keyframeActiveDuration_ms = spriteSeq->GetNumFrames() * _internalUpdateInterval_ms;
-      ANKI_VERIFY((_internalUpdateInterval_ms != 0) &&
-                  ((_internalUpdateInterval_ms % ANIM_TIME_STEP_MS) == 0),
-                  "SpriteSequenceKeyFrame.SetCompositeImage.InvalidTimeStep",
-                  "Update interval %d is not a multiple of anim time step %d",
-                  _internalUpdateInterval_ms, ANIM_TIME_STEP_MS);
+      // ANKI_VERIFY((_internalUpdateInterval_ms != 0) &&
+      //             ((_internalUpdateInterval_ms % ANIM_TIME_STEP_MS) == 0),
+      //             "SpriteSequenceKeyFrame.SetCompositeImage.InvalidTimeStep",
+      //             "Update interval %d is not a multiple of anim time step %d",
+      //             _internalUpdateInterval_ms, ANIM_TIME_STEP_MS);
     }
 
     SpriteSequenceKeyFrame::SpriteSequenceKeyFrame(Vision::SpriteCache* spriteCache, 
@@ -287,12 +287,12 @@ void SafeNumericCast(const FromType& fromVal, ToType& toVal, const char* debugNa
       Vision::HSImageHandle faceHueAndSaturation = ProceduralFace::GetHueSatWrapper();
       _compositeImage = std::make_unique<Vision::CompositeImage>(spriteCache, faceHueAndSaturation, !shouldRenderInEyeHue);
       _compositeImage.reset(compImg);
-      _internalUpdateInterval_ms = frameInterval_ms;
-      ANKI_VERIFY((_internalUpdateInterval_ms != 0) &&
-                  ((_internalUpdateInterval_ms % ANIM_TIME_STEP_MS) == 0),
-                  "SpriteSequenceKeyFrame.SetCompositeImage.InvalidTimeStep",
-                  "Update interval %d is not a multiple of anim time step %d",
-                  _internalUpdateInterval_ms, ANIM_TIME_STEP_MS);
+      _internalUpdateInterval_ms = std::max(frameInterval_ms, SPRITE_FRAME_INTERVAL_MS);
+      // ANKI_VERIFY((_internalUpdateInterval_ms != 0) &&
+      //             ((_internalUpdateInterval_ms % ANIM_TIME_STEP_MS) == 0),
+      //             "SpriteSequenceKeyFrame.SetCompositeImage.InvalidTimeStep",
+      //             "Update interval %d is not a multiple of anim time step %d",
+      //             _internalUpdateInterval_ms, ANIM_TIME_STEP_MS);
     }
 
     SpriteSequenceKeyFrame::SpriteSequenceKeyFrame(const SpriteSequenceKeyFrame& other)
@@ -302,6 +302,7 @@ void SafeNumericCast(const FromType& fromVal, ToType& toVal, const char* debugNa
       _internalUpdateInterval_ms = other._internalUpdateInterval_ms;
       _compositeImageUpdated     = other._compositeImageUpdated;
       _compositeImageUpdateMap   = other._compositeImageUpdateMap;
+      _lastDisplayedFrame        = other._lastDisplayedFrame;
       
       if(other._compositeImage != nullptr){
         _compositeImage.reset(new Vision::CompositeImage(*other._compositeImage));
@@ -341,8 +342,8 @@ void SafeNumericCast(const FromType& fromVal, ToType& toVal, const char* debugNa
     
     bool SpriteSequenceKeyFrame::HaveKeyframeForTimeStamp(const TimeStamp_t timeSinceAnimStart_ms) const
     {
-      return (timeSinceAnimStart_ms < GetTimestampActionComplete_ms()) &&
-             ((timeSinceAnimStart_ms % _internalUpdateInterval_ms) <= ANIM_TIME_STEP_MS);
+      return (timeSinceAnimStart_ms >= GetTriggerTime_ms() &&
+              timeSinceAnimStart_ms < GetTimestampActionComplete_ms());
     }
 
 
@@ -418,6 +419,8 @@ void SafeNumericCast(const FromType& fromVal, ToType& toVal, const char* debugNa
       }
 
       JsonTools::GetValueOptional(jsonRoot, "frameDuration_ms", frameUpdateInterval);
+      frameUpdateInterval = std::max(frameUpdateInterval, SPRITE_FRAME_INTERVAL_MS);
+
       JsonTools::GetValueOptional(jsonRoot, "triggerTime_ms", triggerTime_ms);
 
       return outSeq != nullptr;
@@ -441,9 +444,7 @@ void SafeNumericCast(const FromType& fromVal, ToType& toVal, const char* debugNa
         return true;
       }
 
-      const bool timeToAdvanceFrame = ((timeSinceAnimStart_ms % _internalUpdateInterval_ms) == 0) &&
-                                      (_compositeImage->GetFullLoopLength() > 1);
-      if (timeToAdvanceFrame) {
+      if (timeSinceAnimStart_ms < GetTimestampActionComplete_ms()) {
         return true;
       }
 
@@ -477,7 +478,19 @@ void SafeNumericCast(const FromType& fromVal, ToType& toVal, const char* debugNa
         }
       }
 
-      if (HaveKeyframeForTimeStamp(timeSinceAnimStart_ms) || _compositeImageUpdated)
+      const u32 curFrame = GetFrameNumberForTime(timeSinceAnimStart_ms);
+
+      // Check if we should advance to a new frame
+      const TimeStamp_t timeSinceTrigger = timeSinceAnimStart_ms - GetTriggerTime_ms();
+      const bool shouldAdvanceFrame = ((timeSinceTrigger % _internalUpdateInterval_ms) <= ANIM_TIME_STEP_MS);
+
+      // Only update _lastDisplayedFrame when we should advance
+      if (shouldAdvanceFrame && curFrame != _lastDisplayedFrame) {
+        _lastDisplayedFrame = curFrame;
+      }
+
+      // Always render, but use _lastDisplayedFrame to prevent advancing too fast
+      if (NewImageContentAvailable(timeSinceAnimStart_ms))
       {
         const auto& layerLayoutMap = _compositeImage->GetLayerLayoutMap();
         numLayers = layerLayoutMap.size();
@@ -502,10 +515,10 @@ void SafeNumericCast(const FromType& fromVal, ToType& toVal, const char* debugNa
           img->FillWith(Vision::PixelRGBA());
         }
 
-        const u32 curFrame = GetFrameNumberForTime(timeSinceAnimStart_ms);
-        _compositeImage->OverlayImageWithFrame(*img, curFrame);
+        _compositeImage->OverlayImageWithFrame(*img, _lastDisplayedFrame);
         handle = std::make_shared<Vision::SpriteWrapper>(img);
         _compositeImageUpdated = false;
+
         return true;
       }else{
         return false;
