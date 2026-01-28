@@ -963,6 +963,8 @@ void MovementComponent::UnlockAllTracks()
 void MovementComponent::LockTracks(uint8_t tracks, const std::string& who, const std::string& debugName)
 {
   uint8_t tracksToDisable = 0;
+  bool shouldStopBody = false;
+
   for (int i=0; i < (int)AnimConstants::NUM_TRACKS; i++)
   {
     uint8_t curTrack = (1 << i);
@@ -974,10 +976,26 @@ void MovementComponent::LockTracks(uint8_t tracks, const std::string& who, const
       if (_trackLockCount[i].size() == 1)
       {
         tracksToDisable |= curTrack;
+
+        if (curTrack == (u8)AnimTrackFlag::BODY_TRACK)
+        {
+          shouldStopBody = true;
+        }
+
       }
     }
   }
   
+  if (shouldStopBody)
+  {
+    LOG_INFO("MovementComponent.LockTracks.StoppingBody",
+             "Stopping body motors before locking body track for %s[%s]",
+             debugName.c_str(), who.c_str());
+
+    // Send stop command directly to robot
+    _robot->SendRobotMessage<RobotInterface::DriveWheels>(0.f, 0.f, 0.f, 0.f);
+  }
+
   if (tracksToDisable > 0)
   {
     _robot->SendRobotMessage<RobotInterface::SetFullAnimTrackLockState>(GetLockedTracks());

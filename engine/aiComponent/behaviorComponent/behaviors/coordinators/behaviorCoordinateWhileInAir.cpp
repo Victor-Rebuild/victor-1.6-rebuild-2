@@ -142,6 +142,10 @@ void BehaviorCoordinateWhileInAir::LockTracksIfAppropriate()
 {
   const bool shouldLockTracks = !_dontLockTracksBehaviorSet->AreBehaviorsActivated();
   if(!_areTreadsLocked && shouldLockTracks){
+    // This prevents the wheels from continuing to spin based on the last BodyMotionKeyFrame
+    GetBEI().GetMovementComponent().StopAllMotors();
+
+    // Now lock the tracks to prevent new motion commands
     SmartLockTracks(static_cast<u8>(AnimTrackFlag::BODY_TRACK), GetDebugLabel(), GetDebugLabel());
     _areTreadsLocked = true;
   } else if (_areTreadsLocked && !shouldLockTracks) {

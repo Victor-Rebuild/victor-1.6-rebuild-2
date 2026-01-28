@@ -535,6 +535,13 @@ namespace Anim {
       Abort(kNotAnimatingTag, shouldClearProceduralAnim);
     }
 
+    RobotInterface::DriveWheels stopMsg;
+    stopMsg.lwheel_speed_mmps = 0;
+    stopMsg.rwheel_speed_mmps = 0;
+    stopMsg.lwheel_accel_mmps2 = 0;
+    stopMsg.rwheel_accel_mmps2 = 0;
+    RobotInterface::SendAnimToRobot(std::move(stopMsg));
+
     _streamingAnimation = anim;
 
     if (_streamingAnimation == nullptr) {
@@ -1003,6 +1010,13 @@ namespace Anim {
 
       StopTracksInUse();
 
+      RobotInterface::DriveWheels stopMsg;
+      stopMsg.lwheel_speed_mmps = 0;
+      stopMsg.rwheel_speed_mmps = 0;
+      stopMsg.lwheel_accel_mmps2 = 0;
+      stopMsg.rwheel_accel_mmps2 = 0;
+      RobotInterface::SendAnimToRobot(std::move(stopMsg));
+
       if (_startOfAnimationSent) {
         SendEndOfAnimation(true);
       }
@@ -1065,6 +1079,17 @@ namespace Anim {
       // display state. If we eventually decide we want to have an animation screen run with keepalive eyes,
       // this will need to be addressed across the entire keepalive system
       _proceduralTrackComponent->RemoveKeepFaceAlive(_relativeStreamTime_ms, (3 * ANIM_TIME_STEP_MS));
+
+      auto& bodyTrack = _streamingAnimation->GetTrack<BodyMotionKeyFrame>();
+      if (bodyTrack.IsEmpty())
+      {
+        RobotInterface::DriveWheels stopMsg;
+        stopMsg.lwheel_speed_mmps = 0;
+        stopMsg.rwheel_speed_mmps = 0;
+        stopMsg.lwheel_accel_mmps2 = 0;
+        stopMsg.rwheel_accel_mmps2 = 0;
+        RobotInterface::SendAnimToRobot(std::move(stopMsg));
+      }
 
       if (!s_enableKeepFaceAlive)
       {
