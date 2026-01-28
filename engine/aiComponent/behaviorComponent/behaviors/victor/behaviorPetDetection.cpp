@@ -101,7 +101,8 @@ void BehaviorPetDetection::PlayAnimation() {
   auto* action = new TriggerLiftSafeAnimationAction(trig);
 
   DelegateIfInControl(action, [](const ActionResult& result) {
-    LOG_WARNING( "BehaviorPetDetection.OnBehaviorActivated.AnimFail",
+    ANKI_VERIFY( result == ActionResult::SUCCESS,
+                 "BehaviorPetDetection.OnBehaviorActivated.AnimFail",
                  "Could not play animation" );
   });
 }

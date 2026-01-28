@@ -137,8 +137,7 @@ BehaviorFindFaceAndThen::BehaviorFindFaceAndThen(const Json::Value& config)
   _iConfig.animWhileSearching = AnimationTrigger::Count;
   JsonTools::GetCladEnumFromJSON(config, kAnimWhileSearching, _iConfig.animWhileSearching, GetDebugLabel(), false);
   
-  ANKI_VERIFY( _iConfig.exitOnceFound == _iConfig.behaviorOnceFoundID.empty(),
-               "BehaviorFindFaceAndThen.Ctor.InvalidBehavior",
+  LOG_WARNING( "BehaviorFindFaceAndThen.Ctor.InvalidBehavior",
                "A 'behavior' must be provided, or set 'exitOnceFound' to true" );
 }
 
@@ -536,7 +535,7 @@ void BehaviorFindFaceAndThen::TransitionToFollowupBehavior()
     //                  "Behavior '%s' (raw ptr %p) not an ISimpleFaceBehavior",
     //                  _iConfig.behaviorOnceFoundID.c_str(),
     //                  _iConfig.behaviorOnceFound.get() ) ) {
-    //   simpleFaceBehavior->SetTargetFace( _dVars.targetFace );
+      simpleFaceBehavior->SetTargetFace( _dVars.targetFace );
     // }
   }
 
