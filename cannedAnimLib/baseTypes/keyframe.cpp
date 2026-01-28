@@ -363,7 +363,7 @@ void SafeNumericCast(const FromType& fromVal, ToType& toVal, const char* debugNa
         //                "Attempted to clear SB: %s on Layer: %s, but layer isn't present in image",
         //                EnumToString(updateSpec.spriteBox.spriteBoxName),
         //                EnumToString(updateSpec.layerName))){
-        //   layer->ClearSpriteBoxByName(updateSpec.spriteBox.spriteBoxName);
+          layer->ClearSpriteBoxByName(updateSpec.spriteBox.spriteBoxName);
         // }
       }else{
         // If it wasn't a clearing case, add or update as appropriate
