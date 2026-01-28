@@ -12,6 +12,7 @@
 
 #include "engine/components/settingsManager.h"
 
+#include "anki/cozmo/shared/cozmoConfig.h"
 #include "engine/components/jdocsManager.h"
 #include "engine/components/robotHealthReporter.h"
 #include "engine/components/settingsCommManager.h"
@@ -25,6 +26,7 @@
 
 #include "clad/robotInterface/messageEngineToRobot.h"
 
+#include <anki/cozmo/shared/factory/emrHelper_vicos.h>
 #include <sys/wait.h>
 #include <thread>
 #include <atomic>
@@ -797,6 +799,10 @@ namespace Anki
                       
                       // Apply brightness to saturation (lower brightness = lower saturation)
                       float adjustedSaturation = color.saturation * brightness;
+
+                      if (IsXray()) {
+                        adjustedSaturation = adjustedSaturation + 0.1;
+                      }
                       
                       // Set the face color
                       _robot->SendRobotMessage<RobotInterface::SetFaceHue>(color.hue);
@@ -828,6 +834,9 @@ namespace Anki
           const auto &eyeColorData = config[eyeColorName];
           hue = eyeColorData["Hue"].asFloat();
           saturation = eyeColorData["Saturation"].asFloat();
+          if (IsXray()) {
+            saturation = saturation + 0.15;
+          }
         }
       }
       else
