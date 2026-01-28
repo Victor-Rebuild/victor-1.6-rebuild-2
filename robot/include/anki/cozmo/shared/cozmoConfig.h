@@ -126,7 +126,7 @@ namespace Vector {
   const f32 IMU_POSITION[3] = {5.8f, 0.f, -13.5f};
   
   // Face LCD Screen size
-  const f32 SCREEN_SIZE[2] = {26.f, 13.f};
+  const f32 SCREEN_SIZE[2] = {IsXray() ? 22.f : 26.f, IsXray() ? 11.f : 13.f};
   
   // Face display resolution, in pixels
   const s32 FACE_DISPLAY_WIDTH = IsXray() ? 160: 184;
