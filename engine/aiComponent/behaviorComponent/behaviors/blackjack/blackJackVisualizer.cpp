@@ -235,7 +235,7 @@ void BlackJackVisualizer::Init(BehaviorExternalInterface& bei)
   if(nullptr != seqContainer){
     auto* seqPtr = seqContainer->GetSpriteSequence(kDealerCardFlipSeqName);
     const uint numFrames = seqPtr->GetNumFrames();
-    dealCardSeqDuration_ms = numFrames * ANIM_TIME_STEP_MS;
+    dealCardSeqDuration_ms = numFrames * SPRITE_FRAME_INTERVAL_MS;
   }
 
   // Time after the beginning of a deal animation at which the card has finished flipping,
@@ -252,29 +252,18 @@ void BlackJackVisualizer::Init(BehaviorExternalInterface& bei)
 
   auto& compLayoutMap = *dataAccessorComp.GetCompLayoutMap(); 
   // Add the player card layout to the composite image
-  if (IsXray()) {
-    // 2.0 layouts
-    const auto iter = compLayoutMap.find(Vision::CompositeImageLayout::PlayerCardLayout_Xray);
+    // Dynamic layouts
+    const auto iter = (IsXray() ? compLayoutMap.find(Vision::CompositeImageLayout::PlayerCardLayout_Xray) :
+                                            compLayoutMap.find(Vision::CompositeImageLayout::PlayerCardLayout));
     if(iter != compLayoutMap.end()){
       _compImg->MergeInImage(iter->second);
     }
     
-    const auto iter2 = compLayoutMap.find(Vision::CompositeImageLayout::DealerCardLayout_Xray);
+    const auto iter2 = (IsXray() ? compLayoutMap.find(Vision::CompositeImageLayout::DealerCardLayout_Xray) :
+                                             compLayoutMap.find(Vision::CompositeImageLayout::DealerCardLayout));
     if(iter2 != compLayoutMap.end()){
       _compImg->MergeInImage(iter2->second);
     }
-  } else {
-    // 1.0 layouts
-    const auto iter = compLayoutMap.find(Vision::CompositeImageLayout::PlayerCardLayout);
-    if(iter != compLayoutMap.end()){
-      _compImg->MergeInImage(iter->second);
-    }
-    
-    const auto iter2 = compLayoutMap.find(Vision::CompositeImageLayout::DealerCardLayout);
-    if(iter2 != compLayoutMap.end()){
-      _compImg->MergeInImage(iter2->second);
-    }
-  }
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -433,7 +422,7 @@ void BlackJackVisualizer::PlayCompositeCardAnimationAndLock(const BehaviorExtern
   bool emptySpriteBoxesAreValid = true;
   bei.GetAnimationComponent().PlayCompositeAnimation(compAnimName,
                                                      *(_compImg.get()),
-                                                     ANIM_TIME_STEP_MS,
+                                                     SPRITE_FRAME_INTERVAL_MS,
                                                      outAnimationDuration_ms,
                                                      shouldInterrupt,
                                                      emptySpriteBoxesAreValid,
@@ -489,7 +478,7 @@ void BlackJackVisualizer::SwipeToClearFace(BehaviorExternalInterface& bei, std::
   bool emptySpriteBoxesAreValid = true;
   bei.GetAnimationComponent().PlayCompositeAnimation(kSwipeAnimationName,
                                                      *(_compImg.get()),
-                                                     ANIM_TIME_STEP_MS,
+                                                     SPRITE_FRAME_INTERVAL_MS,
                                                      outAnimationDuration_ms,
                                                      shouldInterrupt,
                                                      emptySpriteBoxesAreValid,
