@@ -321,7 +321,7 @@ static int mmap_camera_capture_buf(struct client_ctx *ctx)
 
   size_t buf_size = mem_info->size;
   // size_t buf_size_align = (buf_size + 4095U) & (~4095U);
-  assert(buf_size == (buf_size + 4095U) & (~4095U));
+  assert(buf_size == ((buf_size + 4095U) & (~4095U)));
   uint8_t *buf = mmap(NULL,
                       buf_size,
                       PROT_READ | PROT_WRITE,

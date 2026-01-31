@@ -24,6 +24,7 @@ set(OPENCV_LIBS
     objdetect
     flann
     imgcodecs
+    highgui
     ml)
 
 # Static libs for mac, shared for android

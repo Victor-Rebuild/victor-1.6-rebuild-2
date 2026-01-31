@@ -14,7 +14,7 @@ alias watch_backtraces="cd ${GIT_PROJ_ROOT} && echo Waiting for backtraces... &&
 alias watch_backtraces_debug="cd ${GIT_PROJ_ROOT} && echo Waiting for backtraces... && python3 project/victor/scripts/backtracewatcherdebug.py"
 
 alias victor_build_release="cd ${GIT_PROJ_ROOT} && ${GIT_PROJ_ROOT}/project/victor/scripts/victor_build_release.sh"
-alias victor_build_debug="cd ${GIT_PROJ_ROOT} && ${GIT_PROJ_ROOT}/project/victor/scripts/victor_build_debugo2.sh"
+alias victor_build_debug="cd ${GIT_PROJ_ROOT} && ${GIT_PROJ_ROOT}/project/victor/scripts/victor_build_debug.sh"
 alias victor_deploy_run="cd ${GIT_PROJ_ROOT} && ${GIT_PROJ_ROOT}/project/victor/scripts/victor_deploy.sh -c Release -b && ${GIT_PROJ_ROOT}/project/victor/scripts/victor_start.sh"
 alias victor_deploy_run_debug="cd ${GIT_PROJ_ROOT} && ${GIT_PROJ_ROOT}/project/victor/scripts/victor_deploy.sh -c Debug -b && ${GIT_PROJ_ROOT}/project/victor/scripts/victor_start.sh"
 

@@ -60,6 +60,7 @@ if (VICOS)
     libopencv_dnn.so.414
     libopencv_features2d.so.414
     libopencv_flann.so.414
+    libopencv_highgui.so.414
     libopencv_imgcodecs.so.414
     libopencv_imgproc.so.414
     libopencv_ml.so.414
