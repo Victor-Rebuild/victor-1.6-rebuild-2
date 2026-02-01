@@ -206,6 +206,9 @@ void BlackJackVisualizer::Init(BehaviorExternalInterface& bei)
 {
   auto& dataAccessorComp = bei.GetComponentWrapper(BEIComponentID::DataAccessor).GetComponent<DataAccessorComponent>();
 
+  const float kAnimAuthoredTimeStep_ms = 33.0f; // Original framerate
+  const float timingScaleFactor = (float)ANIM_TIME_STEP_MS / kAnimAuthoredTimeStep_ms;
+
   // Find the time stamps for animation driven events
   const auto* animContainer = dataAccessorComp.GetCannedAnimationContainer();
   if(nullptr != animContainer){
@@ -216,7 +219,8 @@ void BlackJackVisualizer::Init(BehaviorExternalInterface& bei)
                         kDealAnimationName);
     } else {
       const auto& track = dealAnimPtr->GetTrack<EventKeyFrame>();
-      _dealCardSeqApplyAt_ms = track.GetFirstKeyFrame()->GetTriggerTime_ms();
+      // Scale the trigger time
+      _dealCardSeqApplyAt_ms = track.GetFirstKeyFrame()->GetTriggerTime_ms() * timingScaleFactor;
     }
 
     const Animation* swipeAnimPtr = animContainer->GetAnimation(kSwipeAnimationName);
@@ -226,7 +230,8 @@ void BlackJackVisualizer::Init(BehaviorExternalInterface& bei)
                         kSwipeAnimationName);
     } else {
       const auto& track = swipeAnimPtr->GetTrack<EventKeyFrame>();
-      _clearCardsDuringSwipeAt_ms = track.GetFirstKeyFrame()->GetTriggerTime_ms();
+      // Scale the trigger time
+      _clearCardsDuringSwipeAt_ms = track.GetFirstKeyFrame()->GetTriggerTime_ms() * timingScaleFactor;
     }
   }
 
@@ -235,7 +240,8 @@ void BlackJackVisualizer::Init(BehaviorExternalInterface& bei)
   if(nullptr != seqContainer){
     auto* seqPtr = seqContainer->GetSpriteSequence(kDealerCardFlipSeqName);
     const uint numFrames = seqPtr->GetNumFrames();
-    dealCardSeqDuration_ms = numFrames * SPRITE_FRAME_INTERVAL_MS;
+    // Sprite sequences should play at their intended rate
+    dealCardSeqDuration_ms = numFrames * SPRITE_FRAME_INTERVAL_MS * timingScaleFactor;
   }
 
   // Time after the beginning of a deal animation at which the card has finished flipping,
@@ -422,7 +428,7 @@ void BlackJackVisualizer::PlayCompositeCardAnimationAndLock(const BehaviorExtern
   bool emptySpriteBoxesAreValid = true;
   bei.GetAnimationComponent().PlayCompositeAnimation(compAnimName,
                                                      *(_compImg.get()),
-                                                     SPRITE_FRAME_INTERVAL_MS,
+                                                     ANIM_TIME_STEP_MS,
                                                      outAnimationDuration_ms,
                                                      shouldInterrupt,
                                                      emptySpriteBoxesAreValid,
@@ -478,7 +484,7 @@ void BlackJackVisualizer::SwipeToClearFace(BehaviorExternalInterface& bei, std::
   bool emptySpriteBoxesAreValid = true;
   bei.GetAnimationComponent().PlayCompositeAnimation(kSwipeAnimationName,
                                                      *(_compImg.get()),
-                                                     SPRITE_FRAME_INTERVAL_MS,
+                                                     ANIM_TIME_STEP_MS,
                                                      outAnimationDuration_ms,
                                                      shouldInterrupt,
                                                      emptySpriteBoxesAreValid,
