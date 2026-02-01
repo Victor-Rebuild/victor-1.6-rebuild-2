@@ -535,12 +535,12 @@ namespace Anim {
       Abort(kNotAnimatingTag, shouldClearProceduralAnim);
     }
 
-    RobotInterface::DriveWheels stopMsg;
-    stopMsg.lwheel_speed_mmps = 0;
-    stopMsg.rwheel_speed_mmps = 0;
-    stopMsg.lwheel_accel_mmps2 = 0;
-    stopMsg.rwheel_accel_mmps2 = 0;
-    RobotInterface::SendAnimToRobot(std::move(stopMsg));
+    // RobotInterface::DriveWheels stopMsg;
+    // stopMsg.lwheel_speed_mmps = 0;
+    // stopMsg.rwheel_speed_mmps = 0;
+    // stopMsg.lwheel_accel_mmps2 = 0;
+    // stopMsg.rwheel_accel_mmps2 = 0;
+    // RobotInterface::SendAnimToRobot(std::move(stopMsg));
 
     _streamingAnimation = anim;
 
@@ -1080,16 +1080,16 @@ namespace Anim {
       // this will need to be addressed across the entire keepalive system
       _proceduralTrackComponent->RemoveKeepFaceAlive(_relativeStreamTime_ms, (3 * ANIM_TIME_STEP_MS));
 
-      auto& bodyTrack = _streamingAnimation->GetTrack<BodyMotionKeyFrame>();
-      if (bodyTrack.IsEmpty())
-      {
-        RobotInterface::DriveWheels stopMsg;
-        stopMsg.lwheel_speed_mmps = 0;
-        stopMsg.rwheel_speed_mmps = 0;
-        stopMsg.lwheel_accel_mmps2 = 0;
-        stopMsg.rwheel_accel_mmps2 = 0;
-        RobotInterface::SendAnimToRobot(std::move(stopMsg));
-      }
+      // auto& bodyTrack = _streamingAnimation->GetTrack<BodyMotionKeyFrame>();
+      // if (bodyTrack.IsEmpty())
+      // {
+      //   RobotInterface::DriveWheels stopMsg;
+      //   stopMsg.lwheel_speed_mmps = 0;
+      //   stopMsg.rwheel_speed_mmps = 0;
+      //   stopMsg.lwheel_accel_mmps2 = 0;
+      //   stopMsg.rwheel_accel_mmps2 = 0;
+      //   RobotInterface::SendAnimToRobot(std::move(stopMsg));
+      // }
 
       if (!s_enableKeepFaceAlive)
       {

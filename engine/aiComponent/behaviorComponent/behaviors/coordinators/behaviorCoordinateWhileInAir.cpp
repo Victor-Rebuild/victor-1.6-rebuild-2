@@ -43,7 +43,20 @@ static const std::set<BehaviorID> kBehaviorStatesToSuppressInAirReaction = {{ BE
 static const std::set<BehaviorID> kBehaviorStatesToNotLockTracks =
   {{
     BEHAVIOR_ID(WhatsMyNameVoiceCommand),
-    BEHAVIOR_ID(MeetVictor)
+    BEHAVIOR_ID(MeetVictor),
+    // Gohome behaviors
+    BEHAVIOR_ID(AcknowledgeCharger),
+    BEHAVIOR_ID(ClearChargerArea),
+    BEHAVIOR_ID(EmergencyModeFindAndGoToHome),
+    BEHAVIOR_ID(FindAndGoToHome),
+    BEHAVIOR_ID(FindAndRequestHome),
+    BEHAVIOR_ID(FindHome),
+    BEHAVIOR_ID(FindHomeInHabitat),
+    BEHAVIOR_ID(GoHome),
+    BEHAVIOR_ID(RequestHomeBecauseStuck),
+    BEHAVIOR_ID(RequestToGoHome),
+    BEHAVIOR_ID(RobustChargerObservation),
+    BEHAVIOR_ID(WiggleBackOntoChargerFromPlatform)
   }};
 
 const BehaviorID kWhileInAirDispatcher = BEHAVIOR_ID(WhileInAirDispatcher);
