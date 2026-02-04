@@ -37,23 +37,25 @@
 #include "anki/cozmo/shared/factory/emrHelper.h"
 
 #include "osState/osState.h"
+#include <anki/cozmo/shared/factory/emrHelper_vicos.h>
 
 namespace Anki {
 namespace Vector {
 
 namespace {
-u32 _pin = 123456;
+  u32 _pin = 123456;
 
-const f32 kRobotNameScale = 0.65f;
-const std::string kURLDef = "anki2.ca/1.6";
-const std::string kURLWP = "anki2.ca/wp";
-const ColorRGBA   kColor(0.9f, 0.9f, 0.9f, 1.f);
+  const f32 kRobotNameScale = IsXray() ? 0.6f : 0.65f;
+  const f32 kRobotPinScale = IsXray() ? 0.7f : 0.9f;
+  const std::string kURLDef = "anki2.ca/1.6";
+  const std::string kURLWP = "anki2.ca/wp";
+  const ColorRGBA   kColor(0.9f, 0.9f, 0.9f, 1.f);
 
-const char* kShowPinScreenSpriteName = "pairing_icon_key";
+  const char* kShowPinScreenSpriteName = "pairing_icon_key";
 
-bool s_enteredAnyScreen = false;
+  bool s_enteredAnyScreen = false;
 
-bool isWP = 0;
+  bool isWP = 0;
 }
 
 // Draws BLE name and url to screen
@@ -112,7 +114,7 @@ void DrawShowPinScreen(Anim::AnimationStreamer* animStreamer, const Anim::AnimCo
 
   img->DrawTextCenteredHorizontally(OSState::getInstance()->GetRobotName(), cv::QT_FONT_NORMAL, kRobotNameScale, 1, kColor, 15, false);
 
-  img->DrawTextCenteredHorizontally(pin, cv::QT_FONT_NORMAL, 0.8f, 1, kColor, FACE_DISPLAY_HEIGHT-5, false);
+  img->DrawTextCenteredHorizontally(pin, cv::QT_FONT_NORMAL, kRobotPinScale, 1, kColor, FACE_DISPLAY_HEIGHT-5, false);
 
   auto handle = std::make_shared<Vision::SpriteWrapper>(img);
   const bool shouldRenderInEyeHue = false;
