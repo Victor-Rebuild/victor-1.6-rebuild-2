@@ -55,7 +55,7 @@ namespace {
 
   bool s_enteredAnyScreen = false;
 
-  bool isWP = 0;
+  bool isWP = false;
 }
 
 // Draws BLE name and url to screen
@@ -79,9 +79,9 @@ bool DrawStartPairingScreen(Anim::AnimationStreamer* animStreamer)
   float scale = 0;
 
   if (Util::FileUtils::FileExists("/data/data/server_config.json")) {
-    isWP = 1;
+    isWP = true;
   } else {
-    isWP = 0;
+    isWP = false;
   }
 
   Vision::Image::MakeTextFillImageWidth(isWP ? kURLWP : kURLDef, cv::QT_FONT_NORMAL, 1, img->GetNumCols(), textSize, scale);
