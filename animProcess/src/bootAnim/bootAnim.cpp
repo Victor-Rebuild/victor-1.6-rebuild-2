@@ -61,6 +61,34 @@ static void handler(int signum)
   gShutdown = true;
 }
 
+static void interpolate_frames(void* frame1, void* frame2, void* output, float blend)
+{
+  const size_t num_pixels = use_santek_sizes() ?
+    (FRAME_WIDTH_SANTEK * FRAME_HEIGHT_SANTEK) :
+    (FRAME_WIDTH_MIDAS * FRAME_HEIGHT_MIDAS);
+
+  uint16_t* src1 = (uint16_t*)frame1;
+  uint16_t* src2 = (uint16_t*)frame2;
+  uint16_t* dst = (uint16_t*)output;
+
+  for (size_t i = 0; i < num_pixels; i++)
+  {
+    uint16_t r1 = (src1[i] >> 11) & 0x1F;
+    uint16_t g1 = (src1[i] >> 5) & 0x3F;
+    uint16_t b1 = src1[i] & 0x1F;
+
+    uint16_t r2 = (src2[i] >> 11) & 0x1F;
+    uint16_t g2 = (src2[i] >> 5) & 0x3F;
+    uint16_t b2 = src2[i] & 0x1F;
+
+    uint16_t r = r1 + (uint16_t)((r2 - r1) * blend);
+    uint16_t g = g1 + (uint16_t)((g2 - g1) * blend);
+    uint16_t b = b1 + (uint16_t)((b2 - b1) * blend);
+
+    dst[i] = (r << 11) | (g << 5) | b;
+  }
+}
+
 int main(int argc, char** argv)
 {
   // Setup signal handlers so we can cleanly exit
@@ -113,6 +141,17 @@ int main(int argc, char** argv)
     printf("close failed\n");
   }  
 
+  const size_t frame_size = use_santek_sizes() ?
+    NUM_BYTES_PER_FRAME_SANTEK : NUM_BYTES_PER_FRAME_MIDAS;
+  void* interpBuffer = malloc(frame_size);
+  if (interpBuffer == nullptr)
+  {
+    printf("Failed to allocate interpolation buffer\n");
+    munmap(anim, len);
+    lcd_shutdown();
+    return -1;
+  }
+
   // Start drawing the boot animation to the screen
 
   // Keep track of how far in time we are in this loop of the animation
@@ -125,24 +164,54 @@ int main(int argc, char** argv)
   {
     // Figure out which frame we should play in order to adhere to
     // a frame rate of kFrameDuration_ms
-    static const uint32_t kFrameDuration_ms = 33;
-    const uint32_t nextFrameToDraw = timeCount / kFrameDuration_ms;
+    bool use60 = true; // 60fps mode
+    static const uint32_t kSourceFrameDuration_ms = 33; // 30fps
+    static const uint32_t kTargetFrameDuration_ms = use60 ? 16 : 33; // 60fps or 30fps
 
     // Time how long it takes to animate/draw this frame
     const auto startTime = std::chrono::steady_clock::now();
     const uint32_t frame_offset = use_santek_sizes() ? NUM_BYTES_PER_FRAME_SANTEK : NUM_BYTES_PER_FRAME_MIDAS;
-    animate(((uint8_t*)anim) + (nextFrameToDraw * frame_offset));
+
+    if (use60)
+    {
+      const float animPosition = (timeCount % (kTotalNumFrames * kSourceFrameDuration_ms));
+
+      const uint32_t sourceFrame = (uint32_t)(animPosition / kSourceFrameDuration_ms);
+      const uint32_t nextSourceFrame = (sourceFrame + 1) % kTotalNumFrames;
+
+      const float timeInFrame = fmod(animPosition, kSourceFrameDuration_ms);
+      const float blend = timeInFrame / kSourceFrameDuration_ms;
+
+      void* frame1 = ((uint8_t*)anim) + (sourceFrame * frame_offset);
+      void* frame2 = ((uint8_t*)anim) + (nextSourceFrame * frame_offset);
+
+      interpolate_frames(frame1, frame2, interpBuffer, blend);
+      animate(interpBuffer);
+    }
+    else
+    {
+      const uint32_t nextFrameToDraw = timeCount / kSourceFrameDuration_ms;
+      animate(((uint8_t*)anim) + (nextFrameToDraw * frame_offset));
+    }
+
     const auto endTime = std::chrono::steady_clock::now();
 
     const auto dif = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
-    timeCount += dif.count();
 
-    // Role timeCount over if it exceeds the total duration of the animation
-    if(timeCount >= ((kTotalNumFrames-1)*kFrameDuration_ms))
+    if (dif.count() < kTargetFrameDuration_ms)
     {
-      timeCount %= kTotalNumFrames * kFrameDuration_ms;
+      const useconds_t sleep_us = (useconds_t)((kTargetFrameDuration_ms - dif.count()) * 1000);
+      usleep(sleep_us);
+    }
+
+    timeCount += kTargetFrameDuration_ms;
+
+    if(timeCount >= (kTotalNumFrames * kSourceFrameDuration_ms))
+    {
+      timeCount = 0;
     }
   }
+  free(interpBuffer);
 
   // Unmap the anim
   rc = munmap(anim, len);

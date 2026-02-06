@@ -8,7 +8,7 @@ if [ ! -f /bin/vic-verbose ]; then
     /anki/bin/vic-bootAnim-stock
 fi
 
-if [ -d /anki-devtools ] || [[ "$INDEV_OR_RELEASE" == "indev" ]] || [[ "$INDEV_OR_RELEASE" == "internal" ]] || [ -f /etc/use-vic-verbose ]; then
+if [ -d /anki-devtools ] || [[ "$INDEV_OR_RELEASE" != "release" ]] || [ -f /etc/use-vic-verbose ]; then
     /bin/vic-verbose
 else
     /anki/bin/vic-bootAnim-stock
