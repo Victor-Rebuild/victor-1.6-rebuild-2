@@ -127,7 +127,7 @@ void BehaviorPetDetection::AlwaysHandleInScope(const EngineToGameEvent& ev)
   // okao hits us with a burst of events whenever a pet is seen.
   // let's account for false-positives a little bit by needing 6 events
   if (!_activate) {
-    if (petMsg.numTimesObserved >= 6) {
+    if (petMsg.numTimesObserved >= 8) {
       if (petMsg.img_rect.height > 100) {
         _isDog = (petMsg.petType == Anki::Vision::PetType::Dog);
         _activate = true;
