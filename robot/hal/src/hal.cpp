@@ -74,6 +74,7 @@ namespace { // "Private members"
 
   HAL::PowerState desiredPowerMode_;
 
+  #ifndef HAL_DUMMY_BODY
   // Flag to prevent spamming of unexepected power mode warning
   bool reportUnexpectedPowerMode_ = false;
 
@@ -92,6 +93,7 @@ namespace { // "Private members"
   // Number of frames to skip sending to body when in calm power mode
   static const int NUM_CALM_MODE_SKIP_FRAMES = 12;  // Every 60ms
   int calmModeSkipFrameCount_ = 0;
+  #endif
 
   static const f32 kBatteryScale = 2.8f / 2048.f;
   struct spine_ctx spine_;
@@ -138,7 +140,9 @@ BodyToHead BootBodyData_{
   
   const u32 SELECT_TIMEOUT_SEC = 1;
   const u32 SELECT_TIMEOUT_ATTEMPTS = 5;
+  #ifndef HAL_DUMMY_BODY
   const u32 SPINE_GET_FRAME_TIMEOUT_MS = 1000 * SELECT_TIMEOUT_SEC * (SELECT_TIMEOUT_ATTEMPTS + 1);
+  #endif
   const int* shutdownSignal_ = 0;
 
 } // "private" namespace
@@ -376,7 +380,9 @@ Result spine_wait_for_first_frame(spine_ctx_t spine, const int * shutdownSignal)
 
 Result HAL::Init(const int * shutdownSignal)
 {
+  #ifndef HAL_DUMMY_BODY
   using Result = Anki::Result;
+  #endif
 
   // Set ID
   robotID_ = Anki::Vector::DEFAULT_ROBOT_ID;
@@ -554,15 +560,15 @@ Result HAL::Step(void)
   EventStep();
   EventStart(EventType::HAL_STEP);
 
-  static uint32_t last_packet_send = 0;
-  uint32_t now = GetMicroCounter();
-
   Result result = RESULT_OK;
   bool commander_is_active = false;
 
 #ifndef HAL_DUMMY_BODY
 
   headData_.framecounter++;
+
+  static uint32_t last_packet_send = 0;
+  uint32_t now = GetMicroCounter();
 
   //Packet throttle.
   if (now-last_packet_send >= MIN_CCC_XMIT_SPACING_US ) {
@@ -1137,7 +1143,9 @@ void HAL::PowerSetDesiredMode(const PowerState state)
   DASMSG_SET(i2, HAL::BatteryGetTemperature_C(), "Battery temperature (C)");
   DASMSG_SEND();
   desiredPowerMode_ = state;
+  #ifndef HAL_DUMMY_BODY
   lastPowerSetModeTime_ms_ = HAL::GetTimeStamp();
+  #endif
 }
 
 HAL::PowerState HAL::PowerGetDesiredMode()
