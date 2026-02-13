@@ -60,7 +60,7 @@ namespace {
   
   // Also reduce the AllowedDelta if the robot could be driving over something (i.e. its pitch angle
   // is sufficiently far from zero)
-  const Radians kRobotPitchThresholdPossibleCliff_rad = DEG_TO_RAD(6.f);
+  const Radians kRobotPitchThresholdPossibleCliff_rad = DEG_TO_RAD(6.5f);
 }
 
 
