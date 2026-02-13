@@ -596,6 +596,10 @@
     "AnimName": "ag_chargerdocking_comeoff_straight"
   },
   {
+    "CladEvent": "DriveOffChargerStraightOneOff",
+    "AnimName": "ag_chargerdocking_comeoff_straight_oneoff"
+  },
+  {
     "CladEvent": "DriveStartAngry",
     "AnimName": "ag_driving_upset_start"
   },

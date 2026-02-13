@@ -322,7 +322,16 @@ void BehaviorDriveOffCharger::TransitionToDrivingStraightProcedural()
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BehaviorDriveOffCharger::TransitionToDrivingAnim( const AnimationTrigger& animTrigger )
 {
-  auto* action = new TriggerLiftSafeAnimationAction{ animTrigger };
+  AnimationTrigger actualTrigger = animTrigger;
+
+  if (animTrigger == kAnimStraight) {
+    const bool useOneOff = (rand() % 2) == 0;
+    if (useOneOff) {
+      actualTrigger = AnimationTrigger::DriveOffChargerStraightOneOff;
+    }
+  }
+
+  auto* action = new TriggerLiftSafeAnimationAction{ actualTrigger };
   DelegateIfInControl( action );
   // the Update function will transition back to this or another direction, or end the behavior, as appropriate
 }

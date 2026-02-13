@@ -16,6 +16,11 @@
       "weight": 1.0
     },
     {
+      "behavior": "DriveOffChargerStraightInternalOneOff",
+      "cooldown_s": 300.0,
+      "weight": 0.8
+    },
+    {
       "behavior": "DriveOffChargerRightInternal",
       "cooldown_s": 300.0,
       "weight": 1.0
@@ -34,6 +39,11 @@
       "behaviorName": "DriveOffChargerStraightInternal",
       "behaviorClass": "AnimSequence",
       "animTriggers": ["DriveOffChargerStraight"]
+    },
+    {
+      "behaviorName": "DriveOffChargerStraightOneOffInternal",
+      "behaviorClass": "AnimSequence",
+      "animTriggers": ["DriveOffChargerStraightOneOff"]
     },
     {
       "behaviorName": "DriveOffChargerRightInternal",
