@@ -510,7 +510,8 @@ if [ $USE_SHAKE -eq 0 ]; then
   if [ $VERBOSE -eq 1 ]; then
     VERBOSE_ARG="--verbose"
   fi
-  shake --digest-and-input --report -j $VERBOSE_ARG $*
+  echo "- Using shake to build"
+  shake --digest-and-input -j -V -V -V --color $*
 else
   TARGET_ARG=""
   if [ -n "$CMAKE_TARGET" ]; then
