@@ -1,6 +1,6 @@
-# victor-1.6-rebuild
+# victor-1.6-rebuild-private
 
-Welcome to `victor-1.6-rebuild`. This is where my modifed 1.6 source for Vector lives
+Welcome to `victor-1.6-rebuild-2`. This is where my modifed 1.6 source for Vector lives
 
 ## Changes from regular 1.6
 
@@ -9,16 +9,53 @@ You can see all the changes made compared to normal 1.6 in [CHANGES.md](/CHANGES
 ## Installation
 Check here for info [ABOUT.md](/ABOUT.md)
 
-## Building (Linux)
+## Building (Linux, amd64 only, bare metal)
 
- - Prereqs: Make sure you have `docker` installed.
+- Prerequisites:
+  - glibc 2.35 or above - this means anything Debian Bookworm-era and newer will work.
+  - The following packages need to be installed: `git wget curl openssl ninja g++ gcc pkg-config ccache`
+```
+# Arch Linux:
+sudo pacman -S git wget curl openssl ninja gcc pkgconf ccache
+# Ubuntu/Debian:
+sudo apt-get update && sudo apt-get install -y git wget curl openssl ninja-build gcc g++ pkg-config ccache
+# Fedora
+sudo dnf install -y git wget curl openssl ninja-build gcc gcc-c++ pkgconf-pkg-config ccache
+```
 
 1. Clone the repo and cd into it:
 
 ```
 cd ~
-git clone --recursive https://github.com/Victor-Rebuild/victor-1.6-rebuild -b Main
-cd victor-1.6-rebuild
+git clone --recursive https://github.com/Victor-Rebuild/victor-1.6-rebuild-2 -b master
+cd victor-1.6-rebuild-2
+```
+
+2. Source `setenv.sh`:
+```
+source setenv.sh
+```
+
+3. (OPTIONAL) Run this so you don't have to perform step 2 every time:
+```
+echo "source \"$(pwd)/setenv.sh\"" >> $HOME/.bashrc
+```
+
+4. Build:
+```
+vbuild
+```
+
+## Building (Linux, amd64 only, docker)
+
+ - Prereqs: Make sure you have `docker` and `git` installed.
+
+1. Clone the repo and cd into it:
+
+```
+cd ~
+git clone --recursive https://github.com/Victor-Rebuild/victor-1.6-rebuild-2 -b master
+cd victor-1.6-rebuild-2
 ```
 
 2. Make sure you can run Docker as a normal user. This will probably involve:
@@ -33,56 +70,11 @@ sudo chmod 660 /var/run/docker.sock
 
 3. Run the build script:
 ```
-cd ~/victor-1.6-rebuild
-./wire/build-d.sh
+cd ~/victor-1.6-rebuild-2
+./build/build-v.sh
 ```
 
 3. It should just work! The output will be in `./_build/vicos/Release/`
-
-## Building (Intel macOS)
-
- - Prereqs: Make sure you have [brew](https://brew.sh/) installed.
-   -  Then: `brew install pyenv ccache wget`
-
-1. Clone the repo and cd into it:
-
-```
-cd ~
-git clone --recursive https://github.com/Victor-Rebuild/victor-1.6-rebuild -b Main
-cd victor-1.6-rebuild
-```
-
-2. Set up Python 2:
-
-```
-pyenv install 2.7.18
-pyenv init
-```
-
-- Add the following to both ~/.zshrc and ~/.zprofile. After doing so, run the commands in your terminal session:
-```
-export PYENV_ROOT="$HOME/.pyenv"
-[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
-eval "$(pyenv init -)"
-pyenv shell 2.7.18
-```
-
-3. Disable security:
-
-```
-sudo spctl --master-disable
-sudo spctl --global-disable
-```
-- You will have to head to `System Settings -> Security & Privacy -> Allow applications from` and select "Anywhere".
-
-
-4. Run the build script:
-```
-cd ~/victor-1.6-rebuild
-./wire/build.sh
-```
-
-5. It should just work! The output will be in `./_build/vicos/Release/`
 
 ## Deploying
 
@@ -97,11 +89,11 @@ echo 192.168.1.150 > robot_ip.txt
 3. Run:
 
 ```
-# Linux
-./wire/deploy-d.sh
+# Linux, docker
+./build/deploy-v.sh
 
-# macOS
-./wire/deploy.sh
+# Linux, bare metal
+vdeploy
 ```
 
 <small><sub><sup>DDL, if you're reading this, sosumi.</sup></sub></small>
