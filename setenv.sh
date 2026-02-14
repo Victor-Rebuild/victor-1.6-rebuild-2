@@ -8,15 +8,15 @@ export GIT_PROJ_ROOT="$(
 alias victor_restart="cd ${GIT_PROJ_ROOT} && ${GIT_PROJ_ROOT}/project/victor/scripts/victor_restart.sh"
 alias victor_start="cd ${GIT_PROJ_ROOT} && ${GIT_PROJ_ROOT}/project/victor/scripts/victor_start.sh"
 alias victor_stop="cd ${GIT_PROJ_ROOT} && ${GIT_PROJ_ROOT}/project/victor/scripts/victor_stop.sh"
-alias victor_stage="cd ${GIT_PROJ_ROOT} && ${GIT_PROJ_ROOT}/project/victor/scripts/stage.sh -c Release -b"
-alias victor_stage_debug="cd ${GIT_PROJ_ROOT} && ${GIT_PROJ_ROOT}/project/victor/scripts/stage.sh -c Debug -b"
+alias victor_stage="cd ${GIT_PROJ_ROOT} && ${GIT_PROJ_ROOT}/project/victor/scripts/stage.sh -c Release-Makefiles -b"
+alias victor_stage_debug="cd ${GIT_PROJ_ROOT} && ${GIT_PROJ_ROOT}/project/victor/scripts/stage.sh -c Debug-Makefiles -b"
 alias watch_backtraces="cd ${GIT_PROJ_ROOT} && echo Waiting for backtraces... && python3 project/victor/scripts/backtracewatcher.py"
 alias watch_backtraces_debug="cd ${GIT_PROJ_ROOT} && echo Waiting for backtraces... && python3 project/victor/scripts/backtracewatcherdebug.py"
 
 alias victor_build_release="cd ${GIT_PROJ_ROOT} && ${GIT_PROJ_ROOT}/project/victor/scripts/victor_build_release.sh"
 alias victor_build_debug="cd ${GIT_PROJ_ROOT} && ${GIT_PROJ_ROOT}/project/victor/scripts/victor_build_debug.sh"
-alias victor_deploy_run="cd ${GIT_PROJ_ROOT} && ${GIT_PROJ_ROOT}/project/victor/scripts/victor_deploy.sh -c Release -b && ${GIT_PROJ_ROOT}/project/victor/scripts/victor_start.sh"
-alias victor_deploy_run_debug="cd ${GIT_PROJ_ROOT} && ${GIT_PROJ_ROOT}/project/victor/scripts/victor_deploy.sh -c Debug -b && ${GIT_PROJ_ROOT}/project/victor/scripts/victor_start.sh"
+alias victor_deploy_run="cd ${GIT_PROJ_ROOT} && ${GIT_PROJ_ROOT}/project/victor/scripts/victor_deploy.sh -c Release-Makefiles -b && ${GIT_PROJ_ROOT}/project/victor/scripts/victor_start.sh"
+alias victor_deploy_run_debug="cd ${GIT_PROJ_ROOT} && ${GIT_PROJ_ROOT}/project/victor/scripts/victor_deploy.sh -c Debug-Makefiles -b && ${GIT_PROJ_ROOT}/project/victor/scripts/victor_start.sh"
 
 function IS_ROBOT_IP_THERE() {
     if [[ ! -f "$GIT_PROJ_ROOT/robot_ip.txt" ]]; then
