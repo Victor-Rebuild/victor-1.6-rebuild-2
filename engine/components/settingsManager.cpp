@@ -818,8 +818,8 @@ namespace Anki
                           _stopRebuildEyeThread.store(true, std::memory_order_release);
                           break;
                       }
-                      // Refresh every second
-                      std::this_thread::sleep_for(std::chrono::milliseconds(30));
+                      // Refresh every 3/4 second
+                      std::this_thread::sleep_for(std::chrono::milliseconds(45));
                   }
               });
           }
