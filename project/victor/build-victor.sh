@@ -61,7 +61,7 @@ EXTERNALS_UPDATE_SKIP=0
 
 CONFIGURATION=Release
 PLATFORM=vicos
-GENERATOR=Ninja
+GENERATOR=Makefiles
 FEATURES=""
 DEFINES=""
 ADDITIONAL_PLATFORM_ARGS=()
@@ -482,8 +482,6 @@ if [ $CONFIGURE -eq 1 ]; then
         -DANKI_GO_BIN_PATH=${GOBIN} \
         -DCMAKE_BUILD_TYPE=${CONFIGURATION} \
         -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS} \
-        -DGOPATH=${GOPATH} \
-        -DGOROOT=${GOROOT} \
         -DPROTOBUF_HOME=${PROTOBUF_HOME} \
         -DANKI_BUILD_SHA=${ANKI_BUILD_SHA} \
         -DANKI_BUILD_BRANCH=${ANKI_BUILD_BRANCH} \
@@ -517,6 +515,9 @@ else
   TARGET_ARG=""
   if [ -n "$CMAKE_TARGET" ]; then
     TARGET_ARG="--target $CMAKE_TARGET"
+  fi
+  if [[ ${GENERATOR} == *"Makefiles"* ]]; then
+    TARGET_ARG="-j$(nproc) $TARGET_ARG"
   fi
   $CMAKE_EXE --build . -j $(nproc) $TARGET_ARG $*
   if [[ "$PLATFORM" == "vicos" && $RUN_INSTALL -eq 1 ]]; then
