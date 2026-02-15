@@ -46,9 +46,10 @@ namespace {
   u32 _pin = 123456;
 
   const f32 kRobotNameScale = IsXray() ? 0.6f : 0.65f;
-  const f32 kRobotPinScale = IsXray() ? 0.7f : 0.9f;
+  const f32 kRobotPinScale = IsXray() ? 0.7f : 0.85f;
   const std::string kURLDef = "anki2.ca/1.6";
   const std::string kURLWP = "anki2.ca/wp";
+  const std::string kPrePin = "WAITING FOR BLE";
   const ColorRGBA   kColor(0.9f, 0.9f, 0.9f, 1.f);
 
   const char* kShowPinScreenSpriteName = "pairing_icon_key";
@@ -56,6 +57,7 @@ namespace {
   bool s_enteredAnyScreen = false;
 
   bool isWP = false;
+  bool showingPrePin = false;
 }
 
 // Draws BLE name and url to screen
@@ -99,6 +101,13 @@ void DrawShowPinScreen(Anim::AnimationStreamer* animStreamer, const Anim::AnimCo
 {
   s_enteredAnyScreen = true;
   
+  // Fallback check
+  if (pin == kPrePin) {
+    showingPrePin = true;
+  } else {
+    showingPrePin = false;
+  }
+
   Vision::ImageRGB key;
   key.Load(context->GetDataLoader()->GetSpritePaths()->GetAssetPath(kShowPinScreenSpriteName));
   if(IsXray()) {
@@ -110,11 +119,19 @@ void DrawShowPinScreen(Anim::AnimationStreamer* animStreamer, const Anim::AnimCo
 
   Point2f p((FACE_DISPLAY_WIDTH - key.GetNumCols())/2,
             (FACE_DISPLAY_HEIGHT - key.GetNumRows())/2);
-  img->DrawSubImage(key, p);
 
-  img->DrawTextCenteredHorizontally(OSState::getInstance()->GetRobotName(), cv::QT_FONT_NORMAL, kRobotNameScale, 1, kColor, 15, false);
-
-  img->DrawTextCenteredHorizontally(pin, cv::QT_FONT_NORMAL, kRobotPinScale, 1, kColor, FACE_DISPLAY_HEIGHT-5, false);
+  if (showingPrePin) {
+    cv::Size textSize1;
+    float scale1 = 0;
+    img->DrawSubImage(key, p);
+    img->DrawTextCenteredHorizontally(OSState::getInstance()->GetRobotName(), cv::QT_FONT_NORMAL, kRobotNameScale, 1, kColor, 15, false);
+    Vision::Image::MakeTextFillImageWidth(kPrePin, cv::QT_FONT_NORMAL, 1, img->GetNumCols(), textSize1, scale1);
+    img->DrawTextCenteredHorizontally(kPrePin, cv::QT_FONT_NORMAL, scale1, 1, kColor, (FACE_DISPLAY_HEIGHT + textSize1.height)-20, true);
+  } else {
+    img->DrawSubImage(key, p);
+    img->DrawTextCenteredHorizontally(OSState::getInstance()->GetRobotName(), cv::QT_FONT_NORMAL, kRobotNameScale, 1, kColor, 15, false);
+    img->DrawTextCenteredHorizontally(pin, cv::QT_FONT_NORMAL, kRobotPinScale, 1, kColor, FACE_DISPLAY_HEIGHT-5, false);
+  }
 
   auto handle = std::make_shared<Vision::SpriteWrapper>(img);
   const bool shouldRenderInEyeHue = false;
@@ -243,12 +260,14 @@ void UpdateConnectionFlow(const SwitchboardInterface::SetConnectionStatus& msg,
     break;
     case ConnectionStatus::SHOW_PRE_PIN:
     {
-      DrawShowPinScreen(animStreamer, context, "######");
+      DrawShowPinScreen(animStreamer, context, kPrePin);
+      showingPrePin = true;
     }
     break;
     case ConnectionStatus::SHOW_PIN:
     {
       DrawShowPinScreen(animStreamer, context, std::to_string(_pin));
+      showingPrePin = false;
     }
     break;
     case ConnectionStatus::SETTING_WIFI:
