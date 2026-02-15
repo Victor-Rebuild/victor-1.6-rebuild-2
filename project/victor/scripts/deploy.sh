@@ -245,18 +245,21 @@ robot_sh mkdir -p "${BIN_INSTALL_PATH}"
 robot_sh mkdir -p "${DEVICE_RSYNC_BIN_DIR}"
 
 # install rsync binary and config if needed
-logv "install rsync if necessary"
+# logv "install rsync if necessary"
 set +e
-robot_sh [ -f "$DEVICE_RSYNC_BIN_DIR/rsync.bin" ]
-if [ $? -ne 0 ] || [ $FORCE_RSYNC_BIN -eq 1 ]; then
-  echo "loading rsync to device"
-  robot_cp ${RSYNC_BIN_DIR}/rsync.bin ${DEVICE_RSYNC_BIN_DIR}/rsync.bin
-fi
+# robot_sh [ -f "$DEVICE_RSYNC_BIN_DIR/rsync.bin" ]
+# if [ $? -ne 0 ] || [ $FORCE_RSYNC_BIN -eq 1 ]; then
+#   echo "loading rsync to device"
+#   robot_cp ${RSYNC_BIN_DIR}/rsync.bin ${DEVICE_RSYNC_BIN_DIR}/rsync.bin
+# fi
 
-robot_sh [ -f "$DEVICE_RSYNC_CONF_DIR/rsyncd.conf" ]
-if [ $? -ne 0 ] || [ $FORCE_RSYNC_BIN -eq 1 ]; then
-  echo "loading rsync config to device"
-  robot_cp ${RSYNC_BIN_DIR}/rsyncd.conf ${DEVICE_RSYNC_CONF_DIR}/rsyncd.conf
+robot_sh [ -f "/etc/rsyncd-victor.conf" ]
+  if [ $? -ne 0 ]; then
+  robot_sh [ -f "$DEVICE_RSYNC_CONF_DIR/rsyncd.conf" ]
+  if [ $? -ne 0 ] || [ $FORCE_RSYNC_BIN -eq 1 ]; then
+    echo "loading rsync config to device"
+    robot_cp ${RSYNC_BIN_DIR}/rsyncd.conf ${DEVICE_RSYNC_CONF_DIR}/rsyncd.conf
+  fi
 fi
 
 robot_sh [ -f "$DEVICE_RSYNC_CONF_DIR/rsyncd.service" ]
