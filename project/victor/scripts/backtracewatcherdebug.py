@@ -3,8 +3,8 @@ import re, subprocess, sys, os
 import paramiko
 from pathlib import Path
 
-LIBDIR = "./_build/vicos/Debug/lib"
-BINDIR = "./_build/vicos/Debug/bin"
+LIBDIR = "./_build/vicos/Debug-Makefiles/lib"
+BINDIR = "./_build/vicos/Debug-Makefiles/bin"
 SYSROOT_LIBDIR = "anki-deps/vicos-sdk/dist/5.3.0-r07/sysroot/usr/lib"
 
 with open("./robot_ip.txt") as f:

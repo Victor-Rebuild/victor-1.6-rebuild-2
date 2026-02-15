@@ -3,8 +3,8 @@ import re, subprocess, sys, os
 import paramiko
 from pathlib import Path
 
-LIBDIR = "./_build/vicos/Release/lib"
-BINDIR = "./_build/vicos/Release/bin"
+LIBDIR = "./_build/vicos/Release-Makefiles/lib"
+BINDIR = "./_build/vicos/Release-Makefiles/bin"
 SYSROOT_LIBDIR = "anki-deps/vicos-sdk/dist/5.3.0-r07/sysroot/usr/lib"
 
 with open("./robot_ip.txt") as f:
@@ -105,7 +105,7 @@ def main():
 
     transport = ssh.get_transport()
     channel = transport.open_session()
-    channel.exec_command("tail -F /var/log/messages")
+    channel.exec_command("cat /var/log/messages")
 
     buf = b""
     in_backtrace = False
