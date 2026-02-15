@@ -16,6 +16,7 @@
 #include "engine/aiComponent/behaviorComponent/behaviorExternalInterface/behaviorExternalInterface.h"
 #include "engine/aiComponent/behaviorComponent/behaviorExternalInterface/beiRobotInfo.h"
 #include "engine/components/battery/batteryComponent.h"
+#include <anki/cozmo/shared/factory/emrHelper.h>
 
 namespace Anki {
 namespace Vector {
@@ -33,6 +34,8 @@ namespace
   // up further while he's frantically searching for and
   // docking to the charger.
   const int kBatteryOverheatingThreshold_degC = 55;
+
+  const bool skipOverheatCheck = IsXray();
 }
 
 ConditionHighTemperature::ConditionHighTemperature(const Json::Value& config)
@@ -44,7 +47,7 @@ bool ConditionHighTemperature::AreConditionsMetInternal(BehaviorExternalInterfac
 {
   const bool hotCPU     = bei.GetRobotInfo().GetCpuTemperature_degC() >= kCPUOverheatingThreshold_degC;
   const bool hotBattery = bei.GetRobotInfo().GetBatteryComponent().GetBatteryTemperature_C() >= kBatteryOverheatingThreshold_degC;
-  return hotCPU || hotBattery;
+  return hotCPU || (hotBattery && !skipOverheatCheck);
 }
 
 }
