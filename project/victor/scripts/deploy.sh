@@ -253,13 +253,10 @@ set +e
 #   robot_cp ${RSYNC_BIN_DIR}/rsync.bin ${DEVICE_RSYNC_BIN_DIR}/rsync.bin
 # fi
 
-robot_sh [ -f "/etc/rsyncd-victor.conf" ]
-  if [ $? -ne 0 ]; then
-  robot_sh [ -f "$DEVICE_RSYNC_CONF_DIR/rsyncd.conf" ]
-  if [ $? -ne 0 ] || [ $FORCE_RSYNC_BIN -eq 1 ]; then
-    echo "loading rsync config to device"
-    robot_cp ${RSYNC_BIN_DIR}/rsyncd.conf ${DEVICE_RSYNC_CONF_DIR}/rsyncd.conf
-  fi
+robot_sh [ -f "$DEVICE_RSYNC_CONF_DIR/rsyncd.conf" ]
+if [ $? -ne 0 ] || [ $FORCE_RSYNC_BIN -eq 1 ]; then
+  echo "loading rsync config to device"
+  robot_cp ${RSYNC_BIN_DIR}/rsyncd.conf ${DEVICE_RSYNC_CONF_DIR}/rsyncd.conf
 fi
 
 robot_sh [ -f "$DEVICE_RSYNC_CONF_DIR/rsyncd.service" ]
