@@ -49,7 +49,8 @@ namespace {
   const f32 kRobotPinScale = IsXray() ? 0.7f : 0.85f;
   const std::string kURLDef = "anki2.ca/1.6";
   const std::string kURLWP = "anki2.ca/wp";
-  const std::string kPrePin = "WAITING FOR BLE";
+  const std::string kPrePin = "WAITING FOR VECTOR";
+  const std::string kPrePin2 = "WEB SETUP CONNECTION";
   const ColorRGBA   kColor(0.9f, 0.9f, 0.9f, 1.f);
 
   const char* kShowPinScreenSpriteName = "pairing_icon_key";
@@ -123,10 +124,10 @@ void DrawShowPinScreen(Anim::AnimationStreamer* animStreamer, const Anim::AnimCo
   if (showingPrePin) {
     cv::Size textSize1;
     float scale1 = 0;
-    img->DrawSubImage(key, p);
     img->DrawTextCenteredHorizontally(OSState::getInstance()->GetRobotName(), cv::QT_FONT_NORMAL, kRobotNameScale, 1, kColor, 15, false);
-    Vision::Image::MakeTextFillImageWidth(kPrePin, cv::QT_FONT_NORMAL, 1, img->GetNumCols(), textSize1, scale1);
-    img->DrawTextCenteredHorizontally(kPrePin, cv::QT_FONT_NORMAL, scale1, 1, kColor, (FACE_DISPLAY_HEIGHT + textSize1.height)-20, true);
+    Vision::Image::MakeTextFillImageWidth(kPrePin2, cv::QT_FONT_NORMAL, 1, img->GetNumCols(), textSize1, scale1);
+    img->DrawTextCenteredHorizontally(kPrePin, cv::QT_FONT_NORMAL, scale1, 1, kColor, (FACE_DISPLAY_HEIGHT + textSize1.height)-50, true);
+    img->DrawTextCenteredHorizontally(kPrePin2, cv::QT_FONT_NORMAL, scale1, 1, kColor, (FACE_DISPLAY_HEIGHT + textSize1.height)-30, true);
   } else {
     img->DrawSubImage(key, p);
     img->DrawTextCenteredHorizontally(OSState::getInstance()->GetRobotName(), cv::QT_FONT_NORMAL, kRobotNameScale, 1, kColor, 15, false);
