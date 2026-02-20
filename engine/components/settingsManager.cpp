@@ -28,7 +28,6 @@
 #include "util/fileUtils/fileUtils.h"
 #include "util/logging/logging.h"
 
-#include <anki/cozmo/shared/factory/emrHelper.h>
 #include "osState/wallTime.h"
 #include <string>
 #include <sys/wait.h>
