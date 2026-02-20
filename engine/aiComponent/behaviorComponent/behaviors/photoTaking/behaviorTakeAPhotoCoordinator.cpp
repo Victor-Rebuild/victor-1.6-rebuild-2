@@ -149,10 +149,7 @@ void BehaviorTakeAPhotoCoordinator::OnBehaviorDeactivated()
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BehaviorTakeAPhotoCoordinator::TransitionToStorageIsFull()
 {
-  ANKI_VERIFY(_iConfig.storageIsFullBehavior->WantsToBeActivated(), 
-              "BehaviorTakeAPhotoCoordinator.TransitionToStorageIsFull.DoesNotWantToBeActivated", 
-              "");
-  DelegateIfInControl(_iConfig.storageIsFullBehavior.get());
+  DelegateIfInControl(new TriggerAnimationAction(AnimationTrigger::TakeAPictureStorageFull));
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -534,6 +534,7 @@ enum int_32 AnimationTrigger
   TimerRingGetOut,
   TakeAPictureCapture,
   TakeAPictureFocusing,
+  TakeAPictureStorageFull,
   TextToSpeechGetIn,
   TextToSpeechGetLoop,
   TextToSpeechGetOut,

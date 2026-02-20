@@ -1331,7 +1331,10 @@
     "CladEvent": "TakeAPictureCapture",
     "AnimName": "ag_takepicture_capture"
   },
-
+  {
+    "CladEvent": "TakeAPictureStorageFull",
+    "AnimName": "ag_takepicture_storage_full"
+  },
   {
     "CladEvent": "TextToSpeechGetIn",
     "AnimName": "ag_texttospeech_getin_01"
