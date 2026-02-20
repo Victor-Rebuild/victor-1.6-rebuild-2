@@ -25,8 +25,11 @@
 #include "util/environment/locale.h"
 
 #include "clad/robotInterface/messageEngineToRobot.h"
+#include "util/fileUtils/fileUtils.h"
+#include "util/logging/logging.h"
 
-#include <anki/cozmo/shared/factory/emrHelper_vicos.h>
+#include <anki/cozmo/shared/factory/emrHelper.h>
+#include <string>
 #include <sys/wait.h>
 #include <thread>
 #include <atomic>
@@ -53,58 +56,6 @@ namespace Anki
           float hue;
           float saturation;
       };
-
-      // RebuildXMBColor GetRebuildColorForDate(int month, int day) {
-      //     struct ColorEntry {
-      //         int month;
-      //         int day;
-      //         float hue;
-      //         float saturation;
-      //     };
-          
-      //     const ColorEntry colors[] = {
-      //         {1, 15, 0.167f, 0.5f},
-      //         {1, 24, 0.083f, 0.75f},
-      //         {2, 15, 0.222f, 0.6f},
-      //         {2, 24, 0.333f, 1.0f},
-      //         {3, 15, 0.917f, 0.3f},
-      //         {3, 24, 0.917f, 0.85f},
-      //         {4, 15, 0.0f, 0.0f},
-      //         {4, 24, 0.333f, 1.0f},
-      //         {5, 15, 0.833f, 0.2f},
-      //         {5, 24, 0.833f, 1.0f},
-      //         {6, 15, 0.556f, 0.3f},
-      //         {6, 24, 0.5f, 1.0f},
-      //         {7, 15, 0.667f, 1.0f},
-      //         {7, 24, 0.667f, 1.0f},
-      //         {8, 15, 0.833f, 1.0f},
-      //         {8, 24, 0.792f, 1.0f},
-      //         {9, 15, 0.0f, 0.85f},
-      //         {9, 24, 0.167f, 0.5f},
-      //         {10, 15, 0.083f, 0.65f},
-      //         {10, 24, 0.083f, 0.75f},
-      //         {11, 15, 0.983f, 0.85f},
-      //         {11, 24, 0.0f, 1.0f},
-      //         {12, 15, 0.792f, 0.2f},
-      //         {12, 24, 0.0f, 0.0f}
-      //     };
-          
-      //     int bestIdx = 0;
-      //     int minDiff = 365;
-          
-      //     for (int i = 0; i < 24; i++) {
-      //         int targetDayOfYear = colors[i].month * 30 + colors[i].day;
-      //         int currentDayOfYear = month * 30 + day;
-      //         int diff = abs(targetDayOfYear - currentDayOfYear);
-              
-      //         if (diff < minDiff) {
-      //             minDiff = diff;
-      //             bestIdx = i;
-      //         }
-      //     }
-          
-      //     return {colors[bestIdx].hue, colors[bestIdx].saturation};
-      // }
 
       float GetRebuildXMBBrightnessForHour(int hour, int minute) {
           const float brightness[] = {
@@ -780,6 +731,7 @@ namespace Anki
           {
               _rebuildEyeThread = std::thread([this]()
               {
+                  float setdelay = 0;
                   while (!_stopRebuildEyeThread.load(std::memory_order_acquire))
                   {
                       // Get current date and time
@@ -803,7 +755,28 @@ namespace Anki
                       if (IsXray()) {
                         adjustedSaturation = adjustedSaturation + 0.1;
                       }
-                      
+
+                      if (Util::FileUtils::DirectoryDoesNotExist("/data/data/rebuild")) {
+                        LOG_WARNING("SettingsManager.RebuildEyes.CreateInital", "Creating inital files");
+                        std::vector<std::string> command;
+                        command.push_back("/usr/bin/sudo");
+                        command.push_back("/usr/sbin/save-eye-color");
+                        command.push_back("0");
+                        command.push_back("0");
+                        const bool success = ExecCommand(command);
+                        if (success) {
+                          LOG_WARNING("SettingsManager.RebuildEyes.CreateInital", "Inital files created");
+                        } else {
+                          LOG_WARNING("SettingsManager.RebuildEyes.CreateInital", "Failed to create inital files");
+                        }
+                      }
+
+                      if (setdelay < 450) {
+                        adjustedSaturation = std::stof(Util::FileUtils::ReadFile("/data/data/rebuild/rebuildEyesSaturation"));
+                        color.hue = std::stof(Util::FileUtils::ReadFile("/data/data/rebuild/rebuildEyesHue"));
+                        setdelay = setdelay + 1;
+                      }
+
                       // Set the face color
                       _robot->SendRobotMessage<RobotInterface::SetFaceHue>(color.hue);
                       _robot->SendRobotMessage<RobotInterface::SetFaceSaturation>(adjustedSaturation);
@@ -814,7 +787,19 @@ namespace Anki
                       const auto& currentHueKey = EyeColor_Name(static_cast<external_interface::EyeColor>(eyeval));
                       if (currentHueKey != rebuildEyesStrInTh)
                       {
-                          LOG_INFO("SettingsManager.ApplySettingEyeColor.Apply", "Stopping Rebuild Eyes thread");
+                          LOG_WARNING("SettingsManager.ApplySettingEyeColor.Apply", "Stopping Rebuild Eyes thread");
+                          LOG_WARNING("SettingsManager.RebuildEyes.SaveValues", "Saving rebuild eye colors");
+                          std::vector<std::string> command;
+                          command.push_back("/usr/bin/sudo");
+                          command.push_back("/usr/sbin/save-eye-color");
+                          command.push_back(std::to_string(adjustedSaturation));
+                          command.push_back(std::to_string(color.hue));
+                          const bool success = ExecCommand(command);
+                          if (success) {
+                            LOG_WARNING("SettingsManager.RebuildEyes.SaveValues", "Current values saved");
+                          } else {
+                            LOG_WARNING("SettingsManager.RebuildEyes.SaveValues", "Failed to save values");
+                          }
                           _stopRebuildEyeThread.store(true, std::memory_order_release);
                           break;
                       }

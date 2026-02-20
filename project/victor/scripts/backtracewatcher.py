@@ -105,7 +105,7 @@ def main():
 
     transport = ssh.get_transport()
     channel = transport.open_session()
-    channel.exec_command("cat /var/log/messages")
+    channel.exec_command("tail -f /var/log/messages")
 
     buf = b""
     in_backtrace = False
