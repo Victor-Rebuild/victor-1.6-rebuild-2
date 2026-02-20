@@ -29,6 +29,7 @@
 #include "util/logging/logging.h"
 
 #include <anki/cozmo/shared/factory/emrHelper.h>
+#include "osState/wallTime.h"
 #include <string>
 #include <sys/wait.h>
 #include <thread>
@@ -731,7 +732,8 @@ namespace Anki
           {
               _rebuildEyeThread = std::thread([this]()
               {
-                  float setdelay = 0;
+                  std::tm timeObj;
+                  const bool gotTime = WallTime::getInstance()->GetUTCTime(timeObj);
                   while (!_stopRebuildEyeThread.load(std::memory_order_acquire))
                   {
                       // Get current date and time
@@ -771,10 +773,12 @@ namespace Anki
                         }
                       }
 
-                      if (setdelay < 450) {
+                      if (!gotTime
+                        && Util::FileUtils::FileExists("/data/data/rebuild/rebuildEyesSaturation")
+                        && Util::FileUtils::FileExists("/data/data/rebuild/rebuildEyesHue")
+                        ) {
                         adjustedSaturation = std::stof(Util::FileUtils::ReadFile("/data/data/rebuild/rebuildEyesSaturation"));
                         color.hue = std::stof(Util::FileUtils::ReadFile("/data/data/rebuild/rebuildEyesHue"));
-                        setdelay = setdelay + 1;
                       }
 
                       // Set the face color
