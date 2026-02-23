@@ -730,7 +730,7 @@ namespace Anki
           {
               _rebuildEyeThread = std::thread([this]()
               {
-                  float setdelay = 0;
+                  int nextHour = 0;
                   while (!_stopRebuildEyeThread.load(std::memory_order_acquire))
                   {
                       // Get current date and time
@@ -741,7 +741,10 @@ namespace Anki
                       int day = timeinfo->tm_mday;       // 1-31
                       int hour = timeinfo->tm_hour;      // 0-23
                       int minute = timeinfo->tm_min;
-                      
+
+                      // For checking if we have the time set yet or not
+                      const bool gotTime = OSState::getInstance()->IsWallTimeSynced();
+
                       // Get XMB color for current date/time
                       RebuildXMBColor color = GetInterpolatedRebuildXMBColor(month, day, hour, minute);
                       
@@ -770,15 +773,35 @@ namespace Anki
                         }
                       }
 
-                      if (setdelay < 450) {
+                      if (gotTime != true) {
                         adjustedSaturation = std::stof(Util::FileUtils::ReadFile("/data/data/rebuild/rebuildEyesSaturation"));
                         color.hue = std::stof(Util::FileUtils::ReadFile("/data/data/rebuild/rebuildEyesHue"));
-                        setdelay = setdelay + 1;
+                        LOG_WARNING("SettingsManager.RebuildEyes.Delay", "Doing Delay");
                       }
 
                       // Set the face color
                       _robot->SendRobotMessage<RobotInterface::SetFaceHue>(color.hue);
                       _robot->SendRobotMessage<RobotInterface::SetFaceSaturation>(adjustedSaturation);
+
+                      if (nextHour == 0 && hour != 0) {
+                        nextHour = hour + 5;
+                      }
+
+                      if (gotTime == true && nextHour == hour && (std::stof(Util::FileUtils::ReadFile("/data/data/rebuild/rebuildEyesHue")) != color.hue) && (std::stof(Util::FileUtils::ReadFile("/data/data/rebuild/rebuildEyesSaturation")) != adjustedSaturation)) {
+                        LOG_WARNING("SettingsManager.RebuildEyes.HourlySave", "Saving values");
+                        nextHour = hour + 5;
+                        std::vector<std::string> command;
+                        command.push_back("/usr/bin/sudo");
+                        command.push_back("/usr/sbin/save-eye-color");
+                        command.push_back(std::to_string(adjustedSaturation));
+                        command.push_back(std::to_string(color.hue));
+                        const bool success = ExecCommand(command);
+                        if (success) {
+                          LOG_WARNING("SettingsManager.RebuildEyes.HourlySave", "Current values saved");
+                        } else {
+                          LOG_WARNING("SettingsManager.RebuildEyes.HourlySave", "Failed to save values");
+                        }
+                      }
 
                       // Check if "REBUILD_EYES" mode is still active by checking the setting
                       const std::string rebuildEyesStrInTh = "REBUILD_EYES";
