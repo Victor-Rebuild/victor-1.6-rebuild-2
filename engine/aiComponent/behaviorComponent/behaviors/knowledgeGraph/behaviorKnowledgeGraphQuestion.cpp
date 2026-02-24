@@ -27,10 +27,12 @@
 
 #include "coretech/common/engine/jsonTools.h"
 #include "coretech/common/engine/utils/timer.h"
+#include "osState/wallTime.h"
 #include "util/console/consoleInterface.h"
 #include "util/global/globalDefinitions.h"
 #include "util/logging/logging.h"
 #include "clad/types/animationTrigger.h"
+#include <string>
 
 #define PRINT_DEBUG(format, ...) \
   PRINT_CH_DEBUG("KnowledgeGraph", "BehaviorKnowledgeGraphQuestion", format, ##__VA_ARGS__)
@@ -137,10 +139,11 @@ namespace Anki
       const auto &localeComponent = robotInfo.GetLocaleComponent();
       std::string readyText = localeComponent.GetString(_iVars.readyStringID);
 
-      // Remove ready for intent graph responses
+      // Remove ready for intent graph and date responses
       UserIntentComponent &uic = GetBehaviorComp<UserIntentComponent>();
       UserIntentPtr intentDataPtr = uic.GetUserIntentIfActive(USER_INTENT(knowledge_response_bypass));
-      if (intentDataPtr != nullptr)
+      UserIntentPtr dateDataPtr = uic.GetUserIntentIfActive(USER_INTENT(knowledge_date_response_igraph));
+      if ((intentDataPtr != nullptr) || (dateDataPtr != nullptr))
       {
         readyText = "";
       }
@@ -205,14 +208,24 @@ namespace Anki
       {
         UserIntentComponent &uic = GetBehaviorComp<UserIntentComponent>();
         UserIntentPtr intentDataPtr = uic.GetUserIntentIfActive(USER_INTENT(knowledge_response_bypass));
+        UserIntentPtr dateDataPtr = uic.GetUserIntentIfActive(USER_INTENT(knowledge_date_response_igraph));
 
         // Enter if the a knowledge response was returned and activated
-        if (intentDataPtr != nullptr)
+        if (dateDataPtr != nullptr)
         {
           if (EState::WaitingToStream == _dVars.state)
           {
             CancelDelegates(false);
-            // This skips over the streaming because the results were alreday returned
+            // This skips over the streaming because the results were already returned
+            OnStreamingComplete(true);
+          }
+        }
+        else if (intentDataPtr != nullptr)
+        {
+          if (EState::WaitingToStream == _dVars.state)
+          {
+            CancelDelegates(false);
+            // This skips over the streaming because the results were already returned
             OnStreamingComplete(true);
           }
         }
@@ -282,16 +295,25 @@ namespace Anki
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     void BehaviorKnowledgeGraphQuestion::OnStreamingComplete(bool skipResponsePending)
     {
+      UserIntentComponent &uic = GetBehaviorComp<UserIntentComponent>();
+      UserIntentPtr intentDataPtr = uic.GetUserIntentIfActive(USER_INTENT(knowledge_response_bypass));
+      UserIntentPtr dateDataPtr = uic.GetUserIntentIfActive(USER_INTENT(knowledge_date_response_igraph));
       // go into searching state until we can generate our response
       _dVars.state = EState::Searching;
 
       PlayEarconEnd();
 
       // see if we got a response from knowledge graph
-      if (skipResponsePending)
+      if (skipResponsePending && intentDataPtr)
       {
         ConsumeIntentGraphResponse();
       }
+      // Lower as to give intent graph the highest priority
+      else if (dateDataPtr && skipResponsePending)
+      {
+        SpeakDateResponse();
+      }
+      // Regular knowledge graph has the lowest priority
       else if (IsResponsePending())
       {
         // need to consume the response immediately or the system gets cranky
@@ -424,6 +446,69 @@ namespace Anki
 
       PRINT_DEBUG("Intent Graph Question: %s", Util::HidePersonallyIdentifiableInfo(intentResponse.query_text.c_str()));
       PRINT_DEBUG("Intent Graph Response: %s", Util::HidePersonallyIdentifiableInfo(intentResponse.answer.c_str()));
+    }
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    void BehaviorKnowledgeGraphQuestion::SpeakDateResponse()
+    {
+      std::string dateResponse;
+
+      std::tm timeObj;
+      char timeFormat[50];
+      const bool gotTime = WallTime::getInstance()->GetLocalTime(timeObj);
+      
+      strftime(timeFormat, 50, "%F %R", &timeObj);
+      int month = timeObj.tm_mon + 1;     // 0-11 + 1 = 0-12
+      int day = timeObj.tm_mday;          // 1-31
+
+      std::string monthString;
+      std::string dayString;
+
+      if (month == 1) {
+        monthString = "January";
+      } else if (month == 2) {
+        monthString = "Febuary";
+      } else if (month == 3) {
+        monthString = "March";
+      } else if (month == 4) {
+        monthString = "April";
+      } else if (month == 5) {
+        monthString = "May";
+      } else if (month == 6) {
+        monthString = "June";
+      } else if (month == 7) {
+        monthString = "July";
+      } else if (month == 8) {
+        monthString = "August";
+      } else if (month == 9) {
+        monthString = "September";
+      } else if (month == 10) {
+        monthString = "October";
+      } else if (month == 11) {
+        monthString = "November";
+      } else if (month == 12) {
+        monthString = "December";
+      }
+
+      if ((day % 100 >= 11) && (day % 100 <= 13)) {
+        dayString = "th";
+      } else if (day % 10 == 1) {
+        dayString = "st";
+      } else if (day % 10 == 2) {
+        dayString = "nd";
+      } else if (day % 10 == 3) {
+        dayString = "rd";
+      } else {
+        dayString = "th";
+      }
+
+      const std::string currTime = gotTime ? timeFormat : "Date isn't available";
+
+      dateResponse = monthString + std::to_string(day) + dayString;
+
+      _dVars.responseString = dateResponse;
+
+      PRINT_DEBUG("Date Response: %s", Util::HidePersonallyIdentifiableInfo(dateResponse.c_str()));
     }
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

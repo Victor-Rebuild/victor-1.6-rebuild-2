@@ -144,6 +144,7 @@ union dupes_allowed UserIntent
   UserIntent_Void             knowledge_question,
   UserIntent_KnowledgeResponse knowledge_response,
   UserIntent_KnowledgeResponse knowledge_response_bypass,
+  UserIntent_KnowledgeResponse knowledge_date_response_igraph,
   UserIntent_Void             knowledge_unknown,
   UserIntent_MeetVictor       meet_victor,
   UserIntent_PlaybackMessage  message_playback,
