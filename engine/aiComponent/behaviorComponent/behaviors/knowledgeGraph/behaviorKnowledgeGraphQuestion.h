@@ -60,7 +60,6 @@ namespace Anki
       void TransitionToSearchingLoop();
       void TransitionToBeginResponse();
       void TransitionToNoResponse();
-      void WaitForTTSGeneration();
 
       // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       // Helpers

@@ -342,9 +342,14 @@ namespace Anki
 
         _iVars.ttsBehavior->SetTextToSay(_dVars.responseString, callback);
 
-        // Play a brief waiting animation and check for TTS completion
-        DelegateIfInControl(new TriggerLiftSafeAnimationAction(AnimationTrigger::KnowledgeGraphSearchingGetIn),
-                            &BehaviorKnowledgeGraphQuestion::WaitForTTSGeneration);
+        // let's transition into our "searching" loop
+        // since we always want to loop at least once, play the get in + loop anim before we do any logic for the tts
+        CompoundActionSequential *messageAnimation = new CompoundActionSequential();
+        messageAnimation->AddAction(new TriggerLiftSafeAnimationAction(AnimationTrigger::KnowledgeGraphSearchingGetIn), true);
+        messageAnimation->AddAction(new TriggerLiftSafeAnimationAction(AnimationTrigger::KnowledgeGraphSearching), true);
+
+        DelegateIfInControl(messageAnimation,
+                            &BehaviorKnowledgeGraphQuestion::TransitionToSearchingLoop);
       }
       else
       {
@@ -352,30 +357,6 @@ namespace Anki
 
         // if not, let the user know we failed ...
         TransitionToNoResponse();
-      }
-    }
-
-    void BehaviorKnowledgeGraphQuestion::WaitForTTSGeneration()
-    {
-      if (EGenerationStatus::None != _dVars.ttsGenerationStatus)
-      {
-        if (EGenerationStatus::Success == _dVars.ttsGenerationStatus)
-        {
-          DelegateIfInControl(new TriggerLiftSafeAnimationAction(AnimationTrigger::KnowledgeGraphSearchingGetOutSuccess),
-                              &BehaviorKnowledgeGraphQuestion::TransitionToBeginResponse);
-        }
-        else
-        {
-          CompoundActionSequential *messageAnimation = new CompoundActionSequential();
-          messageAnimation->AddAction(new TriggerLiftSafeAnimationAction(AnimationTrigger::KnowledgeGraphSearchingFail), true);
-          messageAnimation->AddAction(new TriggerLiftSafeAnimationAction(AnimationTrigger::KnowledgeGraphSearchingFailGetOut), true);
-          DelegateIfInControl(messageAnimation);
-        }
-      }
-      else
-      {
-        DelegateIfInControl(new TriggerLiftSafeAnimationAction(AnimationTrigger::KnowledgeGraphSearching),
-                            &BehaviorKnowledgeGraphQuestion::WaitForTTSGeneration);
       }
     }
 
