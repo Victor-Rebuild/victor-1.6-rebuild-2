@@ -10,6 +10,7 @@
     "SDKDefault",
     "SDKLock",
     "SingletonWallTimeCoordinator",
+    "SingletonWallDateCoordinator",
     "TimerUtilityCoordinator",
     "WeatherResponses",
     "TakeAPhotoCoordinator",

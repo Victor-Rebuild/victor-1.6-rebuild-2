@@ -256,9 +256,11 @@ enum uint_8 BehaviorClass {
   // timer
   AdvanceClock,
   DisplayWallTime,
+  DisplayWallDate,
   ProceduralClock,
   TimerUtilityCoordinator,
   WallTimeCoordinator,
+  WallDateCoordinator,
 
   // userDefinedBehaviorTree
   UserDefinedBehaviorSelector,

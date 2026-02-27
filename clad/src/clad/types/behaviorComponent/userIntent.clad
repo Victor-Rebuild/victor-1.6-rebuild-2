@@ -163,6 +163,7 @@ union dupes_allowed UserIntent
   UserIntent_Void             seasonal_happynewyear,
   UserIntent_TimeInSeconds    set_timer,
   UserIntent_Void             show_clock,
+  UserIntent_Void             show_date,
   UserIntent_Void             silence,
   UserIntent_Void             status_feeling,
   UserIntent_Void             system_charger,

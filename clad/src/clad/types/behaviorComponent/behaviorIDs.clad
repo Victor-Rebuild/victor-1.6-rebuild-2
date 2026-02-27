@@ -108,6 +108,10 @@ enum uint_16 BehaviorID {
   SingletonFindFaceInFrontWallTime,
   SingletonWallTimeCoordinator,
 
+  // victorBehaviorTree/date
+  ShowWallDate,
+  SingletonWallDateCoordinator,
+
   // victorBehaviorTree
   ComeHereVoiceCommand,
   ConfirmHabitat,

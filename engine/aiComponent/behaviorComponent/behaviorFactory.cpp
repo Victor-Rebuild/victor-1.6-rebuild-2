@@ -173,9 +173,11 @@
 #include "engine/aiComponent/behaviorComponent/behaviors/sleeping/behaviorSleeping.h"
 #include "engine/aiComponent/behaviorComponent/behaviors/timer/behaviorAdvanceClock.h"
 #include "engine/aiComponent/behaviorComponent/behaviors/timer/behaviorDisplayWallTime.h"
+#include "engine/aiComponent/behaviorComponent/behaviors/timer/behaviorDisplayWallDate.h"
 #include "engine/aiComponent/behaviorComponent/behaviors/timer/behaviorProceduralClock.h"
 #include "engine/aiComponent/behaviorComponent/behaviors/timer/behaviorTimerUtilityCoordinator.h"
 #include "engine/aiComponent/behaviorComponent/behaviors/timer/behaviorWallTimeCoordinator.h"
+#include "engine/aiComponent/behaviorComponent/behaviors/timer/behaviorWallDateCoordinator.h"
 #include "engine/aiComponent/behaviorComponent/behaviors/userDefinedBehaviorTree/behaviorUserDefinedBehaviorSelector.h"
 #include "engine/aiComponent/behaviorComponent/behaviors/userDefinedBehaviorTree/behaviorUserDefinedBehaviorTreeRouter.h"
 #include "engine/aiComponent/behaviorComponent/behaviors/victor/behaviorConfirmObject.h"
@@ -1193,12 +1195,18 @@ ICozmoBehaviorPtr BehaviorFactory::CreateBehavior(const Json::Value& config)
       break;
     }
     
+    case BehaviorClass::DisplayWallDate:
+    {
+      newBehavior = ICozmoBehaviorPtr(new BehaviorDisplayWallDate(config));
+      break;
+    }
+
     case BehaviorClass::ProceduralClock:
     {
       newBehavior = ICozmoBehaviorPtr(new BehaviorProceduralClock(config));
       break;
     }
-    
+
     case BehaviorClass::TimerUtilityCoordinator:
     {
       newBehavior = ICozmoBehaviorPtr(new BehaviorTimerUtilityCoordinator(config));
@@ -1211,6 +1219,12 @@ ICozmoBehaviorPtr BehaviorFactory::CreateBehavior(const Json::Value& config)
       break;
     }
     
+    case BehaviorClass::WallDateCoordinator:
+    {
+      newBehavior = ICozmoBehaviorPtr(new BehaviorWallDateCoordinator(config));
+      break;
+    }
+
     case BehaviorClass::UserDefinedBehaviorSelector:
     {
       newBehavior = ICozmoBehaviorPtr(new BehaviorUserDefinedBehaviorSelector(config));

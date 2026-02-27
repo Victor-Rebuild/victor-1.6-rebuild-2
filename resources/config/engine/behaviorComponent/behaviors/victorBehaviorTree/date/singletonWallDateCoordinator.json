@@ -1,0 +1,10 @@
+{
+  "behaviorID": "SingletonWallDateCoordinator",  
+  "behaviorClass" : "WallDateCoordinator",
+ 
+  "associatedActiveFeature": "Clock",
+
+  "respondToUserIntents": [
+    { "type": "show_date" }
+  ]
+}

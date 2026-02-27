@@ -78,9 +78,6 @@ namespace Anki
       // if it was a knowledge graph response
       void ConsumeIntentGraphResponse();
 
-      // If we got a date intent we'll use that here
-      void SpeakDateResponse();
-
       // we're done listening to the question
       void OnStreamingComplete(bool);
       // we allow the response audio to be interrupted under certain conditions

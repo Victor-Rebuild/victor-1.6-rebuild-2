@@ -210,11 +210,8 @@
       "feature_gate": "KnowledgeGraph"
     },
     {
-      "user_intent": "knowledge_date_response_igraph",
       "cloud_intent": "intent_knowledge_response_date_igraph",
-      "app_intent": "knowledge_date_response_igraph",
-      "test_parsing": false,
-      "feature_gate": "KnowledgeGraph"
+      "user_intent": "show_date"
     },
     {
       "user_intent": "knowledge_unknown",
