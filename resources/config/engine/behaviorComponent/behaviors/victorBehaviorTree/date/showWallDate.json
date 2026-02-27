@@ -27,7 +27,7 @@
         "height": 43
       },
       {
-        "spriteBoxName": "Colon",
+        "spriteBoxName": "Slash",
         "spriteRenderMethod" : "CustomHue",
         "x": 87,
         "y": 27,
@@ -73,7 +73,7 @@
         "height": 36
       },
       {
-        "spriteBoxName": "Colon",
+        "spriteBoxName": "Slash",
         "spriteRenderMethod" : "CustomHue",
         "x": 76,
         "y": 23,
@@ -102,7 +102,7 @@
   // allows template elements which have a static image to be specified once
   "staticElements":
   {
-    "Colon": "clock_colon"
+    "Slash": "clock_slash"
   },
 
   "digitImageMap": [
