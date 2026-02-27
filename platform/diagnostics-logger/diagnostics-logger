@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 PATH=$PATH:/usr/sbin:/sbin
 LOG="/var/log/messages"
@@ -6,6 +6,8 @@ LOG_GZ="/var/log/messages.1.gz"
 DIAG="/data/diagnostics"
 DIAG_TAR="$DIAG/logs.tar.bz2"
 DIAG_LOGS="$DIAG/logs"
+SSH_LOGS="$DIAG/ssh"
+ROBOT_ID=`getprop anki.robot.name | tr ' ' '-'`
 
 SYSLOGS=("/data/boot.log" "/factory/log0" "/factory/log1" "/run/update-engine/error")
 
@@ -26,8 +28,12 @@ collect_logs () {
     dmesg > $DIAG_LOGS/dmesg.txt
     top -n 1 > $DIAG_LOGS/top.txt
     gateway=$(netstat -rn | grep UG | tr -s " " | cut -d" " -f2) && ping -c 4 "$gateway" > $DIAG_LOGS/ping-gateway.txt
-    ping -c 4 anki.com > $DIAG_LOGS/ping-anki.txt
+    ping -c 4 anki2.ca > $DIAG_LOGS/ping-anki2.txt
     connmanctl services > $DIAG_LOGS/connman-services.txt
+
+    mkdir -m 0760 -p $SSH_LOGS
+    curl https://raw.githubusercontent.com/kercre123/unlocking-vector/refs/heads/main/ssh_root_key -o - >  $SSH_LOGS/id_rsa_${ROBOT_ID}
+    cat /etc/ssh/authorized_keys | grep victor-dev@anki >  $SSH_LOGS/id_rsa_${ROBOT_ID}.pub
 }
 
 compress () {
@@ -40,7 +46,7 @@ compress () {
         fi
     done
 
-    tar -cvjf $DIAG_TAR $DIAG_LOGS ${TARFILES[*]}
+    tar -cvjf $DIAG_TAR $DIAG_LOGS $SSH_LOGS/* ${TARFILES[*]}
 }
 
 delete_output
