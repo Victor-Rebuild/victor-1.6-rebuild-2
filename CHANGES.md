@@ -10,6 +10,7 @@
 - Fixed going back to charger loop ([Anki Commit 1](https://github.com/kercre123/victor/commit/ac54369) [Anki Commit 2](https://github.com/kercre123/victor/commit/211c40d))
 
 ## Animation related changes
+- Vector runs at 60fps now (30 previously)
 - BinaryEyes when leaving charger
 - Good looking Vector 2.0 eyes (Used from WireOS + some tweaks from me)
 - Smoother pre-1.6 eye darts (Last in 1.5, ported to Viccyware and used code from there)
@@ -25,6 +26,8 @@
 - Add back the "Pew" sound when petting ([Reverts this Anki Commit](https://github.com/kercre123/victor/commit/48344a779ad6be70e398b96f3c79db069263e8a1))
 - Add old 1.5-era voice command response timing ([Reverts this anki commit](https://github.com/kercre123/victor/commit/6c3df37c6f3d929cc1562be0572185f10575858d))
 - New onboarding animation
+- More clear pairing screen
+- Less screen tearing on Vector 2.0
 
 ## Behavior related changes
 - Unintentional and Intentional performances ([Anki Commit 1](https://github.com/kercre123/victor/commit/d3fa225) [Anki Commit 2](https://github.com/kercre123/victor/commit/2184b33))
@@ -35,6 +38,7 @@
 - Vector can be named in <vector-ip>:8080 in a web browser, name can be asked for by asking the "What is your name?" Voice command if you're connected to the custom server environment.
 - Timer now works up to 1 day (WireOS commit)
 - Can now ask Vector the date, date can be asked for by asking the "What is the date?" Voice command if you're connected to the custom server environment.
+- More sensitive cliff detection
 
 ## Cloud changes
 - vic-cloud that works with wirepod and regular servers
