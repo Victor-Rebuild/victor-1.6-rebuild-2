@@ -34,6 +34,7 @@
 - Added the ability for Vector to say how old Vector is in years once 12 months passes
 - Vector can be named in <vector-ip>:8080 in a web browser, name can be asked for by asking the "What is your name?" Voice command if you're connected to the custom server environment.
 - Timer now works up to 1 day (WireOS commit)
+- Can now ask Vector the date, date can be asked for by asking the "What is the date?" Voice command if you're connected to the custom server environment.
 
 ## Cloud changes
 - vic-cloud that works with wirepod and regular servers
