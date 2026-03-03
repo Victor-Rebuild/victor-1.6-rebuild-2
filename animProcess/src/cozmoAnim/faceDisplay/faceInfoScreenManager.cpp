@@ -69,9 +69,9 @@
 
 // ------ I TAKE NO CREDIT, THIS BRANCH SCREEN IS FROM WIREOS ------
 // CHANGE THIS TO BE YOUR PROJECT'S NAME AND BRANCH
-const std::string OSProject = "1.6-rebuild";
+const std::string OSProject = "1.6-rebuild-private";
 const std::string Creator = "Rebuilt by Emily";
-const std::string CreatorWebsite = "https://anki2.ca";
+const std::string CreatorWebsite = "https://anki2.ca/";
 
 // Log options
 #define LOG_CHANNEL    "FaceInfoScreenManager"
@@ -158,7 +158,7 @@ FaceInfoScreenManager::FaceInfoScreenManager()
 , _wheelMovingBackwardsCount(0)
 , _liftTriggerReady(false)
 , _headTriggerReady(false)
-, _debugInfoScreensUnlocked(false)
+, _debugInfoScreensUnlocked(true)
 , _currScreen(nullptr)
 , _webService(nullptr)
 {
@@ -795,9 +795,9 @@ void FaceInfoScreenManager::DrawConfidenceClock(
   drawImg.FillWith( {clearColor.r(), clearColor.g(), clearColor.b()} );
 
   const Point2i center_px = { FACE_DISPLAY_WIDTH / 2, FACE_DISPLAY_HEIGHT / 2 };
-  constexpr int circleRadius_px = 40;
+  int circleRadius_px = IsXray() ? 32 : 40;
   constexpr int innerRadius_px = 5;
-  constexpr int maxBarLen_px = circleRadius_px - innerRadius_px - 4;
+  int maxBarLen_px = circleRadius_px - innerRadius_px - 4;
   constexpr int barWidth_px = 3;
   constexpr float angleFactorA = 0.866f; // cos(30 degrees)
   constexpr float angleFactorB = 0.5f; // sin(30 degrees)
