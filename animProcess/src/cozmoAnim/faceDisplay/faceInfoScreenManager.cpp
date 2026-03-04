@@ -1544,7 +1544,7 @@ void FaceInfoScreenManager::DrawSensorInfo(const RobotState& state)
 
   if(IsWhiskey())
   {
-    DrawTextOnScreen({cliffs, touch, batt, charger, tempC});
+    DrawTextOnScreen({syscon, cliffs, touch, batt, charger, tempC});
   }
   else if (IsXray())
   {
