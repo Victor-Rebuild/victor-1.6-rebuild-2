@@ -226,6 +226,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   ADD_SCREEN(CustomText, None);
   ADD_SCREEN(Main, Network);
   ADD_SCREEN_WITH_TEXT(UserDataSubmenu, UserDataSubmenu, {"DATA OPTIONS"});
+  ADD_SCREEN_WITH_TEXT(ConfigurationSubmenu, ConfigurationSubmenu, {"CONFIGURATION OPTIONS"});
   ADD_SCREEN_WITH_TEXT(ClearUserData, Main, {"CLEAR USER DATA?"});
   ADD_SCREEN_WITH_TEXT(ClearUserDataFail, Main, {"CLEAR USER DATA FAILED"});
   ADD_SCREEN_WITH_TEXT(Rebooting, Rebooting, {"REBOOTING..."});
@@ -323,19 +324,24 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
 
   ADD_MENU_ITEM(Main, "EXIT", None);
   // #if ENABLE_SELF_TEST
-  ADD_MENU_ITEM(Main, IsXray() ? "TEST" : "SELF TEST", SelfTest);
+  ADD_MENU_ITEM(Main, IsXray() ? "CONF" : "CONFIGURATION", ConfigurationSubmenu);
   // #endif
   ADD_MENU_ITEM(Main, IsXray() ? "DATA" : "DATA OPTIONS", UserDataSubmenu);
+
+  // === Configuration Submenu
+  ADD_MENU_ITEM(ConfigurationSubmenu, "EXIT", Main);
+  ADD_MENU_ITEM(ConfigurationSubmenu, "SELF TEST", SelfTest);
+  ADD_MENU_ITEM(ConfigurationSubmenu, "CHANGE SLOT", SwitchSlot);
+  DISABLE_TIMEOUT(ConfigurationSubmenu)
 
   // === User Data Menu ===
   ADD_MENU_ITEM(UserDataSubmenu, "EXIT", Main);
   ADD_MENU_ITEM(UserDataSubmenu, "REONBOARD", Reonboard);
-  ADD_MENU_ITEM(UserDataSubmenu, "CHANGE SLOT", SwitchSlot);
   ADD_MENU_ITEM(UserDataSubmenu, "CLEAR USER DATA", ClearUserData);
   DISABLE_TIMEOUT(UserDataSubmenu);
 
   // === Self test screen ===
-  ADD_MENU_ITEM(SelfTest, "EXIT", Main);
+  ADD_MENU_ITEM(SelfTest, "EXIT", ConfigurationSubmenu);
   FaceInfoScreen::MenuItemAction confirmSelfTest = [animStreamer, this]() {
     animStreamer->Abort();
     animStreamer->EnableKeepFaceAlive(false, 0);
@@ -2090,6 +2096,8 @@ void FaceInfoScreenManager::DrawScratch()
 {
 
   if (_currScreen == GetScreen(ScreenName::UserDataSubmenu)) {
+    _currScreen->DrawMenuVertical(*_scratchDrawingImg);
+  } else if (_currScreen == GetScreen(ScreenName::ConfigurationSubmenu)) {
     _currScreen->DrawMenuVertical(*_scratchDrawingImg);
   } else {
     _currScreen->DrawMenu(*_scratchDrawingImg);
