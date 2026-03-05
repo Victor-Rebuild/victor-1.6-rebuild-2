@@ -108,15 +108,15 @@ bool isDeployed() {
 }
 
 bool isWireLights() {
-    if (Util::FileUtils::FileExists("/data/data/wirelights")) {
-      Util::FileUtils::MoveFile("/data/data/wirelights", "/data/data/rebuild/wirelights");
-    }
+  if (Util::FileUtils::FileExists("/data/data/wirelights")) {
+    Util::FileUtils::MoveFile("/data/data/wirelights", "/data/data/rebuild/wirelights");
+  }
 
-    if(Util::FileUtils::FileExists("/data/data/rebuild/wirelights")) {
-      return true;
-    } else {
-      return false;
-    }
+  if(Util::FileUtils::FileExists("/data/data/rebuild/wirelights")) {
+    return true;
+  } else {
+    return false;
+  }
 }
 
 namespace {
@@ -2132,9 +2132,7 @@ void FaceInfoScreenManager::EnableMirrorModeScreen(bool enable)
 void FaceInfoScreenManager::DrawScratch()
 {
 
-  if (_currScreen == GetScreen(ScreenName::UserDataSubmenu)) {
-    _currScreen->DrawMenuVertical(*_scratchDrawingImg);
-  } else if (_currScreen == GetScreen(ScreenName::ConfigurationSubmenu)) {
+  if (_currScreen == GetScreen(ScreenName::UserDataSubmenu) || _currScreen == GetScreen(ScreenName::ConfigurationSubmenu)) {
     _currScreen->DrawMenuVertical(*_scratchDrawingImg);
   } else {
     _currScreen->DrawMenu(*_scratchDrawingImg);
