@@ -55,6 +55,7 @@ enum class ScreenName : uint8_t {
   UserDataSubmenu,
   ConfigurationSubmenu, // Let's you change configurations and run the self test, more soon maybe idk
   ServerInformation,
+  BackpackLights,
   
   Count
 };

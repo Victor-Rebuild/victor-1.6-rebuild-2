@@ -107,6 +107,18 @@ bool isDeployed() {
     return S_ISDIR(info.st_mode);
 }
 
+bool isWireLights() {
+    if (Util::FileUtils::FileExists("/data/data/wirelights")) {
+      Util::FileUtils::MoveFile("/data/data/wirelights", "/data/data/rebuild/wirelights");
+    }
+
+    if(Util::FileUtils::FileExists("/data/data/rebuild/wirelights")) {
+      return true;
+    } else {
+      return false;
+    }
+}
+
 namespace {
   // Number of tics that a wheel needs to be moving for before it registers
   // as a signal to move the menu cursor
@@ -226,6 +238,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   ADD_SCREEN(CustomText, None);
   ADD_SCREEN(Main, Network);
   ADD_SCREEN_WITH_TEXT(UserDataSubmenu, UserDataSubmenu, {"DATA OPTIONS"});
+  ADD_SCREEN_WITH_TEXT(BackpackLights, BackpackLights, {isWireLights() ? "USE ANKI LIGHTS?" : "USE WIREOS LIGHTS?"});
   ADD_SCREEN_WITH_TEXT(ConfigurationSubmenu, ConfigurationSubmenu, {"CONFIGURATION OPTIONS"});
   ADD_SCREEN_WITH_TEXT(ClearUserData, Main, {"CLEAR USER DATA?"});
   ADD_SCREEN_WITH_TEXT(ClearUserDataFail, Main, {"CLEAR USER DATA FAILED"});
@@ -331,7 +344,13 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   // === Configuration Submenu
   ADD_MENU_ITEM(ConfigurationSubmenu, "EXIT", Main);
   ADD_MENU_ITEM(ConfigurationSubmenu, "SELF TEST", SelfTest);
-  ADD_MENU_ITEM(ConfigurationSubmenu, "CHANGE SLOT", SwitchSlot);
+  if (isWireLights()) {
+    ADD_MENU_ITEM(ConfigurationSubmenu, "ANKI LIGHTS", BackpackLights);
+    ADD_MENU_ITEM(ConfigurationSubmenu, "CHANGE SLOT", SwitchSlot);
+  } else {
+    ADD_MENU_ITEM(ConfigurationSubmenu, "CHANGE SLOT", SwitchSlot);
+    ADD_MENU_ITEM(ConfigurationSubmenu, "WIREOS LIGHTS", BackpackLights);
+  }
   DISABLE_TIMEOUT(ConfigurationSubmenu)
 
   // === User Data Menu ===
@@ -392,6 +411,20 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   ADD_MENU_ITEM(Reonboard, "EXIT", UserDataSubmenu);
   ADD_MENU_ITEM_WITH_ACTION(Reonboard, "CONFIRM", confirmReonboard);
   DISABLE_TIMEOUT(Reonboard);
+
+  // === Swap backpack lights screen ===
+  FaceInfoScreen::MenuItemAction confirmToggleLights = [this]() {
+      LOG_INFO("FaceInfoScreenManager.Swaplights.Confirmed", "");
+      if (!isWireLights()) {
+        Util::FileUtils::WriteFile("/data/data/rebuild/wirelights", "");
+      } else {
+        Util::FileUtils::DeleteFile("/data/data/rebuild/wirelights");
+      }
+      this->Reboot();
+      return ScreenName::Rebooting;
+  };
+  ADD_MENU_ITEM(BackpackLights, "EXIT", ConfigurationSubmenu);
+  ADD_MENU_ITEM_WITH_ACTION(BackpackLights, "CONFIRM", confirmToggleLights);
 
   // === SwitchSlot screen ===
   FaceInfoScreen::MenuItemAction confirmSlotSwitch = [this]() {
@@ -1334,7 +1367,11 @@ void FaceInfoScreenManager::DrawMain()
 
   std::string botname;
   if (Util::FileUtils::FileExists("/data/data/customBotName")) {
-    botname = Util::FileUtils::ReadFile("/data/data/customBotName");
+    Util::FileUtils::MoveFile("/data/data/customBotName", "/data/data/rebuild/customBotName");
+  }
+
+  if (Util::FileUtils::FileExists("/data/data/rebuild/customBotName")) {
+    botname = Util::FileUtils::ReadFile("/data/data/rebuild/customBotName");
     _knownBot = 1;
   } else {
     _knownBot = 0;
