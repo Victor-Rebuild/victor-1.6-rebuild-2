@@ -177,10 +177,14 @@ void RobotDataLoader::LoadNonConfigData()
 
   // Backpack light animations
   {
-    struct stat buffer;
-    int rc = stat("/data/data/wirelights", &buffer);
-    if(rc == 0) {
+    if (Util::FileUtils::FileExists("/data/data/wirelights")) {
+      Util::FileUtils::MoveFile("/data/data/wirelights", "/data/data/rebuild/wirelights");
+    }
+
+    if(Util::FileUtils::FileExists("/data/data/rebuild/wirelights")) {
       wireoslights = true;
+    } else {
+      wireoslights = false;
     }
 
     // Use the CannedAnimationLoader to collect the backpack light json files
