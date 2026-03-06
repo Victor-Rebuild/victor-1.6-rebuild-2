@@ -293,6 +293,9 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   auto noneEnterFcn = [this]() {
     // Restore power mode as specified by engine
     SendAnimToRobot(_calmModeMsgOnNone);
+    if (!Util::FileUtils::DirectoryExists("/data/data/rebuild/")) {
+      Util::FileUtils::CreateDirectory("/data/data/rebuild/");
+    }
 
     if (FACTORY_TEST) {
       InitConnectionFlow(_animationStreamer);
