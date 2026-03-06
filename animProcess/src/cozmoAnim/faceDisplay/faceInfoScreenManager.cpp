@@ -69,7 +69,7 @@
 
 // ------ I TAKE NO CREDIT, THIS BRANCH SCREEN IS FROM WIREOS ------
 // CHANGE THIS TO BE YOUR PROJECT'S NAME AND BRANCH
-const std::string OSProject = "1.6-rebuild-private";
+const std::string OSProject = "1.6-rebuild";
 const std::string Creator = "Rebuilt by Emily";
 const std::string CreatorWebsite = "https://anki2.ca/";
 
