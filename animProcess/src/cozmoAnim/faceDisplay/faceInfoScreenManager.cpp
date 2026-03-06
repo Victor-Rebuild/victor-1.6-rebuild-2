@@ -98,6 +98,7 @@ namespace Vector {
 const Point2f FaceInfoScreenManager::kDefaultTextStartingLoc_pix = {0,10};
 const u32 FaceInfoScreenManager::kDefaultTextSpacing_pix = 11;
 const f32 FaceInfoScreenManager::kDefaultTextScale = 0.4f;
+int confPageNumber = 1;
 
 bool isDeployed() {
     struct stat info;
@@ -237,9 +238,11 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   ADD_SCREEN(FAC, None);
   ADD_SCREEN(CustomText, None);
   ADD_SCREEN(Main, Network);
+  ADD_SCREEN_WITH_TEXT(BootRecovery, BootRecovery, {"RECOVERY MODE?"});
   ADD_SCREEN_WITH_TEXT(UserDataSubmenu, UserDataSubmenu, {"DATA OPTIONS"});
   ADD_SCREEN_WITH_TEXT(BackpackLights, BackpackLights, {isWireLights() ? "USE ANKI LIGHTS?" : "USE WIREOS LIGHTS?"});
-  ADD_SCREEN_WITH_TEXT(ConfigurationSubmenu, ConfigurationSubmenu, {"CONFIGURATION OPTIONS"});
+  ADD_SCREEN_WITH_TEXT(ConfigurationSubmenu, ConfigurationSubmenu, {"CONFIGURATION PAGE 1"});
+  ADD_SCREEN_WITH_TEXT(ConfigurationSubmenu2, ConfigurationSubmenu2, {"CONFIGURATION PAGE 2"});
   ADD_SCREEN_WITH_TEXT(ClearUserData, Main, {"CLEAR USER DATA?"});
   ADD_SCREEN_WITH_TEXT(ClearUserDataFail, Main, {"CLEAR USER DATA FAILED"});
   ADD_SCREEN_WITH_TEXT(Rebooting, Rebooting, {"REBOOTING..."});
@@ -341,8 +344,26 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   // #endif
   ADD_MENU_ITEM(Main, IsXray() ? "DATA" : "DATA OPTIONS", UserDataSubmenu);
 
-  // === Configuration Submenu
+  // === Configuration Submenu ===
+  FaceInfoScreen::MenuItemAction incSlotUp = [] {
+      confPageNumber += 1;
+      switch(confPageNumber) {
+          case 2:  return ScreenName::ConfigurationSubmenu2;
+          default: confPageNumber = 1; return ScreenName::ConfigurationSubmenu;
+      }
+  };
+
+  FaceInfoScreen::MenuItemAction incSlotDown = [] {
+      confPageNumber -= 1;
+      switch(confPageNumber) {
+          case 1:  return ScreenName::ConfigurationSubmenu;
+          default: confPageNumber = 2; return ScreenName::ConfigurationSubmenu2;
+      }
+  };
+
+  // === Screen 1 ===
   ADD_MENU_ITEM(ConfigurationSubmenu, "EXIT", Main);
+  ADD_MENU_ITEM_WITH_ACTION(ConfigurationSubmenu, "NEXT PAGE", incSlotUp);
   ADD_MENU_ITEM(ConfigurationSubmenu, "SELF TEST", SelfTest);
   if (isWireLights()) {
     ADD_MENU_ITEM(ConfigurationSubmenu, "ANKI LIGHTS", BackpackLights);
@@ -351,6 +372,11 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
     ADD_MENU_ITEM(ConfigurationSubmenu, "CHANGE SLOT", SwitchSlot);
     ADD_MENU_ITEM(ConfigurationSubmenu, "WIREOS LIGHTS", BackpackLights);
   }
+
+  // === Screen 2 ===
+  ADD_MENU_ITEM(ConfigurationSubmenu2, "EXIT", Main);
+  ADD_MENU_ITEM_WITH_ACTION(ConfigurationSubmenu2, "PREV PAGE", incSlotDown);
+  ADD_MENU_ITEM(ConfigurationSubmenu2, "ENTER RECOVERY", BootRecovery);
   DISABLE_TIMEOUT(ConfigurationSubmenu)
 
   // === User Data Menu ===
@@ -395,7 +421,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   };
   SET_ENTER_ACTION(Network, networkEnterFcn);
 
-  // === Network screen ===
+  // === Server screen ===
   auto serverEnterFcn = [this]() {
     DrawServerInfo();
   };
@@ -433,10 +459,20 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
       this->Reboot();
       return ScreenName::SwitchSlotReboot;
   };
-  ADD_MENU_ITEM(SwitchSlot, "EXIT", UserDataSubmenu);
+  ADD_MENU_ITEM(SwitchSlot, "EXIT", ConfigurationSubmenu);
   ADD_MENU_ITEM_WITH_ACTION(SwitchSlot, "CONFIRM", confirmSlotSwitch);
   DISABLE_TIMEOUT(SwitchSlot);
     
+  // === Recovery screen ===
+  FaceInfoScreen::MenuItemAction confirmBootRecovery = []() {
+      LOG_INFO("FaceInfoScreenManager.Recovery.Confirmed", "");
+      (void)system("/usr/sbin/reboot recovery");
+      return ScreenName::Rebooting;
+  };
+  ADD_MENU_ITEM(BootRecovery, "EXIT", ConfigurationSubmenu2);
+  ADD_MENU_ITEM_WITH_ACTION(BootRecovery, "CONFIRM", confirmBootRecovery);
+  DISABLE_TIMEOUT(BootRecovery);
+
   // === Camera screen ===
   FaceInfoScreen::ScreenAction cameraEnterAction = [this]() {
     StreamCameraImages m;
@@ -2132,7 +2168,7 @@ void FaceInfoScreenManager::EnableMirrorModeScreen(bool enable)
 void FaceInfoScreenManager::DrawScratch()
 {
 
-  if (_currScreen == GetScreen(ScreenName::UserDataSubmenu) || _currScreen == GetScreen(ScreenName::ConfigurationSubmenu)) {
+  if (_currScreen == GetScreen(ScreenName::UserDataSubmenu) || _currScreen == GetScreen(ScreenName::ConfigurationSubmenu) || _currScreen == GetScreen(ScreenName::ConfigurationSubmenu2)) {
     _currScreen->DrawMenuVertical(*_scratchDrawingImg);
   } else {
     _currScreen->DrawMenu(*_scratchDrawingImg);

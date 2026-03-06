@@ -53,9 +53,11 @@ enum class ScreenName : uint8_t {
   ToggleMute, // Quick animation to show change in microphone mute state
   ToF,
   UserDataSubmenu,
-  ConfigurationSubmenu, // Let's you change configurations and run the self test, more soon maybe idk
+  ConfigurationSubmenu, // Let's you change configurations and has some other useful options
+  ConfigurationSubmenu2,
   ServerInformation,
   BackpackLights,
+  BootRecovery,
   
   Count
 };
