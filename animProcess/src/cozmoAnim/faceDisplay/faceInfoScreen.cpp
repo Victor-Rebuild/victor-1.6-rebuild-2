@@ -154,7 +154,7 @@ void FaceInfoScreen::DrawMenuHorizontal(Vision::ImageRGB565& img) const
     ASSERT_NAMED(menus <= 3, "More than 3 menus in same row is probably a bad idea");
 
     s32 blocks = menus;
-    f32 blockSize = FACE_DISPLAY_WIDTH / blocks;
+    f32 blockSize = (double)FACE_DISPLAY_WIDTH / blocks;
     s32 blockDrawn = 1;
 
     // Clear background
