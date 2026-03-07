@@ -120,6 +120,14 @@ bool isWireLights() {
   }
 }
 
+bool checkAutoUpdatesOn() {
+  if(Util::FileUtils::FileExists("/data/data/user-do-not-auto-update")) {
+    return false;
+  } else {
+    return true;
+  }
+}
+
 namespace {
   // Number of tics that a wheel needs to be moving for before it registers
   // as a signal to move the menu cursor
@@ -238,6 +246,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   ADD_SCREEN(FAC, None);
   ADD_SCREEN(CustomText, None);
   ADD_SCREEN(Main, Network);
+  ADD_SCREEN_WITH_TEXT(AutoUpdates, AutoUpdates, {"TOGGLE UPDATING?"});
   ADD_SCREEN_WITH_TEXT(BootRecovery, BootRecovery, {"RECOVERY MODE?"});
   ADD_SCREEN_WITH_TEXT(UserDataSubmenu, UserDataSubmenu, {"DATA OPTIONS"});
   ADD_SCREEN_WITH_TEXT(BackpackLights, BackpackLights, {isWireLights() ? "USE ANKI LIGHTS?" : "USE WIREOS LIGHTS?"});
@@ -250,6 +259,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   ADD_SCREEN_WITH_TEXT(SwitchSlotReboot, SwitchSlotReboot, {"SWITCHING SLOT..."});
   ADD_SCREEN_WITH_TEXT(SelfTest, Main, {"START SELF TEST?"});
   ADD_SCREEN(SelfTestRunning, SelfTestRunning)
+  ADD_SCREEN_WITH_TEXT(SetFrequency, SetFrequency, {"SET SPEED TO?"});
   ADD_SCREEN(Network, SensorInfo);
   ADD_SCREEN(SensorInfo, IMUInfo);
   ADD_SCREEN(IMUInfo, MotorInfo);
@@ -380,6 +390,8 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   ADD_MENU_ITEM(ConfigurationSubmenu2, "EXIT", Main);
   ADD_MENU_ITEM_WITH_ACTION(ConfigurationSubmenu2, "PREV PAGE", incSlotDown);
   ADD_MENU_ITEM(ConfigurationSubmenu2, "ENTER RECOVERY", BootRecovery);
+  ADD_MENU_ITEM(ConfigurationSubmenu2, "TOGGLE UPDATING", AutoUpdates);
+  ADD_MENU_ITEM(ConfigurationSubmenu2, "CHANGE PERF PROFILE", SetFrequency);
   DISABLE_TIMEOUT(ConfigurationSubmenu)
 
   // === User Data Menu ===
@@ -432,35 +444,71 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
 
   // === Reonboard screen ===
   FaceInfoScreen::MenuItemAction confirmReonboard = [this]() {
-      LOG_INFO("FaceInfoScreenManager.Reonboard.Confirmed", "");
-      (void)system("cd /data/data/com.anki.victor/persistent && rm -f onboarding/onboardingState.json token/token.jwt ../../server_config.json");
-      this->Reboot();
-      return ScreenName::Reonboarding;
+    LOG_INFO("FaceInfoScreenManager.Reonboard.Confirmed", "");
+    (void)system("cd /data/data/com.anki.victor/persistent && rm -f onboarding/onboardingState.json token/token.jwt ../../server_config.json");
+    this->Reboot();
+    return ScreenName::Reonboarding;
   };
   ADD_MENU_ITEM(Reonboard, "EXIT", UserDataSubmenu);
   ADD_MENU_ITEM_WITH_ACTION(Reonboard, "CONFIRM", confirmReonboard);
   DISABLE_TIMEOUT(Reonboard);
 
+  // === Change CPU/RAM speed ===
+  FaceInfoScreen::MenuItemAction confirmSetSpeedReg = []() {
+    LOG_INFO("FaceInfoScreenManager.ChangeFrequency.ConfirmedRegular", "");
+    (void)system("curl 'http://localhost:8080/api/mods/FreqChange/set?freq=0'");
+    return ScreenName::ConfigurationSubmenu2;
+  };
+
+  FaceInfoScreen::MenuItemAction confirmSetSpeedBal = []() {
+    LOG_INFO("FaceInfoScreenManager.ChangeFrequency.ConfirmedBalanced", "");
+    (void)system("curl 'http://localhost:8080/api/mods/FreqChange/set?freq=1'");
+    return ScreenName::ConfigurationSubmenu2;
+  };
+
+  FaceInfoScreen::MenuItemAction confirmSetSpeedPerf= []() {
+    LOG_INFO("FaceInfoScreenManager.ChangeFrequency.ConfirmedPerf", "");
+    (void)system("curl 'http://localhost:8080/api/mods/FreqChange/set?freq=2'");
+    return ScreenName::ConfigurationSubmenu2;
+  };
+  ADD_MENU_ITEM(SetFrequency, "EXIT", ConfigurationSubmenu2);
+  ADD_MENU_ITEM_WITH_ACTION(SetFrequency, "REGULAR", confirmSetSpeedReg);
+  ADD_MENU_ITEM_WITH_ACTION(SetFrequency, "BALANCED", confirmSetSpeedBal);
+  ADD_MENU_ITEM_WITH_ACTION(SetFrequency, "PERFORMANCE", confirmSetSpeedPerf);
+
+  // === Disable/Enable auto updates ===
+  FaceInfoScreen::MenuItemAction confirmAutoUpdates = []() {
+    LOG_INFO("FaceInfoScreenManager.AutoUpdates.Confirmed", "");
+    if (checkAutoUpdatesOn()) {
+      Util::FileUtils::WriteFile("/data/data/user-do-not-auto-update", "");
+    } else {
+      Util::FileUtils::DeleteFile("/data/data/user-do-not-auto-update");
+    }
+    return ScreenName::ConfigurationSubmenu2;
+  };
+  ADD_MENU_ITEM(AutoUpdates, "EXIT", ConfigurationSubmenu2);
+  ADD_MENU_ITEM_WITH_ACTION(AutoUpdates, "CONFIRM", confirmAutoUpdates);
+
   // === Swap backpack lights screen ===
   FaceInfoScreen::MenuItemAction confirmToggleLights = [this]() {
-      LOG_INFO("FaceInfoScreenManager.Swaplights.Confirmed", "");
-      if (!isWireLights()) {
-        Util::FileUtils::WriteFile("/data/data/rebuild/wirelights", "");
-      } else {
-        Util::FileUtils::DeleteFile("/data/data/rebuild/wirelights");
-      }
-      this->Reboot();
-      return ScreenName::Rebooting;
+    LOG_INFO("FaceInfoScreenManager.Swaplights.Confirmed", "");
+    if (!isWireLights()) {
+      Util::FileUtils::WriteFile("/data/data/rebuild/wirelights", "");
+    } else {
+      Util::FileUtils::DeleteFile("/data/data/rebuild/wirelights");
+    }
+    this->Reboot();
+    return ScreenName::Rebooting;
   };
   ADD_MENU_ITEM(BackpackLights, "EXIT", ConfigurationSubmenu);
   ADD_MENU_ITEM_WITH_ACTION(BackpackLights, "CONFIRM", confirmToggleLights);
 
   // === SwitchSlot screen ===
   FaceInfoScreen::MenuItemAction confirmSlotSwitch = [this]() {
-      LOG_INFO("FaceInfoScreenManager.SwitchSlot.Confirmed", "");
-      (void)system("/bin/sysswitch");
-      this->Reboot();
-      return ScreenName::SwitchSlotReboot;
+    LOG_INFO("FaceInfoScreenManager.SwitchSlot.Confirmed", "");
+    (void)system("/bin/sysswitch");
+    this->Reboot();
+    return ScreenName::SwitchSlotReboot;
   };
   ADD_MENU_ITEM(SwitchSlot, "EXIT", ConfigurationSubmenu);
   ADD_MENU_ITEM_WITH_ACTION(SwitchSlot, "CONFIRM", confirmSlotSwitch);
@@ -468,9 +516,9 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
     
   // === Recovery screen ===
   FaceInfoScreen::MenuItemAction confirmBootRecovery = []() {
-      LOG_INFO("FaceInfoScreenManager.Recovery.Confirmed", "");
-      (void)system("/usr/sbin/reboot recovery");
-      return ScreenName::Rebooting;
+    LOG_INFO("FaceInfoScreenManager.Recovery.Confirmed", "");
+    (void)system("/usr/sbin/reboot recovery");
+    return ScreenName::Rebooting;
   };
   ADD_MENU_ITEM(BootRecovery, "EXIT", ConfigurationSubmenu2);
   ADD_MENU_ITEM_WITH_ACTION(BootRecovery, "CONFIRM", confirmBootRecovery);
@@ -2171,7 +2219,11 @@ void FaceInfoScreenManager::EnableMirrorModeScreen(bool enable)
 void FaceInfoScreenManager::DrawScratch()
 {
 
-  if (_currScreen == GetScreen(ScreenName::UserDataSubmenu) || _currScreen == GetScreen(ScreenName::ConfigurationSubmenu) || _currScreen == GetScreen(ScreenName::ConfigurationSubmenu2)) {
+  if (_currScreen == GetScreen(ScreenName::UserDataSubmenu) ||
+    _currScreen == GetScreen(ScreenName::ConfigurationSubmenu) ||
+    _currScreen == GetScreen(ScreenName::ConfigurationSubmenu2) ||
+    _currScreen == GetScreen(ScreenName::SetFrequency))
+  {
     _currScreen->DrawMenuVertical(*_scratchDrawingImg);
   } else {
     _currScreen->DrawMenu(*_scratchDrawingImg);

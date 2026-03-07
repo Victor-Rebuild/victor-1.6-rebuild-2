@@ -58,6 +58,8 @@ enum class ScreenName : uint8_t {
   ServerInformation,
   BackpackLights,
   BootRecovery,
+  AutoUpdates,
+  SetFrequency,
   
   Count
 };
