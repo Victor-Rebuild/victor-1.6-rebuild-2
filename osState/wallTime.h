@@ -14,7 +14,6 @@
 #define __Engine_WallTime_H__
 
 #include "util/singleton/dynamicSingleton.h"
-
 #include <chrono>
 
 // forward declare time struct (see <ctime>)
@@ -72,6 +71,10 @@ public:
   // uses local time if possible, otherwise falls back to UTC. Checks if the time points are in the same day
   // or different days (rolling over at midnight)
   static bool AreTimePointsInSameDay(const TimePoint_t& a, const TimePoint_t& b);
+
+  // Returns the current day of week string (e.g. "Monday"), using accurate time
+  // if synced, approximate otherwise. Returns empty string on error.
+  std::string GetDayOfWeek();
 
 private:
 

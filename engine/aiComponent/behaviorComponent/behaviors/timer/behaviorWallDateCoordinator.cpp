@@ -228,8 +228,10 @@ std::string BehaviorWallDateCoordinator::GetTTSStringForDate()
   int currentMonth = localDate.tm_mon + 1;
   int currentDay = localDate.tm_mday;
 
+  std::string buffer = " ";
   std::string monthString;
   std::string dayString;
+  std::string dayWeekString = WallTime::getInstance()->GetDayOfWeek();
 
   if (currentMonth == 1) {
     monthString = "January";
@@ -269,7 +271,8 @@ std::string BehaviorWallDateCoordinator::GetTTSStringForDate()
     dayString = "th";
   }
     
-  ss << monthString + std::to_string(currentDay) + dayString;
+  ss << dayWeekString + buffer + monthString + buffer + std::to_string(currentDay) + dayString;
+  LOG_WARNING("Date", "DateString: %s", ss.str().c_str());
 
   return ss.str();
 }
