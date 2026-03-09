@@ -33,6 +33,7 @@
 #include "coretech/common/engine/utils/timer.h"
 #include "coretech/vision/engine/image.h"
 #include "coretech/vision/engine/image_impl.h"
+#include "engine/components/lightsConfig.h"
 #include "util/console/consoleInterface.h"
 #include "util/console/consoleSystem.h"
 #include "util/fileUtils/fileUtils.h"
@@ -106,18 +107,6 @@ bool isDeployed() {
         return false;
     }
     return S_ISDIR(info.st_mode);
-}
-
-bool isWireLights() {
-  if (Util::FileUtils::FileExists("/data/data/wirelights")) {
-    Util::FileUtils::MoveFile("/data/data/wirelights", "/data/data/rebuild/wirelights");
-  }
-
-  if(Util::FileUtils::FileExists("/data/data/rebuild/wirelights")) {
-    return true;
-  } else {
-    return false;
-  }
 }
 
 bool checkAutoUpdatesOn() {
@@ -249,7 +238,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   ADD_SCREEN_WITH_TEXT(AutoUpdates, AutoUpdates, {"TOGGLE UPDATING?"});
   ADD_SCREEN_WITH_TEXT(BootRecovery, BootRecovery, {"RECOVERY MODE?"});
   ADD_SCREEN_WITH_TEXT(UserDataSubmenu, UserDataSubmenu, {"DATA OPTIONS"});
-  ADD_SCREEN_WITH_TEXT(BackpackLights, BackpackLights, {isWireLights() ? "USE ANKI LIGHTS?" : "USE WIREOS LIGHTS?"});
+  ADD_SCREEN_WITH_TEXT(BackpackLights, BackpackLights, {_wireoslights() ? "USE ANKI LIGHTS?" : "USE WIREOS LIGHTS?"});
   ADD_SCREEN_WITH_TEXT(ConfigurationSubmenu, ConfigurationSubmenu, {"CONFIGURATION PAGE 1"});
   ADD_SCREEN_WITH_TEXT(ConfigurationSubmenu2, ConfigurationSubmenu2, {"CONFIGURATION PAGE 2"});
   ADD_SCREEN_WITH_TEXT(ClearUserData, Main, {"CLEAR USER DATA?"});
@@ -378,9 +367,12 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   ADD_MENU_ITEM(ConfigurationSubmenu, "EXIT", Main);
   ADD_MENU_ITEM_WITH_ACTION(ConfigurationSubmenu, "NEXT PAGE", incSlotUp);
   ADD_MENU_ITEM(ConfigurationSubmenu, "SELF TEST", SelfTest);
-  if (isWireLights()) {
+  if (_wireoslights()) {
     ADD_MENU_ITEM(ConfigurationSubmenu, "ANKI LIGHTS", BackpackLights);
     ADD_MENU_ITEM(ConfigurationSubmenu, "CHANGE SLOT", SwitchSlot);
+  } else if (_userlights()) {
+    ADD_MENU_ITEM(ConfigurationSubmenu, "CHANGE SLOT", SwitchSlot);
+    ADD_MENU_ITEM(ConfigurationSubmenu, "CUSTOM LIGHTS ON", ConfigurationSubmenu);
   } else {
     ADD_MENU_ITEM(ConfigurationSubmenu, "CHANGE SLOT", SwitchSlot);
     ADD_MENU_ITEM(ConfigurationSubmenu, "WIREOS LIGHTS", BackpackLights);
@@ -492,7 +484,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   // === Swap backpack lights screen ===
   FaceInfoScreen::MenuItemAction confirmToggleLights = [this]() {
     LOG_INFO("FaceInfoScreenManager.Swaplights.Confirmed", "");
-    if (!isWireLights()) {
+    if (!_wireoslights()) {
       Util::FileUtils::WriteFile("/data/data/rebuild/wirelights", "");
     } else {
       Util::FileUtils::DeleteFile("/data/data/rebuild/wirelights");

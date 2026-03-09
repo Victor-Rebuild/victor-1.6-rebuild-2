@@ -29,6 +29,7 @@
 #include "cozmoAnim/backpackLights/backpackLightAnimationContainer.h"
 #include "cozmoAnim/backpackLights/animBackpackLightComponent.h"
 
+#include "engine/components/lightsConfig.h"
 #include "osState/osState.h"
 
 #include "util/console/consoleInterface.h"
@@ -55,10 +56,8 @@ const char* kPathToExternalSpriteSequences = "assets/sprites/spriteSequences/";
 const char* kPathToEngineSpriteSequences = "config/devOnlySprites/spriteSequences/";
 const char* kPathToEngineBackpackLightsWireOS = "config/engine/lights/backpackLightsWireOS/";
 const char* kPathToEngineBackpackLightsStock = "config/engine/lights/backpackLights/";
+const char* kPathToEngineBackpackLightsUser = "../../../../data/data/customBackpackLights/";
 const char* kProceduralAnimName = "_PROCEDURAL_";
-
-bool wireoslights = false;
-
 }
 
 RobotDataLoader::RobotDataLoader(const AnimContext* context)
@@ -177,23 +176,21 @@ void RobotDataLoader::LoadNonConfigData()
 
   // Backpack light animations
   {
-    if (Util::FileUtils::FileExists("/data/data/wirelights")) {
-      Util::FileUtils::MoveFile("/data/data/wirelights", "/data/data/rebuild/wirelights");
-    }
-
-    if(Util::FileUtils::FileExists("/data/data/rebuild/wirelights")) {
-      wireoslights = true;
-    } else {
-      wireoslights = false;
-    }
-
     // Use the CannedAnimationLoader to collect the backpack light json files
     CannedAnimationLoader animLoader(_platform,
                                      _spriteSequenceContainer.get(), 
                                      _loadingCompleteRatio, _abortLoad);
 
-    const auto& fileInfo = animLoader.CollectAnimFiles({ wireoslights ? kPathToEngineBackpackLightsWireOS : kPathToEngineBackpackLightsStock});
-    LoadBackpackLightAnimations(fileInfo);
+    if(_wireoslights()){
+      const auto& fileInfo = animLoader.CollectAnimFiles({kPathToEngineBackpackLightsWireOS});
+      LoadBackpackLightAnimations(fileInfo);
+    } else if(_userlights()) {
+      const auto& fileInfo = animLoader.CollectAnimFiles({kPathToEngineBackpackLightsUser});
+      LoadBackpackLightAnimations(fileInfo);
+    } else {
+      const auto& fileInfo = animLoader.CollectAnimFiles({kPathToEngineBackpackLightsStock});
+      LoadBackpackLightAnimations(fileInfo);
+    }
   }
 
   {
