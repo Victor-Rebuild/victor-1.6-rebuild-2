@@ -126,8 +126,13 @@ void DrawShowPinScreen(Anim::AnimationStreamer* animStreamer, const Anim::AnimCo
     float scale1 = 0;
     img->DrawTextCenteredHorizontally(OSState::getInstance()->GetRobotName(), cv::QT_FONT_NORMAL, kRobotNameScale, 1, kColor, 15, false);
     Vision::Image::MakeTextFillImageWidth(kPrePin2, cv::QT_FONT_NORMAL, 1, img->GetNumCols(), textSize1, scale1);
-    img->DrawTextCenteredHorizontally(kPrePin, cv::QT_FONT_NORMAL, scale1, 1, kColor, (FACE_DISPLAY_HEIGHT + textSize1.height)-50, true);
-    img->DrawTextCenteredHorizontally(kPrePin2, cv::QT_FONT_NORMAL, scale1, 1, kColor, (FACE_DISPLAY_HEIGHT + textSize1.height)-30, true);
+    if (IsXray()) {
+      img->DrawTextCenteredHorizontally(kPrePin, cv::QT_FONT_NORMAL, scale1, 1, kColor, (FACE_DISPLAY_HEIGHT + textSize1.height)-50, true);
+      img->DrawTextCenteredHorizontally(kPrePin2, cv::QT_FONT_NORMAL, scale1, 1, kColor, (FACE_DISPLAY_HEIGHT + textSize1.height)-30, true);
+    } else {
+      img->DrawTextCenteredHorizontally(kPrePin, cv::QT_FONT_NORMAL, scale1, 1, kColor, (FACE_DISPLAY_HEIGHT + textSize1.height)-60, true);
+      img->DrawTextCenteredHorizontally(kPrePin2, cv::QT_FONT_NORMAL, scale1, 1, kColor, (FACE_DISPLAY_HEIGHT + textSize1.height)-40, true);
+    }
   } else {
     img->DrawSubImage(key, p);
     img->DrawTextCenteredHorizontally(OSState::getInstance()->GetRobotName(), cv::QT_FONT_NORMAL, kRobotNameScale, 1, kColor, 15, false);
