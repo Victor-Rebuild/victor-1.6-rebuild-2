@@ -29,7 +29,7 @@ public:
   virtual ~BehaviorWallDateCoordinator();
 
   // return a string which can be passed into TTS to say the time correctly 
-  static std::string GetTTSStringForDate();
+  std::string GetTTSStringForDate();
 
 protected:
   // Enforce creation through BehaviorFactory

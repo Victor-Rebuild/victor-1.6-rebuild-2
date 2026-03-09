@@ -1,0 +1,78 @@
+{
+  "smartling": {
+    "translate_paths": [
+      "*/translation"
+    ],
+    "variants_enabled": true,
+    "translate_mode": "custom",
+    "placeholder_format_custom": [
+      "%%[^%]+?%%",
+      "%[^%]+?%",
+      "##[^#]+?##",
+      "__[^_]+?__",
+      "[$]\\{[^\\}\\{]+?\\}",
+      "\\{\\{[^\\}\\{]+?\\}\\}",
+      "(?<!\\{)\\{[^\\}\\{]+?\\}(?!\\})"
+    ],
+    "source_key_paths": [
+      "/{*}"
+    ]
+  },
+  "BehaviorDate.Month1": {
+    "translation": "１月"
+  },
+  "BehaviorDate.Month2": {
+    "translation": "２月"
+  },
+  "BehaviorDate.Month3": {
+    "translation": "３月"
+  },
+  "BehaviorDate.Month4": {
+    "translation": "４月"
+  },
+  "BehaviorDate.Month5": {
+    "translation": "５月"
+  },
+  "BehaviorDate.Month6": {
+    "translation": "６月"
+  },
+  "BehaviorDate.Month7": {
+    "translation": "７月"
+  },
+  "BehaviorDate.Month8": {
+    "translation": "８月"
+  },
+  "BehaviorDate.Month9": {
+    "translation": "９月"
+  },
+  "BehaviorDate.Month10": {
+    "translation": "１０月"
+  },
+  "BehaviorDate.Month11": {
+    "translation": "１１月"
+  },
+  "BehaviorDate.Month12": {
+    "translation": "１２月"
+  },
+  "BehaviorDate.Day1": {
+    "translation": "日曜日"
+  },
+  "BehaviorDate.Day2": {
+    "translation": "月曜日"
+  },
+  "BehaviorDate.Day3": {
+    "translation": "火曜日"
+  },
+  "BehaviorDate.Day4": {
+    "translation": "水曜日"
+  },
+  "BehaviorDate.Day5": {
+    "translation": "木曜日"
+  },
+  "BehaviorDate.Day6": {
+    "translation": "金曜日"
+  },
+  "BehaviorDate.Day7": {
+    "translation": "土曜日"
+  }
+}

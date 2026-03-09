@@ -17,18 +17,41 @@
 #include "components/textToSpeech/textToSpeechCoordinator.h"
 #include "engine/aiComponent/behaviorComponent/behaviorContainer.h"
 #include "engine/aiComponent/behaviorComponent/behaviors/timer/behaviorDisplayWallDate.h"
+#include "engine/aiComponent/behaviorComponent/behaviorExternalInterface/beiRobotInfo.h"
 #include "engine/actions/animActions.h"
+#include "engine/components/localeComponent.h"
 #include "engine/components/settingsManager.h"
 #include "engine/faceWorld.h"
 #include "osState/wallTime.h"
 
 #include <iomanip>
+#include <string>
 
 namespace Anki {
 namespace Vector {
   
 
 namespace{
+  constexpr const char * kDateJanuary = "BehaviorDate.Month1";
+  constexpr const char * kDateFebruary = "BehaviorDate.Month2";
+  constexpr const char * kDateMarch = "BehaviorDate.Month3";
+  constexpr const char * kDateApril = "BehaviorDate.Month4";
+  constexpr const char * kDateMay = "BehaviorDate.Month5";
+  constexpr const char * kDateJune = "BehaviorDate.Month6";
+  constexpr const char * kDateJuly = "BehaviorDate.Month7";
+  constexpr const char * kDateAugust = "BehaviorDate.Month8";
+  constexpr const char * kDateSeptember = "BehaviorDate.Month9";
+  constexpr const char * kDateOctober = "BehaviorDate.Month10";
+  constexpr const char * kDateNovember = "BehaviorDate.Month11";
+  constexpr const char * kDateDecember = "BehaviorDate.Month12";
+
+  constexpr const char * kDaySunday = "BehaviorDate.Day1";
+  constexpr const char * kDayMonday = "BehaviorDate.Day2";
+  constexpr const char * kDayTuesday = "BehaviorDate.Day3";
+  constexpr const char * kDayWednesday = "BehaviorDate.Day4";
+  constexpr const char * kDayThursday = "BehaviorDate.Day5";
+  constexpr const char * kDayFriday = "BehaviorDate.Day6";
+  constexpr const char * kDaySaturday = "BehaviorDate.Day7";
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -227,51 +250,72 @@ std::string BehaviorWallDateCoordinator::GetTTSStringForDate()
 
   int currentMonth = localDate.tm_mon + 1;
   int currentDay = localDate.tm_mday;
+  int dayWeek = 0;
 
   std::string buffer = " ";
   std::string monthString;
   std::string dayString;
-  std::string dayWeekString = WallTime::getInstance()->GetDayOfWeek();
+  std::string dayStringEnd;
+  WallTime::getInstance()->GetDayOfWeek(dayWeek);
+  const auto & localeComponent = GetBEI().GetRobotInfo().GetLocaleComponent();
+
+  dayWeek = dayWeek + 1;
+
+  if (dayWeek == 1) {
+    dayString = localeComponent.GetString(kDaySunday);
+  } else if (dayWeek == 2) {
+    dayString = localeComponent.GetString(kDayMonday);
+  } else if (dayWeek == 3) {
+    dayString = localeComponent.GetString(kDayTuesday);
+  } else if (dayWeek == 4) {
+    dayString = localeComponent.GetString(kDayWednesday);
+  } else if (dayWeek == 5) {
+    dayString = localeComponent.GetString(kDayThursday);
+  } else if (dayWeek == 6) {
+    dayString = localeComponent.GetString(kDayFriday);
+  } else if (dayWeek == 7) {
+    dayString = localeComponent.GetString(kDaySaturday);
+  }
 
   if (currentMonth == 1) {
-    monthString = "January";
+    monthString = localeComponent.GetString(kDateJanuary);
   } else if (currentMonth == 2) {
-    monthString = "February";
+    monthString = localeComponent.GetString(kDateFebruary);
   } else if (currentMonth == 3) {
-    monthString = "March";
+    monthString = localeComponent.GetString(kDateMarch);
   } else if (currentMonth == 4) {
-    monthString = "April";
+    monthString = localeComponent.GetString(kDateApril);
   } else if (currentMonth == 5) {
-    monthString = "May";
+    monthString = localeComponent.GetString(kDateMay);
   } else if (currentMonth == 6) {
-    monthString = "June";
+    monthString = localeComponent.GetString(kDateJune);
   } else if (currentMonth == 7) {
-    monthString = "July";
+    monthString = localeComponent.GetString(kDateJuly);
   } else if (currentMonth == 8) {
-    monthString = "August";
+    monthString = localeComponent.GetString(kDateAugust);
   } else if (currentMonth == 9) {
-    monthString = "September";
+    monthString = localeComponent.GetString(kDateSeptember);
   } else if (currentMonth == 10) {
-    monthString = "October";
+    monthString = localeComponent.GetString(kDateOctober);
   } else if (currentMonth == 11) {
-    monthString = "November";
+    monthString = localeComponent.GetString(kDateNovember);
   } else if (currentMonth == 12) {
-    monthString = "December";
+    monthString = localeComponent.GetString(kDateDecember);
   }
 
   if ((currentDay % 100 >= 11) && (currentDay % 100 <= 13)) {
-    dayString = "th";
+    dayStringEnd = "th";
   } else if (currentDay % 10 == 1) {
-    dayString = "st";
+    dayStringEnd = "st";
   } else if (currentDay % 10 == 2) {
-    dayString = "nd";
+    dayStringEnd = "nd";
   } else if (currentDay % 10 == 3) {
-    dayString = "rd";
+    dayStringEnd = "rd";
   } else {
-    dayString = "th";
+    dayStringEnd = "th";
   }
     
-  ss << dayWeekString + buffer + monthString + buffer + std::to_string(currentDay) + dayString;
+  ss << dayString + buffer + monthString + buffer + std::to_string(currentDay) + dayStringEnd;
   LOG_WARNING("Date", "DateString: %s", ss.str().c_str());
 
   return ss.str();

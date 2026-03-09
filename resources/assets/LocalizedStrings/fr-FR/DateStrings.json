@@ -1,0 +1,78 @@
+{
+  "smartling": {
+    "translate_paths": [
+      "*/translation"
+    ],
+    "variants_enabled": true,
+    "translate_mode": "custom",
+    "placeholder_format_custom": [
+      "%%[^%]+?%%",
+      "%[^%]+?%",
+      "##[^#]+?##",
+      "__[^_]+?__",
+      "[$]\\{[^\\}\\{]+?\\}",
+      "\\{\\{[^\\}\\{]+?\\}\\}",
+      "(?<!\\{)\\{[^\\}\\{]+?\\}(?!\\})"
+    ],
+    "source_key_paths": [
+      "/{*}"
+    ]
+  },
+  "BehaviorDate.Month1": {
+    "translation": "janvier"
+  },
+  "BehaviorDate.Month2": {
+    "translation": "février"
+  },
+  "BehaviorDate.Month3": {
+    "translation": "mars"
+  },
+  "BehaviorDate.Month4": {
+    "translation": "avril"
+  },
+  "BehaviorDate.Month5": {
+    "translation": "mai"
+  },
+  "BehaviorDate.Month6": {
+    "translation": "juin"
+  },
+  "BehaviorDate.Month7": {
+    "translation": "juillet"
+  },
+  "BehaviorDate.Month8": {
+    "translation": "août"
+  },
+  "BehaviorDate.Month9": {
+    "translation": "septembre"
+  },
+  "BehaviorDate.Month10": {
+    "translation": "octobre"
+  },
+  "BehaviorDate.Month11": {
+    "translation": "novembre"
+  },
+  "BehaviorDate.Month12": {
+    "translation": "décembre"
+  },
+  "BehaviorDate.Day1": {
+    "translation": "dimanche"
+  },
+  "BehaviorDate.Day2": {
+    "translation": "lundi"
+  },
+  "BehaviorDate.Day3": {
+    "translation": "mardi"
+  },
+  "BehaviorDate.Day4": {
+    "translation": "mercredi"
+  },
+  "BehaviorDate.Day5": {
+    "translation": "jeudi"
+  },
+  "BehaviorDate.Day6": {
+    "translation": "vendredi"
+  },
+  "BehaviorDate.Day7": {
+    "translation": "samedi"
+  }
+}

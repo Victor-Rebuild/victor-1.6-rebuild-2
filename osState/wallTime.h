@@ -74,7 +74,7 @@ public:
 
   // Returns the current day of week string (e.g. "Monday"), using accurate time
   // if synced, approximate otherwise. Returns empty string on error.
-  std::string GetDayOfWeek();
+  void GetDayOfWeek(int dayWeekString);
 
 private:
 

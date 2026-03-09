@@ -1,0 +1,78 @@
+{
+  "smartling": {
+    "translate_paths": [
+      "*/translation"
+    ],
+    "variants_enabled": true,
+    "translate_mode": "custom",
+    "placeholder_format_custom": [
+      "%%[^%]+?%%",
+      "%[^%]+?%",
+      "##[^#]+?##",
+      "__[^_]+?__",
+      "[$]\\{[^\\}\\{]+?\\}",
+      "\\{\\{[^\\}\\{]+?\\}\\}",
+      "(?<!\\{)\\{[^\\}\\{]+?\\}(?!\\})"
+    ],
+    "source_key_paths": [
+      "/{*}"
+    ]
+  },
+  "BehaviorDate.Month1": {
+    "translation": "January"
+  },
+  "BehaviorDate.Month2": {
+    "translation": "February"
+  },
+  "BehaviorDate.Month3": {
+    "translation": "March"
+  },
+  "BehaviorDate.Month4": {
+    "translation": "April"
+  },
+  "BehaviorDate.Month5": {
+    "translation": "May"
+  },
+  "BehaviorDate.Month6": {
+    "translation": "June"
+  },
+  "BehaviorDate.Month7": {
+    "translation": "July"
+  },
+  "BehaviorDate.Month8": {
+    "translation": "August"
+  },
+  "BehaviorDate.Month9": {
+    "translation": "September"
+  },
+  "BehaviorDate.Month10": {
+    "translation": "October"
+  },
+  "BehaviorDate.Month11": {
+    "translation": "November"
+  },
+  "BehaviorDate.Month12": {
+    "translation": "December"
+  },
+  "BehaviorDate.Day1": {
+    "translation": "Sunday"
+  },
+  "BehaviorDate.Day2": {
+    "translation": "Monday"
+  },
+  "BehaviorDate.Day3": {
+    "translation": "Tuesday"
+  },
+  "BehaviorDate.Day4": {
+    "translation": "Wednesday"
+  },
+  "BehaviorDate.Day5": {
+    "translation": "Thursday"
+  },
+  "BehaviorDate.Day6": {
+    "translation": "Friday"
+  },
+  "BehaviorDate.Day7": {
+    "translation": "Saturday"
+  }
+}
