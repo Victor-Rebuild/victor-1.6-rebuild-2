@@ -15,17 +15,15 @@
 - Good looking Vector 2.0 eyes (Used from WireOS + some tweaks from me)
 - Smoother pre-1.6 eye darts (Last in 1.5, ported to Viccyware and used code from there)
 - Added the previously unused second timer end beep animation
-- Rainbow Eyes!
-- Rebuild Eyes, default and can be set by asking Vector `Change eye color to Cross Media Bar` (Changes eye color on the same schedule as the PS3 XMB)!
+- Rainbow Eyes! (Can be set by asking Vector `Change eye color to Rainbow Eyes`)
+- Rebuild Eyes, default, and can be set by asking Vector `Change eye color to Cross Media Bar` (Changes eye color on the same schedule as the PS3 XMB)!
 - Petting Lights (Code from WireOS but petting colors are mine)
 - Alt power on eye animations
 - More expressive power on anims
 - Face image overlays (Code used from WireOS)
-- Toggle between Anki lights and wireOS lights! (Run `touch /data/data/rebuild/wirelights` over ssh)
+- Toggle between Anki lights and WireOS lights! (Run `touch /data/data/rebuild/wirelights` over ssh)
 - Custom backpack lights! (Following [this](https://github.com/os-vector/wire-os-victor/pull/30) pr)
 - Screen doesn't flash as much when booting up (ThommoMC's fix)
-- Add back the "Pew" sound when petting ([Reverts this Anki Commit](https://github.com/kercre123/victor/commit/48344a779ad6be70e398b96f3c79db069263e8a1))
-- Add old 1.5-era voice command response timing ([Reverts this anki commit](https://github.com/kercre123/victor/commit/6c3df37c6f3d929cc1562be0572185f10575858d))
 - New onboarding animation
 - More clear pairing screen
 - Less screen tearing on Vector 2.0
@@ -33,6 +31,8 @@
 ## Behavior related changes
 - Unintentional and Intentional performances ([Anki Commit 1](https://github.com/kercre123/victor/commit/d3fa225) [Anki Commit 2](https://github.com/kercre123/victor/commit/2184b33))
 - Can now play Blackjack on charger
+- Add back the "Pew" sound when petting ([Reverts this Anki Commit](https://github.com/kercre123/victor/commit/48344a779ad6be70e398b96f3c79db069263e8a1))
+- Add old 1.5-era voice command response timing ([Reverts this anki commit](https://github.com/kercre123/victor/commit/6c3df37c6f3d929cc1562be0572185f10575858d))
 - Now plays the wakeup after onboarding is finished from web setup (Code from Viccyware)
 - Fixed Blackjack so that Vector actually says "Dealer" correctly
 - Added the ability for Vector to say how old Vector is in years once 12 months passes
