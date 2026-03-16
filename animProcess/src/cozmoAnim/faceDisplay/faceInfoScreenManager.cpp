@@ -236,11 +236,13 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   ADD_SCREEN(CustomText, None);
   ADD_SCREEN(Main, Network);
   ADD_SCREEN_WITH_TEXT(AutoUpdates, AutoUpdates, {"TOGGLE UPDATING?"});
+  ADD_SCREEN_WITH_TEXT(DTTBRandomEyes, DTTBRandomEyes, {"TOGGLE DTTB EYES?"});
   ADD_SCREEN_WITH_TEXT(BootRecovery, BootRecovery, {"RECOVERY MODE?"});
   ADD_SCREEN_WITH_TEXT(UserDataSubmenu, UserDataSubmenu, {"DATA OPTIONS"});
   ADD_SCREEN_WITH_TEXT(BackpackLights, BackpackLights, {_wireoslights() ? "USE ANKI LIGHTS?" : "USE WIREOS LIGHTS?"});
   ADD_SCREEN_WITH_TEXT(ConfigurationSubmenu, ConfigurationSubmenu, {"CONFIGURATION PAGE 1"});
   ADD_SCREEN_WITH_TEXT(ConfigurationSubmenu2, ConfigurationSubmenu2, {"CONFIGURATION PAGE 2"});
+  ADD_SCREEN_WITH_TEXT(ConfigurationSubmenu3, ConfigurationSubmenu3, {"CONFIGURATION PAGE 3"});
   ADD_SCREEN_WITH_TEXT(ClearUserData, Main, {"CLEAR USER DATA?"});
   ADD_SCREEN_WITH_TEXT(ClearUserDataFail, Main, {"CLEAR USER DATA FAILED"});
   ADD_SCREEN_WITH_TEXT(Rebooting, Rebooting, {"REBOOTING..."});
@@ -350,6 +352,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   FaceInfoScreen::MenuItemAction incSlotUp = [] {
       confPageNumber += 1;
       switch(confPageNumber) {
+          case 3:  return ScreenName::ConfigurationSubmenu3;
           case 2:  return ScreenName::ConfigurationSubmenu2;
           default: confPageNumber = 1; return ScreenName::ConfigurationSubmenu;
       }
@@ -359,7 +362,8 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
       confPageNumber -= 1;
       switch(confPageNumber) {
           case 1:  return ScreenName::ConfigurationSubmenu;
-          default: confPageNumber = 2; return ScreenName::ConfigurationSubmenu2;
+          case 2:  return ScreenName::ConfigurationSubmenu2;
+          default: confPageNumber = 3; return ScreenName::ConfigurationSubmenu3;
       }
   };
 
@@ -381,9 +385,16 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   // === Screen 2 ===
   ADD_MENU_ITEM(ConfigurationSubmenu2, "EXIT", Main);
   ADD_MENU_ITEM_WITH_ACTION(ConfigurationSubmenu2, "PREV PAGE", incSlotDown);
+  ADD_MENU_ITEM_WITH_ACTION(ConfigurationSubmenu2, "NEXT PAGE", incSlotUp);
   ADD_MENU_ITEM(ConfigurationSubmenu2, "ENTER RECOVERY", BootRecovery);
-  ADD_MENU_ITEM(ConfigurationSubmenu2, "TOGGLE UPDATING", AutoUpdates);
   ADD_MENU_ITEM(ConfigurationSubmenu2, "CHANGE PERF PROFILE", SetFrequency);
+  DISABLE_TIMEOUT(ConfigurationSubmenu)
+
+  // === Screen 3 ===
+  ADD_MENU_ITEM(ConfigurationSubmenu3, "EXIT", Main);
+  ADD_MENU_ITEM_WITH_ACTION(ConfigurationSubmenu3, "PREV PAGE", incSlotDown);
+  ADD_MENU_ITEM(ConfigurationSubmenu3, "TOGGLE UPDATING", AutoUpdates);
+  ADD_MENU_ITEM(ConfigurationSubmenu3, "DTTB RANDOM COLORS", DTTBRandomEyes);
   DISABLE_TIMEOUT(ConfigurationSubmenu)
 
   // === User Data Menu ===
@@ -478,7 +489,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
     }
     return ScreenName::ConfigurationSubmenu2;
   };
-  ADD_MENU_ITEM(AutoUpdates, "EXIT", ConfigurationSubmenu2);
+  ADD_MENU_ITEM(AutoUpdates, "EXIT", ConfigurationSubmenu3);
   ADD_MENU_ITEM_WITH_ACTION(AutoUpdates, "CONFIRM", confirmAutoUpdates);
 
   // === Swap backpack lights screen ===
@@ -515,6 +526,19 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   ADD_MENU_ITEM(BootRecovery, "EXIT", ConfigurationSubmenu2);
   ADD_MENU_ITEM_WITH_ACTION(BootRecovery, "CONFIRM", confirmBootRecovery);
   DISABLE_TIMEOUT(BootRecovery);
+
+  // === DTTB random eye colors screen ===
+  FaceInfoScreen::MenuItemAction confirmToggleDTTBEyes = []() {
+    LOG_INFO("FaceInfoScreenManager.Swaplights.Confirmed", "");
+    if (Util::FileUtils::FileDoesNotExist("/data/data/rebuild/dttb-eye-randomizer")) {
+      Util::FileUtils::WriteFile("/data/data/rebuild/dttb-eye-randomizer", "");
+    } else {
+      Util::FileUtils::DeleteFile("/data/data/rebuild/dttb-eye-randomizer");
+    }
+    return ScreenName::ConfigurationSubmenu3;
+  };
+  ADD_MENU_ITEM(DTTBRandomEyes, "EXIT", ConfigurationSubmenu3);
+  ADD_MENU_ITEM_WITH_ACTION(DTTBRandomEyes, "CONFIRM", confirmToggleDTTBEyes);
 
   // === Camera screen ===
   FaceInfoScreen::ScreenAction cameraEnterAction = [this]() {
@@ -2214,6 +2238,7 @@ void FaceInfoScreenManager::DrawScratch()
   if (_currScreen == GetScreen(ScreenName::UserDataSubmenu) ||
     _currScreen == GetScreen(ScreenName::ConfigurationSubmenu) ||
     _currScreen == GetScreen(ScreenName::ConfigurationSubmenu2) ||
+    _currScreen == GetScreen(ScreenName::ConfigurationSubmenu3) ||
     _currScreen == GetScreen(ScreenName::SetFrequency))
   {
     _currScreen->DrawMenuVertical(*_scratchDrawingImg);

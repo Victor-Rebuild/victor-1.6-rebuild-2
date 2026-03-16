@@ -55,11 +55,13 @@ enum class ScreenName : uint8_t {
   UserDataSubmenu,
   ConfigurationSubmenu, // Let's you change configurations and has some other useful options
   ConfigurationSubmenu2,
+  ConfigurationSubmenu3,
   ServerInformation,
   BackpackLights,
   BootRecovery,
   AutoUpdates,
   SetFrequency,
+  DTTBRandomEyes,
   
   Count
 };

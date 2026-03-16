@@ -170,24 +170,26 @@ void BehaviorDanceToTheBeat::OnBehaviorActivated()
   DASMSG_SET(i3, (int) _dVars.danceAnims.size(), "Number of dance animations that have been queued to play");
   DASMSG_SEND();
 
-  // Backup the current hue and saturation
-  auto readVar = [](const char* key) -> float {
-      std::string cmd = std::string("curl -s 'localhost:8889/consolevarget?key=") + key + "' | cut -d'<' -f1";
-      FILE* pipe = popen(cmd.c_str(), "r");
-      if (!pipe) return 0.f;
-      char buf[64] = {};
-      (void)fgets(buf, sizeof(buf), pipe);
-      pclose(pipe);
-      try {
-          return std::stof(buf);
-      } catch (const std::exception& e) {
-          PRINT_NAMED_WARNING("BehaviorDanceToTheBeat.InitBehavior.ReadVar",
-                              "Failed to parse console var '%s' value '%s': %s", key, buf, e.what());
-          return 0.f;
-      }
-  };
-  origHue = readVar("ProcFace_Hue");
-  origSat = readVar("ProcFace_Saturation");
+  if (_dVars.eyeColorRandomizer) {
+    // Backup the current hue and saturation
+    auto readVar = [](const char* key) -> float {
+        std::string cmd = std::string("curl -s 'localhost:8889/consolevarget?key=") + key + "' | cut -d'<' -f1";
+        FILE* pipe = popen(cmd.c_str(), "r");
+        if (!pipe) return 0.f;
+        char buf[64] = {};
+        (void)fgets(buf, sizeof(buf), pipe);
+        pclose(pipe);
+        try {
+            return std::stof(buf);
+        } catch (const std::exception& e) {
+            PRINT_NAMED_WARNING("BehaviorDanceToTheBeat.InitBehavior.ReadVar",
+                                "Failed to parse console var '%s' value '%s': %s", key, buf, e.what());
+            return 0.f;
+        }
+    };
+    origHue = readVar("ProcFace_Hue");
+    origSat = readVar("ProcFace_Saturation");
+  }
 
   TransitionToDancing();
 }
@@ -335,12 +337,17 @@ void BehaviorDanceToTheBeat::PlayNextDanceAnim()
   auto* animAction = new PlayAnimationAction(_dVars.danceAnims.front().GetAnimName());
   _dVars.danceAnims.pop_front();
   
-  int nextEyeColor = rand() % 7;
+  std::string hueVal;
+  std::string satVal;
 
-  std::string hueVal = "curl 'localhost:8889/consolevarset?key=ProcFace_Hue&value="
-      + std::to_string(GetEyeColorHue(nextEyeColor)) + "' &";
-  std::string satVal = "curl 'localhost:8889/consolevarset?key=ProcFace_Saturation&value="
-      + std::to_string(GetEyeColorSat(nextEyeColor)) + "' &";
+  if (_dVars.eyeColorRandomizer) {
+    int nextEyeColor = rand() % 7;
+
+    hueVal = "curl 'localhost:8889/consolevarset?key=ProcFace_Hue&value="
+        + std::to_string(GetEyeColorHue(nextEyeColor)) + "' &";
+    satVal = "curl 'localhost:8889/consolevarset?key=ProcFace_Saturation&value="
+        + std::to_string(GetEyeColorSat(nextEyeColor)) + "' &";
+  }
 
   if (_dVars.danceAnims.empty()) {
     // No more animations to play after this one, so play the get-out after
@@ -353,8 +360,10 @@ void BehaviorDanceToTheBeat::PlayNextDanceAnim()
     DelegateNow(animAction, [this](){
       DelegateIfInControl(new ReselectingLoopAnimationAction(_iConfig.eyeHoldAnim));
     });
-    (void)(system((hueVal.c_str())));
-    (void)(system((satVal.c_str())));
+    if (_dVars.eyeColorRandomizer) {
+      (void)(system((hueVal.c_str())));
+      (void)(system((satVal.c_str())));
+    }
     SetNextAnimTriggerTime();
   }
   
@@ -430,10 +439,12 @@ void BehaviorDanceToTheBeat::StopBackpackLights()
 {
   auto& blc = GetBEI().GetBackpackLightComponent();
   blc.ClearAllBackpackLightConfigs();
-  std::string hueVal = "curl 'localhost:8889/consolevarset?key=ProcFace_Hue&value=" + std::to_string(origHue) + "'";
-  std::string satVal = "curl 'localhost:8889/consolevarset?key=ProcFace_Saturation&value=" + std::to_string(origSat) + "'";
-  (void)(system((hueVal.c_str())));
-  (void)(system((satVal.c_str())));
+  if (_dVars.eyeColorRandomizer) {
+    std::string hueVal = "curl 'localhost:8889/consolevarset?key=ProcFace_Hue&value=" + std::to_string(origHue) + "'";
+    std::string satVal = "curl 'localhost:8889/consolevarset?key=ProcFace_Saturation&value=" + std::to_string(origSat) + "'";
+    (void)(system((hueVal.c_str())));
+    (void)(system((satVal.c_str())));
+  }
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
