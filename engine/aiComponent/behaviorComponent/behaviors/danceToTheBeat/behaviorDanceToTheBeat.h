@@ -27,7 +27,10 @@ enum class AnimationTrigger : int32_t;
 
 class BehaviorDanceToTheBeat : public ICozmoBehavior
 {
-  
+
+public:
+  float origHue;
+  float origSat;
 protected:
   // Enforce creation through BehaviorFactory
   friend class BehaviorFactory;
