@@ -283,7 +283,7 @@ bool WallTime::AreTimePointsInSameDay(const TimePoint_t& a, const TimePoint_t& b
   return sameDay;
 }
 
-void WallTime::GetDayOfWeek(int dayWeekString)
+void WallTime::GetDayOfWeek(int& dayWeekString)
 {
   struct tm localTime;
   bool got = GetLocalTime(localTime);
@@ -295,13 +295,17 @@ void WallTime::GetDayOfWeek(int dayWeekString)
   if( !got ) {
     PRINT_NAMED_WARNING("WallTime.GetDayOfWeek.Failed",
                         "Could not retrieve local time to determine day of week");
+    return;
   }
 
   if( localTime.tm_wday < 0 || localTime.tm_wday > 6 ) {
     PRINT_NAMED_ERROR("WallTime.GetDayOfWeek.InvalidWday",
                       "tm_wday value %d is out of range",
                       localTime.tm_wday);
+    return;
   }
+
+  dayWeekString = localTime.tm_wday;
 }
 
 }
