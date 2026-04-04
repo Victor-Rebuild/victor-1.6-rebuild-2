@@ -28,7 +28,7 @@ namespace Vector {
 
 namespace {
   unsigned int kTicksPerGameUpdate = 1;
-  unsigned int kScalingFactor = 2*2; // must be power of 2
+  unsigned int kScalingFactor = IsXray() ? 2 : 4; // must be power of 2
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -170,8 +170,8 @@ void BehaviorSnakeGame::DrawGame( Vision::Image& image ) const
 
   for( int j=0; j<height; ++j ) {
     for( int i=0; i<width; ++i ) {
-      unsigned int snakeI = (i-1)/kScalingFactor;
-      unsigned int snakeJ = (j-1)/kScalingFactor;
+      unsigned int snakeI = (i - kScalingFactor) / kScalingFactor;
+      unsigned int snakeJ = (j - kScalingFactor) / kScalingFactor;
       if( i<kScalingFactor || j<kScalingFactor || i>=width-kScalingFactor || j>=height-kScalingFactor ) {
         setImg(i,j, 255);
         continue;
