@@ -50,6 +50,7 @@
 #include "osState/wallTime.h"
 #include "opencv2/highgui.hpp"
 
+#include "anki/cozmo/shared/cozmoConfig.h"
 #include "anki/cozmo/shared/factory/faultCodes.h"
 
 #include "util/logging/logging.h"
@@ -113,6 +114,16 @@ bool checkAutoUpdatesOn() {
     return false;
   } else {
     return true;
+  }
+}
+
+bool namedRobot() {
+  if (Util::FileUtils::FileExists("/data/data/customBotName") ||
+      Util::FileUtils::FileExists("/data/data/rebuild/customBotName"))
+  {
+    return true;
+  } else {
+    return false;
   }
 }
 
@@ -1528,59 +1539,31 @@ void FaceInfoScreenManager::DrawMain()
   std::string esn = osstate->GetSerialNumberAsString();
   if(esn.empty())
   {
-    // TODO Remove once DVT2s are phased out
-    // ESN is 0 assume this is a DVT2 with a fake birthcertificate
-    // so look for serial number in "/proc/cmdline"
-    static std::string serialNum = "";
-    if(serialNum == "")
-    {
-      std::ifstream infile("/proc/cmdline");
-
-      std::string line;
-      while(std::getline(infile, line))
-      {
-        static const std::string kProp = "androidboot.serialno=";
-        size_t index = line.find(kProp);
-        if(index != std::string::npos)
-        {
-          serialNum = line.substr(index + kProp.length(), 8);
-        }
-      }
-      infile.close();
-    }
-    esn =  serialNum;
+    esn = "00601b50";
   }
 
   std::transform(esn.begin(), esn.end(), esn.begin(),
     [](unsigned char c){ return std::tolower(c); });
 
   std::string botname;
-  if (Util::FileUtils::FileExists("/data/data/customBotName")) {
-    botname = Util::FileUtils::ReadFile("/data/data/customBotName");
-    _knownBot = 1;
-  } else if (Util::FileUtils::FileExists("/data/data/rebuild/customBotName")) {
-    botname = Util::FileUtils::ReadFile("/data/data/rebuild/customBotName");
-    _knownBot = 1;
-  } else {
-    _knownBot = 0;
+  if (namedRobot()) {
+    if (Util::FileUtils::FileExists("/data/data/customBotName")) {
+      botname = Util::FileUtils::ReadFile("/data/data/customBotName");
+    } else if (Util::FileUtils::FileExists("/data/data/rebuild/customBotName")) {
+      botname = Util::FileUtils::ReadFile("/data/data/rebuild/customBotName");
+    }
   }
 
-  const std::string nameOfBot = "BOT: " + botname;
-
-  const std::string serialNo = "ESN: " + esn;
+  const std::string serialNo = namedRobot() ? "BOT: " + botname : "ESN: " + esn;
 
   const std::string hwVer    = "HW: "   + std::to_string(IsXray() ? 8 : Factory::GetEMR()->fields.HW_VER);
 
   const std::string osProject    = "OS: " + OSProject;
 
   // osVer will be sha if deployed build
-  std::string osVer = "VER: " + osstate->GetOSBuildVersion();
+  std::string osVer = isDeployed() ? "SHA: "  + osstate->GetBuildSha() : "VER: " + osstate->GetOSBuildVersion();
 
   const std::string ssid     = "SSID: " + osstate->GetSSID(true);
-
-  if (isDeployed()) {
-    osVer      = "SHA: "  + osstate->GetBuildSha();
-  }
 
   std::string ip             = osstate->GetIPAddress();
   if (ip.empty()) {
@@ -1595,24 +1578,14 @@ void FaceInfoScreenManager::DrawMain()
   } else {
     // ESN/serialNo and the HW version are drawn on the same line with serialNo default left aligned and
     // HW version right aligned.
-    if (_knownBot) {
-      ColoredTextLines lines = { { {nameOfBot}, {hwVer, NamedColors::WHITE, false} },
-                                {serialNo},
-                                {osProject},
-                                {osVer},
-                                { {"IP: "}, {ip, (osstate->IsValidIPAddress(ip) ? NamedColors::GREEN : NamedColors::RED)} },
-                              };
-      DrawTextOnScreen(lines);
-    } else {
-      ColoredTextLines lines = { { {serialNo},  {hwVer, NamedColors::WHITE, false} },
-                                {osProject},
-                                {osVer},
-                                {ssid},
-                                { {"IP: "}, {ip, (osstate->IsValidIPAddress(ip) ? NamedColors::GREEN : NamedColors::RED)} },
-                              };
+    ColoredTextLines lines = { { {serialNo},  {hwVer, NamedColors::WHITE, false} },
+                              {osProject},
+                              {osVer},
+                              {ssid},
+                              { {"IP: "}, {ip, (osstate->IsValidIPAddress(ip) ? NamedColors::GREEN : NamedColors::RED)} },
+                            };
 
-      DrawTextOnScreen(lines);
-    }
+    DrawTextOnScreen(lines);
   }
 }
 

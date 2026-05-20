@@ -17,7 +17,6 @@
 #ifndef __AnimProcess_CozmoAnim_FaceDisplay_FaceInfoScreenManager_H_
 #define __AnimProcess_CozmoAnim_FaceDisplay_FaceInfoScreenManager_H_
 
-#include "anki/cozmo/shared/cozmoConfig.h"
 #include "coretech/common/shared/types.h"
 #include "coretech/common/engine/colorRGBA.h"
 #include "coretech/common/shared/math/point_fwd.h"
@@ -245,7 +244,6 @@ private:
   
   bool _drawFAC = false;
   bool _engineLoaded = false;
-  bool _knownBot = false;
 
   bool _invalidServConfig = false;
   bool _usesCustServConfig = true;
