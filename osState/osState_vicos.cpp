@@ -13,7 +13,6 @@
  **/
 
 #include "osState/osState.h"
-#include "anki/cozmo/shared/cozmoConfig.h"
 #include "util/console/consoleInterface.h"
 #include "util/console/consoleInterface.h"
 #include "util/fileUtils/fileUtils.h"
@@ -236,7 +235,7 @@ OSState::~OSState()
 
 RobotID_t OSState::GetRobotID() const
 {
-  return DEFAULT_ROBOT_ID;
+  return 0;
 }
 
 void OSState::Update(BaseStationTime_t currTime_nanosec)
