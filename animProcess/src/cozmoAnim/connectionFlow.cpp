@@ -50,36 +50,33 @@ namespace {
 
   const char* kShowPinScreenSpriteName = "pairing_icon_key";
 
+  bool usingWP = Util::FileUtils::FileExists("/data/data/server_config.json");
+
   bool s_enteredAnyScreen = false;
 }
 
 // Draws BLE name and url to screen
 bool DrawStartPairingScreen(Anim::AnimationStreamer* animStreamer)
 {
+  // Not using this code here -- Emily
   // Robot name will be empty until switchboard has set the property
-  std::string robotName = OSState::getInstance()->GetRobotName();
-  if(robotName == "")
-  {
-    return false;
-  }
+  // std::string robotName = OSState::getInstance()->GetRobotName();
+  // if(robotName == "")
+  // {
+  //   return false;
+  // }
   
   s_enteredAnyScreen = true;  
 
   auto* img = new Vision::ImageRGBA(FACE_DISPLAY_HEIGHT, FACE_DISPLAY_WIDTH);
   img->FillWith(Vision::PixelRGBA(0, 0));
 
-  img->DrawTextCenteredHorizontally(robotName, cv::QT_FONT_NORMAL, kRobotNameScale, 1, kColor, 15, false);
+  img->DrawTextCenteredHorizontally("Setup Robot at:", cv::QT_FONT_NORMAL, kRobotNameScale, 1, kColor, 15, false);
 
   cv::Size textSize;
   float scale = 0;
 
-  std::string kURL;
-
-  if (Util::FileUtils::FileExists("/data/data/server_config.json")) {
-    kURL = kURLWP;
-  } else {
-    kURL = kURLDef;
-  }
+  const std::string kURL = usingWP ? kURLWP : kURLDef;
 
   Vision::Image::MakeTextFillImageWidth(kURL, cv::QT_FONT_NORMAL, 1, img->GetNumCols(), textSize, scale);
   img->DrawTextCenteredHorizontally(kURL, cv::QT_FONT_NORMAL, scale, 1, kColor, (FACE_DISPLAY_HEIGHT + textSize.height)/2, true);
