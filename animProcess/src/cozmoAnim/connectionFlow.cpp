@@ -55,7 +55,7 @@ namespace {
   bool s_enteredAnyScreen = false;
 }
 
-// Draws BLE name and url to screen
+// Draws setup text and url to screen
 bool DrawStartPairingScreen(Anim::AnimationStreamer* animStreamer)
 {
   // Not using this code here -- Emily
