@@ -28,6 +28,8 @@
 #include <map>
 #include <thread>
 #include <atomic>
+#include <condition_variable>
+#include <mutex>
 
 namespace Anki {
 namespace Vector {
@@ -47,6 +49,8 @@ public:
   std::thread _rebuildEyeThread;
   std::atomic<bool> __rebuildEyeThread{false};
   std::atomic<bool> _stopRebuildEyeThread{false};
+  std::condition_variable _rebuildEyeCV;
+  std::mutex _rebuildEyeMutex;
 
   //////
   // IDependencyManagedComponent functions

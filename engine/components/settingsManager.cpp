@@ -682,6 +682,7 @@ namespace Anki
       if (_rebuildEyeThread.joinable())
       {
         _stopRebuildEyeThread.store(true, std::memory_order_release);
+        _rebuildEyeCV.notify_all();
         _rebuildEyeThread.join();
         _rebuildEyeThread = std::thread();                             // Reset the thread object
         _stopRebuildEyeThread.store(false, std::memory_order_release); // Reset the flag for future use
@@ -712,7 +713,7 @@ namespace Anki
                         hue += 0.01f;
                         if (hue > 1.0f)
                         {
-                            hue = 0.0f;
+                          hue = 0.0f;
                         }
                         std::this_thread::sleep_for(std::chrono::milliseconds(30));
 
@@ -722,9 +723,9 @@ namespace Anki
                         const auto& currentHueKey = EyeColor_Name(static_cast<external_interface::EyeColor>(eyeval));
                         if (currentHueKey != rainbowEyesStrInTh)
                         {
-                            LOG_INFO("SettingsManager.ApplySettingEyeColor.Apply", "Stopping Rainbow Eyes thread");
-                            _stopRainbowEyeThread.store(true, std::memory_order_release);
-                            break;
+                          LOG_INFO("SettingsManager.ApplySettingEyeColor.Apply", "Stopping Rainbow Eyes thread");
+                          _stopRainbowEyeThread.store(true, std::memory_order_release);
+                          break;
                         }
                     } });
           }
@@ -838,8 +839,11 @@ namespace Anki
                           _stopRebuildEyeThread.store(true, std::memory_order_release);
                           break;
                       }
-                      // Refresh every 3/4 second
-                      std::this_thread::sleep_for(std::chrono::milliseconds(45));
+                      // Refresh every 15 seconds
+                      std::unique_lock<std::mutex> lock(_rebuildEyeMutex);
+                      _rebuildEyeCV.wait_for(lock, std::chrono::seconds(15), [this]() {
+                        return _stopRebuildEyeThread.load(std::memory_order_acquire);
+                      });
                   }
               });
           }
