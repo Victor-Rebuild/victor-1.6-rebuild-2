@@ -183,20 +183,17 @@ void BehaviorBlackJack::OnBehaviorActivated()
          "A Game of BlackJack has just started");
   DASMSG_SEND();
 
-  bool skipLookForFace = false;
+  bool leaveChargerAndPlay = _iConfig.driveOffChargerBehavior->WantsToBeActivated();
 
   if ( GetBEI().GetRobotInfo().IsOnChargerPlatform() &&
-      _iConfig.driveOffChargerBehavior->WantsToBeActivated() ) {
+      leaveChargerAndPlay ) {
       DelegateIfInControl(_iConfig.driveOffChargerBehavior.get(),
                           &BehaviorBlackJack::TransitionToTurnToFace);
       return;
-  } else if ( GetBEI().GetRobotInfo().IsOnChargerPlatform() &&
-      !_iConfig.driveOffChargerBehavior->WantsToBeActivated() ) {
-      skipLookForFace = true;
   }
 
   // --- On With the Game ---
-  if (skipLookForFace && GetBEI().GetRobotInfo().IsOnChargerPlatform()) {
+  if (!leaveChargerAndPlay && GetBEI().GetRobotInfo().IsOnChargerPlatform()) {
     TransitionToGetIn();
   } else {
     TransitionToTurnToFace();
