@@ -96,11 +96,6 @@ private:
   
   void ParseDisplayTempTimesFromAnim();
   void StartTTSGeneration();
-
-  // For freqchange stuff
-  int _prevcpufreq = 0;
-  bool _doXrayOverclock = false;
-
 };
 
 } // namespace Vector
