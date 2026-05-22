@@ -1,12 +1,12 @@
 /**
  * File: behaviorDisplayWallDate.h
  *
- * Author: Kevin M. Karol
- * Created: 2018-05-30
+ * Author: Emily modder
+ * Created: 2026-02-26
  *
- * Description: If the robot has a valid wall time, display it on the robot's face
+ * Description: If the robot has a valid date, display it on the robot's face
  *
- * Copyright: Anki, Inc. 2018
+ * Copyright: Victor-Rebuild, 2026
  *
  **/
 

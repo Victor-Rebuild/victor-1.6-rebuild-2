@@ -1,12 +1,12 @@
 /**
 * File: BehaviorWallDateCoordinator.cpp
 *
-* Author: Kevin M. Karol
-* Created: 2018-06-15
+* Author: Emily modder
+* Created: 2026-02-26
 *
-* Description: Manage the designed response to a user request for the wall time
+* Description: Manage the designed response to a user request for the date
 *
-* Copyright: Anki, Inc. 2018
+* Copyright: Victor-Rebuild, 2026
 *
 **/
 
