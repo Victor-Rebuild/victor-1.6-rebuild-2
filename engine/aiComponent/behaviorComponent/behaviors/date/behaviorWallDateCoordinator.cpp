@@ -64,7 +64,7 @@ BehaviorWallDateCoordinator::DynamicVariables::DynamicVariables()
 {
   utteranceID = kInvalidUtteranceID;
   utteranceState = UtteranceState::Generating;
-  isShowingTime = false;
+  isShowingDate = false;
 }
 
 
@@ -147,7 +147,7 @@ void BehaviorWallDateCoordinator::BehaviorUpdate()
     return;
   }
 
-  if (!_dVars.isShowingTime){
+  if (!_dVars.isShowingDate){
     switch (_dVars.utteranceState)
     {
       case UtteranceState::Ready:
@@ -198,14 +198,14 @@ void BehaviorWallDateCoordinator::TransitionToFindFaceInFront()
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BehaviorWallDateCoordinator::TransitionToShowWallDate()
 {
-  _dVars.isShowingTime = true;
+  _dVars.isShowingDate = true;
 
   auto playUtteranceCallback = [this](){
     // only play TTS if it was generated, else we're fine with just the clock
     if ((kInvalidUtteranceID != _dVars.utteranceID) && (_dVars.utteranceState == UtteranceState::Ready)){
       GetBEI().GetTextToSpeechCoordinator().PlayUtterance(_dVars.utteranceID);
     } else {
-      LOG_ERROR("BehaviorWallDateCoordinator", "Attempted to play time TTS but generation failed");
+      LOG_ERROR("BehaviorWallDateCoordinator", "Attempted to play date TTS but generation failed");
     }
   };
 
@@ -222,7 +222,7 @@ void BehaviorWallDateCoordinator::TransitionToShowWallDate()
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BehaviorWallDateCoordinator::StartTTSGeneration()
 {
-  auto textOfTime = GetTTSStringForDate();
+  auto textOfDate = GetTTSStringForDate();
 
   const UtteranceTriggerType triggerType = UtteranceTriggerType::Manual;
   const AudioTtsProcessingStyle style = AudioTtsProcessingStyle::Default_Processed;
@@ -232,7 +232,7 @@ void BehaviorWallDateCoordinator::StartTTSGeneration()
     _dVars.utteranceState = utteranceState;
   };
 
-  _dVars.utteranceID = GetBEI().GetTextToSpeechCoordinator().CreateUtterance(textOfTime, triggerType, style,
+  _dVars.utteranceID = GetBEI().GetTextToSpeechCoordinator().CreateUtterance(textOfDate, triggerType, style,
                                                                              1.0f, callback);
 
   // if we failed to create the tts, we need to let our behavior know since the callback is NOT called in this case
@@ -245,62 +245,60 @@ void BehaviorWallDateCoordinator::StartTTSGeneration()
 std::string BehaviorWallDateCoordinator::GetTTSStringForDate()
 {
   std::stringstream ss;
+  std::string monthString;
+  std::string dayString;
+  std::string dayStringEnd;
   struct tm localDate;
-  WallTime::getInstance()->GetLocalTime(localDate);
 
   int currentMonth = localDate.tm_mon + 1;
   int currentDay = localDate.tm_mday;
   int dayWeek = 0;
 
-  std::string buffer = " ";
-  std::string monthString;
-  std::string dayString;
-  std::string dayStringEnd;
+  WallTime::getInstance()->GetLocalTime(localDate);
   WallTime::getInstance()->GetDayOfWeek(dayWeek);
+
+  currentMonth = localDate.tm_mon;
+  currentDay = localDate.tm_mday;
+
   const auto & localeComponent = GetBEI().GetRobotInfo().GetLocaleComponent();
 
-  dayWeek = dayWeek + 1;
+  const std::string monthStringLocalized[] = {
+    localeComponent.GetString(kDateJanuary),
+    localeComponent.GetString(kDateFebruary),
+    localeComponent.GetString(kDateMarch),
+    localeComponent.GetString(kDateApril),
+    localeComponent.GetString(kDateMay),
+    localeComponent.GetString(kDateJune),
+    localeComponent.GetString(kDateJuly),
+    localeComponent.GetString(kDateAugust),
+    localeComponent.GetString(kDateSeptember),
+    localeComponent.GetString(kDateOctober),
+    localeComponent.GetString(kDateNovember),
+    localeComponent.GetString(kDateDecember)
+  };
 
-  if (dayWeek == 1) {
-    dayString = localeComponent.GetString(kDaySunday);
-  } else if (dayWeek == 2) {
-    dayString = localeComponent.GetString(kDayMonday);
-  } else if (dayWeek == 3) {
-    dayString = localeComponent.GetString(kDayTuesday);
-  } else if (dayWeek == 4) {
-    dayString = localeComponent.GetString(kDayWednesday);
-  } else if (dayWeek == 5) {
-    dayString = localeComponent.GetString(kDayThursday);
-  } else if (dayWeek == 6) {
-    dayString = localeComponent.GetString(kDayFriday);
-  } else if (dayWeek == 7) {
-    dayString = localeComponent.GetString(kDaySaturday);
+  const std::string dayStringLocalized[] = {
+    localeComponent.GetString(kDaySunday),
+    localeComponent.GetString(kDayMonday),
+    localeComponent.GetString(kDayTuesday),
+    localeComponent.GetString(kDayWednesday),
+    localeComponent.GetString(kDayThursday),
+    localeComponent.GetString(kDayFriday),
+    localeComponent.GetString(kDaySaturday)
+  };
+
+  if (dayWeek >= 0 && dayWeek <= 6) {
+    dayString = dayStringLocalized[dayWeek];
+  } else {
+    // This shouldn't be anything outside the range of 0-6 (1-7 (Sunday to Saturday)), but if it does we handle it by cancelling the behavior
+    TransitionToICantDoThat();
   }
 
-  if (currentMonth == 1) {
-    monthString = localeComponent.GetString(kDateJanuary);
-  } else if (currentMonth == 2) {
-    monthString = localeComponent.GetString(kDateFebruary);
-  } else if (currentMonth == 3) {
-    monthString = localeComponent.GetString(kDateMarch);
-  } else if (currentMonth == 4) {
-    monthString = localeComponent.GetString(kDateApril);
-  } else if (currentMonth == 5) {
-    monthString = localeComponent.GetString(kDateMay);
-  } else if (currentMonth == 6) {
-    monthString = localeComponent.GetString(kDateJune);
-  } else if (currentMonth == 7) {
-    monthString = localeComponent.GetString(kDateJuly);
-  } else if (currentMonth == 8) {
-    monthString = localeComponent.GetString(kDateAugust);
-  } else if (currentMonth == 9) {
-    monthString = localeComponent.GetString(kDateSeptember);
-  } else if (currentMonth == 10) {
-    monthString = localeComponent.GetString(kDateOctober);
-  } else if (currentMonth == 11) {
-    monthString = localeComponent.GetString(kDateNovember);
-  } else if (currentMonth == 12) {
-    monthString = localeComponent.GetString(kDateDecember);
+  if (currentMonth >= 0 && currentMonth <= 11) {
+    monthString = monthStringLocalized[currentMonth];
+  } else {
+    // This shouldn't be anything outside the range of 0-11 (1-12 (January to December)), but if it does we handle it by cancelling the behavior
+    TransitionToICantDoThat();
   }
 
   if ((currentDay % 100 >= 11) && (currentDay % 100 <= 13)) {
@@ -312,10 +310,10 @@ std::string BehaviorWallDateCoordinator::GetTTSStringForDate()
   } else if (currentDay % 10 == 3) {
     dayStringEnd = "rd";
   } else {
-    dayStringEnd = "th";
+    dayStringEnd = "";
   }
     
-  ss << dayString + buffer + monthString + buffer + std::to_string(currentDay) + dayStringEnd;
+  ss << dayString + "" + monthString + "" + std::to_string(currentDay) + dayStringEnd;
   LOG_WARNING("Date", "DateString: %s", ss.str().c_str());
 
   return ss.str();

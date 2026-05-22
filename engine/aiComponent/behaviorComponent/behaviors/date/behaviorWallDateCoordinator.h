@@ -28,7 +28,7 @@ class BehaviorWallDateCoordinator : public ICozmoBehavior
 public: 
   virtual ~BehaviorWallDateCoordinator();
 
-  // return a string which can be passed into TTS to say the time correctly 
+  // return a string which can be passed into TTS to say the date correctly
   std::string GetTTSStringForDate();
 
 protected:
@@ -60,7 +60,7 @@ private:
     DynamicVariables();
     uint8_t utteranceID;
     UtteranceState  utteranceState;
-    bool isShowingTime;
+    bool isShowingDate;
     struct tm date;
   };
 
