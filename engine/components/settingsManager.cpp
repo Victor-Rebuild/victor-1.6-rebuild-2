@@ -202,6 +202,7 @@ namespace Anki
       {
         LOG_INFO("SettingsManager.Destructor", "Stopping Rebuild Eyes thread during shutdown");
         _stopRebuildEyeThread.store(true, std::memory_order_release);
+        _rebuildEyeCV.notify_all();
         _rebuildEyeThread.join();
       }
     }
@@ -840,7 +841,7 @@ namespace Anki
                 }
                 // Refresh every 15 seconds
                 std::unique_lock<std::mutex> lock(_rebuildEyeMutex);
-                _rebuildEyeCV.wait_for(lock, std::chrono::seconds(15), [this]() {
+                _rebuildEyeCV.wait_for(lock, std::chrono::seconds(30), [this]() {
                   return _stopRebuildEyeThread.load(std::memory_order_acquire);
                 });
               }
