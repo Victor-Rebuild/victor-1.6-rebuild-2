@@ -706,29 +706,30 @@ namespace Anki
           {
             _robot->SendRobotMessage<RobotInterface::SetFaceSaturation>(1.00);
             _rainbowEyeThread = std::thread([this]()
-                                            {
-                    float hue = 0.0f;
-                    while (!_stopRainbowEyeThread.load(std::memory_order_acquire))
-                    {
-                        _robot->SendRobotMessage<RobotInterface::SetFaceHue>(hue);
-                        hue += 0.01f;
-                        if (hue > 1.0f)
-                        {
-                          hue = 0.0f;
-                        }
-                        std::this_thread::sleep_for(std::chrono::milliseconds(30));
+            {
+              float hue = 0.0f;
+              while (!_stopRainbowEyeThread.load(std::memory_order_acquire))
+              {
+                _robot->SendRobotMessage<RobotInterface::SetFaceHue>(hue);
+                hue += 0.01f;
+                if (hue > 1.0f)
+                {
+                  hue = 0.0f;
+                }
+                std::this_thread::sleep_for(std::chrono::milliseconds(30));
 
-                        // Check if "RAINBOW_EYES" mode is still active by checking the setting
-                        const std::string rainbowEyesStrInTh = "RAINBOW_EYES";
-                        const auto& eyeval = _currentSettings[key].asUInt();
-                        const auto& currentHueKey = EyeColor_Name(static_cast<external_interface::EyeColor>(eyeval));
-                        if (currentHueKey != rainbowEyesStrInTh)
-                        {
-                          LOG_INFO("SettingsManager.ApplySettingEyeColor.Apply", "Stopping Rainbow Eyes thread");
-                          _stopRainbowEyeThread.store(true, std::memory_order_release);
-                          break;
-                        }
-                    } });
+                // Check if "RAINBOW_EYES" mode is still active by checking the setting
+                const std::string rainbowEyesStrInTh = "RAINBOW_EYES";
+                const auto& eyeval = _currentSettings[key].asUInt();
+                const auto& currentHueKey = EyeColor_Name(static_cast<external_interface::EyeColor>(eyeval));
+                if (currentHueKey != rainbowEyesStrInTh)
+                {
+                  LOG_INFO("SettingsManager.ApplySettingEyeColor.Apply", "Stopping Rainbow Eyes thread");
+                  _stopRainbowEyeThread.store(true, std::memory_order_release);
+                  break;
+                }
+              }
+            });
           }
 
           return true;
