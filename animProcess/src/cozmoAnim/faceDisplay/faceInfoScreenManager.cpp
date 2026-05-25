@@ -254,6 +254,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   ADD_SCREEN_WITH_TEXT(ConfigurationSubmenu4, ConfigurationSubmenu4, {"CONFIGURATION PAGE 4"});
   ADD_SCREEN_WITH_TEXT(DTTBRandomEyes, DTTBRandomEyes, {"TOGGLE DTTB EYES?"});
   ADD_SCREEN_WITH_TEXT(OldNewAlexa, OldNewAlexa, {_classicAlexa ? "USE MODERN ALEXA?" : "USE BETA ALEXA?"});
+  ADD_SCREEN_WITH_TEXT(Reloading, Reloading, {"RELOADING..."});
   ADD_SCREEN_WITH_TEXT(Reonboarding, Reonboarding, {"REONBOARDING..."});
   ADD_SCREEN_WITH_TEXT(Reonboard, Reonboard, {"REONBOARD?"});
   ADD_SCREEN_WITH_TEXT(SetFrequency, SetFrequency, {"SET SPEED TO?"});
@@ -1539,7 +1540,7 @@ void FaceInfoScreenManager::DrawMain()
   std::string esn = osstate->GetSerialNumberAsString();
   if(esn.empty())
   {
-    esn = "00601b50";
+    esn = "NO ESN!";
   }
 
   std::transform(esn.begin(), esn.end(), esn.begin(),
@@ -1574,7 +1575,7 @@ void FaceInfoScreenManager::DrawMain()
 
   if (_isRestartRequired) {
     (void)system("curl 'http://localhost:8080/api/extra/restartvic' &");
-    SetScreen(ScreenName::Rebooting);
+    SetScreen(ScreenName::Reloading);
   } else {
     // ESN/serialNo and the HW version are drawn on the same line with serialNo default left aligned and
     // HW version right aligned.

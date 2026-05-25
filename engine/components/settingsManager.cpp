@@ -697,6 +697,7 @@ namespace Anki
         const auto &eyeColorName = EyeColor_Name(static_cast<external_interface::EyeColor>(value));
         LOG_INFO("SettingsManager.ApplySettingEyeColor.Apply", "Setting robot eye color to %s", eyeColorName.c_str());
 
+        // Start custom dynamic eye color functions
         if (eyeColorName == rainbowEyesStr)
         {
           LOG_INFO("SettingsManager.ApplySettingEyeColor.Apply", "Starting Rainbow Eyes thread");
@@ -809,7 +810,7 @@ namespace Anki
                   }
                 }
 
-                if (gotTime != true &&
+                if (!gotTime &&
                   Util::FileUtils::FileExists("/data/data/rebuild/rebuildEyesSaturation") &&
                   Util::FileUtils::FileExists("/data/data/rebuild/rebuildEyesHue"))
                 {
@@ -851,6 +852,7 @@ namespace Anki
 
           return true;
         }
+        // End custom dynamic eye colors
         else
         {
           LOG_INFO("SettingsManager.ApplySettingEyeColor.Apply", "Setting robot eye color to %s", eyeColorName.c_str());

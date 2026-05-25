@@ -52,20 +52,24 @@ enum class ScreenName : uint8_t {
   AlexaPairingFailed,  // server error (has timeout)
   ToggleMute, // Quick animation to show change in microphone mute state
   ToF,
-  UserDataSubmenu,
-  ConfigurationSubmenu, // Let's you change configurations and has some other useful options
-  ConfigurationSubmenu2,
-  ConfigurationSubmenu3,
-  ConfigurationSubmenu4,
-  ServerInformation,
+
+ // Start rebuild custom screens
+  AutoUpdates,
   BackpackLights,
   BootRecovery,
-  AutoUpdates,
-  SetFrequency,
+  ConfigurationSubmenu, // Let's you change configurations and has some other useful options
+  ConfigurationSubmenu2, // ^
+  ConfigurationSubmenu3, // ^^
+  ConfigurationSubmenu4, // ^^^
   DTTBRandomEyes,
-  Toggle30fps,
   OldNewAlexa,
+  Reloading,
   Snoring,
+  ServerInformation,
+  SetFrequency,
+  Toggle30fps,
+  UserDataSubmenu,
+  // end rebuild custom screens
   
   Count
 };
