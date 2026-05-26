@@ -57,6 +57,7 @@
 #include "webServerProcess/src/webService.h"
 
 #include <chrono>
+#include <cstddef>
 #include <fstream>
 #include <iomanip>
 #include <thread>
@@ -1774,14 +1775,17 @@ void FaceInfoScreenManager::DrawSensorInfo(const RobotState& state)
 }
 
 void FaceInfoScreenManager::DrawBuildInfo() {
+  std::string indevOrReleasestr = Util::FileUtils::ReadFile("/etc/rebuild-dev-or-indev");
+
   auto *osstate = OSState::getInstance();
   const std::string osProject = "OS: " + OSProject;
   const std::string branch = "BRANCH: " + osstate->GetBuildBranch();
+  const std::string indevOrRelease = "TYPE: " + indevOrReleasestr;
   const std::string osVer = "VER: " + osstate->GetOSBuildVersion();
   const std::string sha = "SHA: " + osstate->GetBuildSha();
   const std::string creator = Creator;
   const std::string creatorWebsite = CreatorWebsite;
-  DrawTextOnScreen({osProject, branch, osVer, sha, creator, creatorWebsite});
+  DrawTextOnScreen({osProject, isDeployed() ? branch : indevOrRelease, osVer, sha, creator, creatorWebsite});
 }
 
 void FaceInfoScreenManager::DrawIMUInfo(const RobotState& state)
