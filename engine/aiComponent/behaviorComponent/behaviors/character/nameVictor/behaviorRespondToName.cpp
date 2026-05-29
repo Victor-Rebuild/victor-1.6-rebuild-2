@@ -10,7 +10,7 @@
  *
  **/
 
-#include "engine/aiComponent/behaviorComponent/behaviors/nameVictor/behaviorRespondToName.h"
+#include "engine/aiComponent/behaviorComponent/behaviors/character/nameVictor/behaviorRespondToName.h"
 
 #include "aiComponent/behaviorComponent/behaviorExternalInterface/beiRobotInfo.h"
 #include "clad/externalInterface/messageEngineToGame.h"
