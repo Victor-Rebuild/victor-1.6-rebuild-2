@@ -81,8 +81,8 @@ namespace Anki {
 namespace Vector {
   
 // VIC-13319 remove
-// CONSOLE_VAR_EXTERN(bool, kAlexaEnabledInUK);
-// CONSOLE_VAR_EXTERN(bool, kAlexaEnabledInAU);
+CONSOLE_VAR_EXTERN(bool, kAlexaEnabledInUK);
+CONSOLE_VAR_EXTERN(bool, kAlexaEnabledInAU);
   
 namespace MicData {
 
@@ -841,8 +841,8 @@ void MicDataSystem::SetAlexaState(AlexaSimpleState state)
   
   const bool active = (_alexaState == AlexaSimpleState::Active);
   // UK/AU seem to be worse at handling self-loops
-  if (((_locale.GetCountry() == Util::Locale::CountryISO2::GB))
-      || ((_locale.GetCountry() == Util::Locale::CountryISO2::AU))) {
+  if (((_locale.GetCountry() == Util::Locale::CountryISO2::GB) && kAlexaEnabledInUK)
+      || ((_locale.GetCountry() == Util::Locale::CountryISO2::AU) && kAlexaEnabledInUK)) {
     _speechRecognizerSystem->ToggleNotchDetector( active );
   }
   else {

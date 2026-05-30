@@ -37,8 +37,8 @@ namespace Anki {
 namespace Vector {
 
 // VIC-13319 remove
-// CONSOLE_VAR_EXTERN(bool, kAlexaEnabledInUK);
-// CONSOLE_VAR_EXTERN(bool, kAlexaEnabledInAU);
+CONSOLE_VAR_EXTERN(bool, kAlexaEnabledInUK);
+CONSOLE_VAR_EXTERN(bool, kAlexaEnabledInAU);
   
 namespace {
 #define LOG_CHANNEL "SpeechRecognizer"
@@ -165,10 +165,10 @@ bool AlexaLocaleEnabled(const Util::Locale& locale)
     return true;
   }
   else if (locale.GetCountry() == Util::Locale::CountryISO2::GB) {
-    return true;
+    return kAlexaEnabledInUK;
   }
   else if (locale.GetCountry() == Util::Locale::CountryISO2::AU) {
-    return true;
+    return kAlexaEnabledInAU;
   }
   else {
     return false;

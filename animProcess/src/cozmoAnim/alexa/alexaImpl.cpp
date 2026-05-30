@@ -82,8 +82,8 @@ namespace Vector {
 using namespace alexaClientSDK;
   
 // VIC-13319 remove
-// CONSOLE_VAR_EXTERN(bool, kAlexaEnabledInUK);
-// CONSOLE_VAR_EXTERN(bool, kAlexaEnabledInAU);
+CONSOLE_VAR_EXTERN(bool, kAlexaEnabledInUK);
+CONSOLE_VAR_EXTERN(bool, kAlexaEnabledInAU);
   
 namespace {
   #define CRITICAL_SDK(event) ACSDK_CRITICAL(avsCommon::utils::logger::LogEntry(__FILE__, event))
@@ -221,9 +221,9 @@ namespace {
     if( locale.GetCountry() == Util::Locale::CountryISO2::US ) {
       return true;
     } else if( locale.GetCountry() == Util::Locale::CountryISO2::GB ) {
-      return true;
+      return kAlexaEnabledInUK;
     } else if( locale.GetCountry() == Util::Locale::CountryISO2::AU ) {
-      return true;
+      return kAlexaEnabledInAU;
     } else {
       return false;
     }
