@@ -1924,7 +1924,7 @@ void FaceInfoScreenManager::DrawAlexaFace()
   struct TextDataLine
   {
     std::string   text;
-    float         scale = 1.0f;
+    float         scale = 1.25f;
   };
   std::vector<TextDataLine> textVec;
   
@@ -1943,12 +1943,12 @@ void FaceInfoScreenManager::DrawAlexaFace()
     case ScreenName::AlexaPairingSuccess:
     {
       textVec.push_back( { "You're ready to use Alexa." } );
-      // if (IsXray()) {
-      //   textVec.push_back( { "Check out the Alexa App." } );
-      // } else {
+      if (IsXray()) {
+        textVec.push_back( { "Check out the Alexa App." } );
+      } else {
       	textVec.push_back( { "Check out the Alexa App" } );
       	textVec.push_back( { "for things to try." } );
-      // }
+      }
 
       break;
     }
