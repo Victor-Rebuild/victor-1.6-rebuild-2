@@ -1,6 +1,7 @@
 ---
 name: Feature request
-about: Suggest an idea to be implemented into Rebuild (Must be within reason)
+about: Suggest an idea to be implemented into Rebuild (Must be within reason and implementable
+  in a anki-like way)
 title: "[FEATURE]"
 labels: enhancement
 assignees: Switch-modder
