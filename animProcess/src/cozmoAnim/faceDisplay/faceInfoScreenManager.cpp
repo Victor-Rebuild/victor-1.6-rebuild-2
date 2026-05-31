@@ -1924,7 +1924,7 @@ void FaceInfoScreenManager::DrawAlexaFace()
   struct TextDataLine
   {
     std::string   text;
-    float         scale = 1.25f;
+    float         scale = IsXray() ? 1.25f : 1.0f;
   };
   std::vector<TextDataLine> textVec;
   
