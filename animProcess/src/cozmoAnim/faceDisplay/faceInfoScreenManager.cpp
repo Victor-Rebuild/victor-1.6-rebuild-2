@@ -1776,6 +1776,7 @@ void FaceInfoScreenManager::DrawSensorInfo(const RobotState& state)
 
 void FaceInfoScreenManager::DrawBuildInfo() {
   std::string indevOrReleasestr = Util::FileUtils::ReadFile("/etc/rebuild-dev-or-indev");
+  indevOrReleasestr.erase(indevOrReleasestr.find_last_not_of(" \t\n\r\f\v") + 1);
 
   auto *osstate = OSState::getInstance();
   const std::string osProject = "OS: " + OSProject;
