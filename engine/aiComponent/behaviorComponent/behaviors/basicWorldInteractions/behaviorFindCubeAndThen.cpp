@@ -78,6 +78,7 @@ bool BehaviorFindCubeAndThen::WantsToBeActivatedBehavior() const
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BehaviorFindCubeAndThen::GetBehaviorOperationModifiers(BehaviorOperationModifiers& modifiers) const
 {
+  modifiers.visionModesForActiveScope->insert({ VisionMode::Markers, EVisionUpdateFrequency::High });
   modifiers.wantsToBeActivatedWhenOnCharger = true;
   modifiers.wantsToBeActivatedWhenCarryingObject = false; 
   modifiers.cubeConnectionRequirements = BehaviorOperationModifiers::CubeConnectionRequirements::OptionalActive;
@@ -204,7 +205,7 @@ void BehaviorFindCubeAndThen::TransitionToFollowUpBehavior()
     // Let the behavior end when the followup does
     DelegateIfInControl(_iConfig.followUpBehavior.get());
   } else {
-    LOG_WARNING("EMILY", "STUPID");
+    TransitionToGetOutFailure();
   }
   // If there is no followUp behavior, end now
 }

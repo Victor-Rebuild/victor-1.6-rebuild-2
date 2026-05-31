@@ -128,6 +128,10 @@ private:
   volatile bool               _stopThread     = false;     // clean up and stop the thread entirely
   volatile bool               _startPlanner   = false;     // start planning now if it isn't running
   volatile bool               _stopPlanner    = false;     // if the planner is currently running, force it to stop
+
+  bool                        _planningFailed = false;
+  Pose2d                      _lastFailedStart;
+  std::vector<Pose2d>         _lastFailedTargets;
 };
     
     

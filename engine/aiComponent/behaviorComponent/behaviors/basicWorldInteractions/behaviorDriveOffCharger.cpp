@@ -153,20 +153,13 @@ bool BehaviorDriveOffCharger::WantsToBeActivatedBehavior() const
   // charger). Now, we've gone back to OnChargerPlatform but fixed it to work better
   const bool onChargerPlatform = robotInfo.IsOnChargerPlatform();
 
-  const bool seesRecentFace = GetBEI().GetFaceWorld().HasAnyFaces(_iConfig.maxFaceAge_s * 1000);
-  
-  BlockWorldFilter cubeFilter;
-  cubeFilter.AddFilterFcn(&BlockWorldFilter::IsLightCubeFilter);
-  const auto* recentCube = GetBEI().GetBlockWorld().FindMostRecentlyObservedObject(cubeFilter);
-  const bool seesRecentCube = (recentCube != nullptr);
-
   bool leavecharger = true;
 
   if (Util::FileUtils::FileExists("/data/data/rebuild/stayfuckingputanddontleaveyourdamncharger")) {
     leavecharger = false;
   }
   
-  return leavecharger && (onChargerPlatform || (seesRecentFace || seesRecentCube));
+  return leavecharger && onChargerPlatform;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

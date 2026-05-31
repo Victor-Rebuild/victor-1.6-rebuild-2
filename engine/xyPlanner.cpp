@@ -109,6 +109,16 @@ EComputePathStatus XYPlanner::ComputeNewPathIfNeeded(const Pose3d& startPose, bo
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 EComputePathStatus XYPlanner::InitializePlanner(const Pose2d& start, const std::vector<Pose2d>& targets, bool forceReplan, bool allowGoalChange)
 {
+  // Don't retry unless forced
+  if (!forceReplan && _planningFailed
+      && IsNearlyEqual(start.GetTranslation(), _lastFailedStart.GetTranslation())
+      && targets == _lastFailedTargets)
+  {
+    return EComputePathStatus::Error;
+  }
+
+  _planningFailed = false;
+
   // planner will start on next thread cycle
   if (!forceReplan && _startPlanner) { return EComputePathStatus::Running; }
   
@@ -171,9 +181,23 @@ void XYPlanner::StartPlanner()
   if (_allowGoalChange || (_path.GetNumSegments() == 0)) {
     for (const auto& g : _targets) {
       Point2f grid_g = GetNearestGridPoint(g.GetTranslation(), kPlanningResolution_mm);
+      if (_map.CheckForCollisions(Ball2f(grid_g, kRobotRadius_mm + kPlanningPadding_mm))) {
+        LOG_WARNING("XYPlanner.StartPlanner", "Goal %s is in collision, skipping",
+                    grid_g.ToString().c_str());
+        continue;
+      }
       plannerGoals.push_back( grid_g );
       // grid_g should be a whole number, so cast to int here to prevent weird floating point precision issues
       goalLookup[grid_g.CastTo<int>()] = g.GetTranslation();
+    }
+
+    if (plannerGoals.empty()) {
+      LOG_WARNING("XYPlanner.StartPlanner", "All goals are in collision, aborting");
+      _status = EPlannerStatus::CompleteNoPlan;
+      _planningFailed = true;
+      _lastFailedStart = _start;
+      _lastFailedTargets = _targets;
+      return;
     }
   } else {
     // no goal change, so use the end point of the last computed path
@@ -233,6 +257,9 @@ void XYPlanner::StartPlanner()
   } else {
     LOG_WARNING("XYPlanner.StartPlanner", "No path found!" );
     _status = EPlannerStatus::CompleteNoPlan;
+    _planningFailed = true;
+    _lastFailedStart = _start;
+    _lastFailedTargets = _targets;
   }
 
   // grab performance metrics
