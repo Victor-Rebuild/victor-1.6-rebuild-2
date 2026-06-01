@@ -54,6 +54,9 @@ private:
     std::string powerOnAnimName;
     std::string powerOffAnimName;
     bool waitForAnimMsg;
+
+    std::string findChargerBehaviorName;
+    ICozmoBehaviorPtr findChargerBehavior;
   };
 
   struct DynamicVariables {
@@ -67,6 +70,8 @@ private:
 
   InstanceConfig _iConfig;
   DynamicVariables _dVars;
+
+  void TransitionToCharger();
 
   void TransitionToPoweringOff();
 

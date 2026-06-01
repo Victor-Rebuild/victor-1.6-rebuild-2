@@ -172,6 +172,7 @@ union dupes_allowed UserIntent
   UserIntent_TakeAPhoto       take_a_photo,
   UserIntent_Void             victor_reboot,
   UserIntent_Void             victor_shutdown,
+  UserIntent_Void             victor_shutdown_satisfied,
   UserIntent_WeatherResponse  weather_response,
   
 

@@ -341,6 +341,10 @@
     {
       "cloud_intent": "intent_victor_shutdown",
       "user_intent": "victor_shutdown"
+    },
+    {
+      "cloud_intent": "intent_victor_shutdown_satisfied",
+      "user_intent": "victor_shutdown_satisfied"
     }
   ],
 

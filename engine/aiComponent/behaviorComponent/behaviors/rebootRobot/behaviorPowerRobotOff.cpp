@@ -13,6 +13,7 @@
 
 #include "engine/aiComponent/behaviorComponent/behaviors/rebootRobot/behaviorPowerRobotOff.h"
 
+#include "aiComponent/behaviorComponent/behaviorContainer.h"
 #include "cannedAnimLib/cannedAnims/cannedAnimationContainer.h"
 #include "clad/robotInterface/messageEngineToRobot.h"
 #include "clad/robotInterface/messageRobotToEngine.h"
@@ -31,6 +32,7 @@ namespace Vector {
 namespace{
 const char* kPowerOffAnimName         = "powerOffAnimName";
 const char* const kWaitForAnimMsgKey  = "waitForAnimMsg";
+const char* kFindChargerBehaviorKey = "goToChargerBehavior";
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -56,6 +58,8 @@ BehaviorPowerRobotOff::BehaviorPowerRobotOff(const Json::Value& config)
 : ICozmoBehavior(config)
 , _iConfig(config)
 {
+  auto debugStr = "BehaviorSleepCycle.Constructor.MissingDelegateID";
+  _iConfig.findChargerBehaviorName = JsonTools::ParseString(config, kFindChargerBehaviorKey, debugStr);
   SubscribeToTags({RobotInterface::RobotToEngineTag::startShutdownAnim});
 }
 
@@ -68,6 +72,12 @@ BehaviorPowerRobotOff::~BehaviorPowerRobotOff()
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BehaviorPowerRobotOff::InitBehavior()
 {
+  auto& BC = GetBEI().GetBehaviorContainer();
+  {
+    BehaviorID delegateID = BehaviorTypesWrapper::BehaviorIDFromString(_iConfig.findChargerBehaviorName);
+    _iConfig.findChargerBehaviorName.clear();
+    _iConfig.findChargerBehavior = BC.FindBehaviorByID( delegateID );
+  }
 }
 
 
@@ -75,7 +85,7 @@ void BehaviorPowerRobotOff::InitBehavior()
 bool BehaviorPowerRobotOff::WantsToBeActivatedBehavior() const
 {
   auto& uic = GetBehaviorComp<UserIntentComponent>();
-  return uic.IsUserIntentPending(USER_INTENT(victor_reboot)) || uic.IsUserIntentPending(USER_INTENT(victor_shutdown));
+  return uic.IsUserIntentPending(USER_INTENT(victor_reboot)) || uic.IsUserIntentPending(USER_INTENT(victor_shutdown)) || uic.IsUserIntentPending(USER_INTENT(victor_shutdown_satisfied));
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -90,6 +100,7 @@ void BehaviorPowerRobotOff::GetBehaviorOperationModifiers(BehaviorOperationModif
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BehaviorPowerRobotOff::GetAllDelegates(std::set<IBehavior*>& delegates) const
 {
+  delegates.insert(_iConfig.findChargerBehavior.get());
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -97,6 +108,7 @@ void BehaviorPowerRobotOff::GetBehaviorJsonKeys(std::set<const char*>& expectedK
 {
   const char* list[] = {
     kPowerOffAnimName,
+    kFindChargerBehaviorKey,
   };
   expectedKeys.insert( std::begin(list), std::end(list) );
 }
@@ -114,6 +126,7 @@ void BehaviorPowerRobotOff::OnBehaviorActivated()
   UserIntentComponent& uic = GetBehaviorComp<UserIntentComponent>();
   UserIntentPtr intentDataReboot   = uic.GetUserIntentIfActive(USER_INTENT(victor_reboot));
   UserIntentPtr intentDataShutdown = uic.GetUserIntentIfActive(USER_INTENT(victor_shutdown));
+  UserIntentPtr intentDataShutdownSatisfied = uic.GetUserIntentIfActive(USER_INTENT(victor_shutdown_satisfied));
 
   // reset dynamic variables
   const bool prevShouldStartPowerOffAnimaiton = _dVars.shouldStartPowerOffAnimaiton;
@@ -125,13 +138,17 @@ void BehaviorPowerRobotOff::OnBehaviorActivated()
     _dVars.shouldStartPowerOffAnimaiton = prevShouldStartPowerOffAnimaiton;
   }
 
-  if (intentDataShutdown) {
+  if (intentDataShutdown || intentDataShutdownSatisfied) {
     _dVars.isShutdown = true;
   } else if (intentDataReboot) {
     _dVars.isShutdown = false;
   }
 
-  TransitionToPoweringOff();
+  if (intentDataShutdownSatisfied) {
+    TransitionToCharger();
+  } else {
+    TransitionToPoweringOff();
+  }
 }
 
 
@@ -154,6 +171,28 @@ void BehaviorPowerRobotOff::AlwaysHandleInScope(const RobotToEngineEvent& event)
   }
 }
 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void BehaviorPowerRobotOff::TransitionToCharger()
+{
+  if( GetBEI().GetRobotInfo().IsOnChargerContacts() ) {
+    // skip straight to powering off
+    LOG_WARNING("BehaviorPowerRobotOff.TransitionToCharger.WontRun", "On charger");
+    TransitionToPoweringOff();
+  }
+  else {
+    CancelDelegates(false);
+    if( _iConfig.findChargerBehavior != nullptr
+        && _iConfig.findChargerBehavior->WantsToBeActivated() ) {
+      DelegateIfInControl( _iConfig.findChargerBehavior.get(),
+                           &BehaviorPowerRobotOff::TransitionToPoweringOff );
+    }
+    else {
+      LOG_WARNING("BehaviorPowerRobotOff.TransitionToCharger.WontRun",
+                  "Not on charger contacts, but find charger behavior doesn't want to activate");
+      TransitionToPoweringOff();
+    }
+  }
+}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BehaviorPowerRobotOff::TransitionToPoweringOff()
