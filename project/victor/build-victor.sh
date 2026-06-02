@@ -57,7 +57,7 @@ EXPORT_COMPILE_COMMANDS=0
 IGNORE_EXTERNAL_DEPENDENCIES=0
 BUILD_SHARED_LIBS=1
 DONT_ANIM=0
-EXTERNALS_UPDATE_SKIP=0
+# EXTERNALS_UPDATE_SKIP=0
 
 CONFIGURATION=Release
 PLATFORM=vicos
@@ -162,10 +162,11 @@ if [ -z "${CMAKE_EXE+x}" ]; then
 fi
 
 if [ $IGNORE_EXTERNAL_DEPENDENCIES -eq 0 ]; then
-  echo "Attempting to run fetch-build-deps.sh"
-  EXTERNALS_UPDATE_SKIP=$EXTERNALS_UPDATE_SKIP DONT_ANIM=$DONT_ANIM ${TOPLEVEL}/project/victor/scripts/fetch-build-deps.sh
+    echo "Attempting to run fetch-build-deps.sh"
+#   EXTERNALS_UPDATE_SKIP=$EXTERNALS_UPDATE_SKIP DONT_ANIM=$DONT_ANIM ${TOPLEVEL}/project/victor/scripts/fetch-build-deps.sh
+    EXTERNALS_UPDATE_SKIP=$EXTERNALS_UPDATE_SKIP DONT_ANIM=$DONT_ANIM ${TOPLEVEL}/project/victor/scripts/fetch-build-deps.sh
 else
-  echo "Ignore external dependencies"
+    echo "Ignore external dependencies"
 fi
 
 PLATFORM=`echo $PLATFORM | tr "[:upper:]" "[:lower:]"`

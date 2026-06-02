@@ -65,6 +65,8 @@ BehaviorPossiblePerformance::BehaviorPossiblePerformance(const Json::Value& conf
                                                                             kAnimTriggerKey,
                                                                             "BehaviorPossiblePerformance.ConfigError") );
 
+  _iConfig.currAnim = JsonTools::ParseString(config, kAnimTriggerKey, "BehaviorPossiblePerformance.ConfigError");
+
   // TEMP: load remaining cooldown from disk
 }
 
@@ -139,7 +141,22 @@ void BehaviorPossiblePerformance::GetBehaviorJsonKeys(std::set<const char*>& exp
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BehaviorPossiblePerformance::OnBehaviorActivated()
 {
-  DelegateIfInControl( new TriggerAnimationAction( _iConfig.animTrigger ) );
+  auto* action = new TriggerLiftSafeAnimationAction{ AnimationTrigger::Count };
+
+  int randForSpaceUPerf = rand() % 21;
+
+  if (_iConfig.currAnim == "IntentionalPerformance") {
+    action = new TriggerLiftSafeAnimationAction{ AnimationTrigger::IntentionalPerformance };
+  } else if (_iConfig.currAnim == "UnintentionalPerformance") {
+    if (randForSpaceUPerf >= 15) {
+      action = new TriggerLiftSafeAnimationAction{ AnimationTrigger::UnintentionalPerformanceSpace };
+      action->SetRenderInEyeHue( false );
+    } else {
+      action = new TriggerLiftSafeAnimationAction{ AnimationTrigger::UnintentionalPerformance };
+    }
+  }
+
+  DelegateIfInControl(action);
 
   // reset cooldown
   const float currTime_s = BaseStationTimer::getInstance()->GetCurrentTimeInSeconds();

@@ -540,6 +540,7 @@ enum int_32 AnimationTrigger
   TextToSpeechGetLoop,
   TextToSpeechGetOut,
   UnintentionalPerformance,
+  UnintentionalPerformanceSpace,
   UnitTestAnim,
   VC_ListeningGetIn,
   VC_ListeningLoop,

@@ -2108,6 +2108,10 @@
     "AnimName": "ag_uperformance"
   },
   {
+    "CladEvent": "UnintentionalPerformanceSpace",
+    "AnimName": "ag_uperformance_space"
+  },
+  {
     "CladEvent": "IntentionalPerformance",
     "AnimName": "ag_iperformance"
   }
