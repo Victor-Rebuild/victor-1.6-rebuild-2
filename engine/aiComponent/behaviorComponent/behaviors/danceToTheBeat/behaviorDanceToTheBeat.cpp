@@ -341,6 +341,7 @@ void BehaviorDanceToTheBeat::PlayNextDanceAnim()
   std::string satVal;
 
   if (_dVars.eyeColorRandomizer) {
+    srand(time(0));
     int nextEyeColor = rand() % 7;
 
     hueVal = "curl 'localhost:8889/consolevarset?key=ProcFace_Hue&value="

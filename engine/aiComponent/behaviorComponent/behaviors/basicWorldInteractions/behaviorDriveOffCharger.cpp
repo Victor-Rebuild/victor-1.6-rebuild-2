@@ -325,7 +325,7 @@ void BehaviorDriveOffCharger::TransitionToDrivingAnim( const AnimationTrigger& a
   AnimationTrigger actualTrigger = animTrigger;
 
   if (animTrigger == kAnimStraight) {
-    const bool useOneOff = (rand() % 2) == 0;
+    bool useOneOff = GetRNG().RandBool();
     if (useOneOff) {
       actualTrigger = AnimationTrigger::DriveOffChargerStraightOneOff;
     }
