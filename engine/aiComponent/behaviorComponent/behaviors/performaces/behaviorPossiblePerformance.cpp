@@ -143,6 +143,7 @@ void BehaviorPossiblePerformance::OnBehaviorActivated()
 {
   auto* action = new TriggerLiftSafeAnimationAction{ AnimationTrigger::Count };
 
+  srand(time(0));
   int randForSpaceUPerf = rand() % 21;
 
   if (_iConfig.currAnim == "IntentionalPerformance") {
