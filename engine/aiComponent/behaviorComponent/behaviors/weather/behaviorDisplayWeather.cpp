@@ -661,40 +661,14 @@ void BehaviorDisplayWeather::StartTTSGeneration()
   const auto success = _iConfig->intentParser->GetRawTemperature(weatherResponse, temperature);
   const auto & bei = GetBEI();
   const auto & ttsMap = bei.GetDataAccessorComponent().GetWeatherConditionTTSMap();
-  const auto & robotInfo = bei.GetRobotInfo();
-  const auto & localeComponent = robotInfo.GetLocaleComponent();
+  const auto ttsIter = ttsMap->find(condition);
+  if (success && ttsIter != ttsMap->end()) {
 
-  std::string ttsString;
-  bool gotTtsString = false;
+    // Get localized version of "X degrees and cloudy"
+    const auto & robotInfo = bei.GetRobotInfo();
+    const auto & localeComponent = robotInfo.GetLocaleComponent();
+    const auto & ttsString = localeComponent.GetString(ttsIter->second, std::to_string(temperature));
 
-  if (success && !weatherResponse.rawCondition.empty()) {
-    std::string rawConditionNoSpaces;
-    for (const char c : weatherResponse.rawCondition) {
-      if (c != ' ') {
-        rawConditionNoSpaces += c;
-      }
-    }
-
-    LOG_WARNING("Weather.TTS", "Raw Condition String (result %s)", rawConditionNoSpaces.c_str());
-
-    const std::string rawKey = "BehaviorDisplayWeather." + rawConditionNoSpaces;
-    const std::string rawResult = localeComponent.GetString(rawKey, std::to_string(temperature));
-    if (!rawResult.empty() && rawResult != rawKey) {
-      ttsString = rawResult;
-      gotTtsString = true;
-    }
-  }
-
-  // Fall back to the normal condition
-  if (success && !gotTtsString) {
-    const auto ttsIter = ttsMap->find(condition);
-    if (success && ttsIter != ttsMap->end()) {
-      ttsString = localeComponent.GetString(ttsIter->second, std::to_string(temperature));
-      gotTtsString = true;
-    }
-  }
-
-  if (gotTtsString) {
     LOG_WARNING("Weather.TTS", "Sent string (result %s)", ttsString.c_str());
 
     // Generate TTS utterance for localized string

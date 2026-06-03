@@ -144,8 +144,7 @@
         "is_forecast": "isForecast",
         "temperature_unit": "temperatureUnit",
         "local_datetime": "localDateTime",
-        "day_or_night": "dayOrNight",
-        "raw_condition": "rawCondition"
+        "day_or_night": "dayOrNight"
       }
     },
     {

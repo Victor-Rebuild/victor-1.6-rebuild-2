@@ -27,35 +27,11 @@
   "BehaviorDisplayWeather.Cloudy": {
     "translation": "{0} degrees and cloudy"
   },
-  "BehaviorDisplayWeather.Partlycloudy": {
-    "translation": "{0} degrees and partly cloudy"
-  },
-  "BehaviorDisplayWeather.Mostlycloudy": {
-    "translation": "{0} degrees and mostly cloudy"
-  },
   "BehaviorDisplayWeather.Cold": {
     "translation": "{0} degrees and freezing"
   },
   "BehaviorDisplayWeather.Rain": {
     "translation": "{0} degrees and rainy"
-  },
-  "BehaviorDisplayWeather.Freezingdrizzle": {
-    "translation": "{0} degrees with light freezing rain"
-  },
-  "BehaviorDisplayWeather.Freezingrain": {
-    "translation": "{0} degrees with freezing rain"
-  },
-  "BehaviorDisplayWeather.Drizzle": {
-    "translation": "{0} degrees with light rain"
-  },
-  "BehaviorDisplayWeather.Lightrain": {
-    "translation": "{0} degrees with light rain"
-  },
-  "BehaviorDisplayWeather.Heavyrain": {
-    "translation": "{0} degrees with heavy rain"
-  },
-  "BehaviorDisplayWeather.Strongstorms": {
-    "translation": "{0} degrees with strong storms"
   },
   "BehaviorDisplayWeather.Snow": {
     "translation": "{0} degrees and snowy"
@@ -71,12 +47,6 @@
   },
   "BehaviorDisplayWeather.Windy": {
     "translation": "{0} degrees and windy"
-  },
-  "BehaviorDisplayWeather.Tornado": {
-    "translation": "{0} degrees with tornados"
-  },
-  "BehaviorDisplayWeather.Hurricane": {
-    "translation": "{0} degrees with hurricanes"
   },
   "BehaviorEnrollFace.HaveWeMetBefore": {
     "translation": "Have we met before, {0}?"
