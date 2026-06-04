@@ -232,8 +232,7 @@ void BehaviorWallDateCoordinator::StartTTSGeneration()
     _dVars.utteranceState = utteranceState;
   };
 
-  _dVars.utteranceID = GetBEI().GetTextToSpeechCoordinator().CreateUtterance(textOfDate, triggerType, style,
-                                                                             1.0f, callback);
+  _dVars.utteranceID = GetBEI().GetTextToSpeechCoordinator().CreateUtterance(textOfDate, triggerType, style, callback);
 
   // if we failed to create the tts, we need to let our behavior know since the callback is NOT called in this case
   if (kInvalidUtteranceID == _dVars.utteranceID){
