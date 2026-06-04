@@ -15,9 +15,10 @@
 // External interface for robot <-> app and robot <-> sdk communication
 
 syntax = "proto3";
-option go_package = "github.com/digital-dream-labs/vector-cloud/internal/proto/external_interface";
 
 package Anki.Vector.external_interface;
+
+option go_package = "Anki.Vector.external_interface";
 
 import "response_status.proto";
 import "extensions.proto";
@@ -711,15 +712,6 @@ message CancelActionByIdTagRequest {
 // Response from the robot to CancelActionByIdTagRequest.
 message CancelActionByIdTagResponse {
   // A generic status.
-  ResponseStatus status = 1;
-}
-
-// Cancel a behavior in progress
-message CancelBehaviorRequest {
-}
-
-// Response from the robot to CancelBehaviorRequest.
-message CancelBehaviorResponse {
   ResponseStatus status = 1;
 }
 

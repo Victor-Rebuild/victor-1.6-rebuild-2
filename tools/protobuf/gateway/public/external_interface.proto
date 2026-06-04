@@ -15,9 +15,10 @@
 // External interface for robot <-> app and robot <-> sdk communication
 
 syntax = "proto3";
-option go_package = "github.com/digital-dream-labs/vector-cloud/internal/proto/external_interface";
 
 package Anki.Vector.external_interface;
+
+option go_package = "Anki.Vector.external_interface";
 
 import "google/api/annotations.proto";
 import "alexa.proto"; // App only
@@ -220,14 +221,6 @@ service ExternalInterface {
   rpc CancelActionByIdTag(CancelActionByIdTagRequest) returns (CancelActionByIdTagResponse) {
     option (google.api.http) = {
       post: "/v1/cancel_action_by_id_tag",
-      body: "*"
-    };
-  }
-
-  // Cancel running SDK Behavior
-  rpc CancelBehavior(CancelBehaviorRequest) returns (CancelBehaviorResponse) {
-    option (google.api.http) = {
-      post: "/v1/cancel_behavior",
       body: "*"
     };
   }
@@ -507,14 +500,6 @@ service ExternalInterface {
     };
   }
 
-  // Get Vector's camera configuration.
-  rpc GetCameraConfig(CameraConfigRequest) returns (CameraConfigResponse) {
-    option (google.api.http) = {
-      post: "/v1/get_camera_config",
-      body: "*"
-    };
-  }
-
   // Set Vector's eye color.
   rpc SetEyeColor(SetEyeColorRequest) returns (SetEyeColorResponse) {
     option (google.api.http) = {
@@ -527,14 +512,6 @@ service ExternalInterface {
   rpc NavMapFeed(NavMapFeedRequest) returns (stream NavMapFeedResponse) {
     option (google.api.http) = {
       post: "/v1/nav_map_feed",
-      body: "*"
-    };
-  }
-
-  // Set Vector's camera settings
-  rpc SetCameraSettings(SetCameraSettingsRequest) returns (SetCameraSettingsResponse) {
-    option (google.api.http) = {
-      post: "/v1/set_camera_settings",
       body: "*"
     };
   }

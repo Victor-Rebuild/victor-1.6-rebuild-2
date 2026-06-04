@@ -16,9 +16,10 @@
 // about the robot's navigational memory map.
 
 syntax = "proto3";
-option go_package = "github.com/digital-dream-labs/vector-cloud/internal/proto/external_interface";
 
 package Anki.Vector.external_interface;
+
+option go_package = "Anki.Vector.external_interface";
 
 // Every tile in the nav map will be tagged with a content key referring to
 // the different environmental elements that Vector can identify.

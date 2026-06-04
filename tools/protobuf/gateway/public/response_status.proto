@@ -15,9 +15,10 @@
 // Response status
 
 syntax = "proto3";
-option go_package = "github.com/digital-dream-labs/vector-cloud/internal/proto/external_interface";
 
 package Anki.Vector.external_interface;
+
+option go_package = "Anki.Vector.external_interface";
 
 // A shared response message sent back as part of most requests.
 // This will indicate the generic state of the request.

@@ -20,7 +20,7 @@
 // 	protoc        v6.31.1
 // source: external_interface.proto
 
-package external_interface
+package Anki_Vector_external_interface
 
 import (
 	_ "google.golang.org/genproto/googleapis/api/annotations"
@@ -199,7 +199,7 @@ const file_external_interface_proto_rawDesc = "" +
 	"\x11GetAlexaAuthState\x125.Anki.Vector.external_interface.AlexaAuthStateRequest\x1a6.Anki.Vector.external_interface.AlexaAuthStateResponse\"\x1f\x82\xd3\xe4\x93\x02\x19:\x01*\"\x14/v1/alexa_auth_state\x12\x90\x01\n" +
 	"\n" +
 	"AlexaOptIn\x121.Anki.Vector.external_interface.AlexaOptInRequest\x1a2.Anki.Vector.external_interface.AlexaOptInResponse\"\x1b\x82\xd3\xe4\x93\x02\x15:\x01*\"\x10/v1/alexa_opt_in\x12\xb2\x01\n" +
-	"\x15AssumeBehaviorControl\x126.Anki.Vector.external_interface.BehaviorControlRequest\x1a7.Anki.Vector.external_interface.BehaviorControlResponse\"&\x82\xd3\xe4\x93\x02 :\x01*\"\x1b/v1/assume_behavior_control0\x01BNZLgithub.com/digital-dream-labs/vector-cloud/internal/proto/external_interfaceb\x06proto3"
+	"\x15AssumeBehaviorControl\x126.Anki.Vector.external_interface.BehaviorControlRequest\x1a7.Anki.Vector.external_interface.BehaviorControlResponse\"&\x82\xd3\xe4\x93\x02 :\x01*\"\x1b/v1/assume_behavior_control0\x01B Z\x1eAnki.Vector.external_interfaceb\x06proto3"
 
 var (
 	file_external_interface_proto_rawDescOnce sync.Once

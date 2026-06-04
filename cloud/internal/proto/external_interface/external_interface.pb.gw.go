@@ -2,11 +2,11 @@
 // source: external_interface.proto
 
 /*
-Package external_interface is a reverse proxy.
+Package Anki_Vector_external_interface is a reverse proxy.
 
 It translates gRPC into RESTful JSON APIs.
 */
-package external_interface
+package Anki_Vector_external_interface
 
 import (
 	"context"

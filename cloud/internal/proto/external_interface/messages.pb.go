@@ -20,7 +20,7 @@
 // 	protoc        v6.31.1
 // source: messages.proto
 
-package external_interface
+package Anki_Vector_external_interface
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -14452,7 +14452,7 @@ const file_messages_proto_rawDesc = "" +
 	"\x11NoCloudConnection\x10\x01\x12\n" +
 	"\n" +
 	"\x06NoWifi\x10\x02\x12\x13\n" +
-	"\x0fUnmatchedIntent\x10\x03BNZLgithub.com/digital-dream-labs/vector-cloud/internal/proto/external_interfaceb\x06proto3"
+	"\x0fUnmatchedIntent\x10\x03B Z\x1eAnki.Vector.external_interfaceb\x06proto3"
 
 var (
 	file_messages_proto_rawDescOnce sync.Once

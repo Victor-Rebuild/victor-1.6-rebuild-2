@@ -20,7 +20,7 @@
 // 	protoc        v6.31.1
 // source: cube.proto
 
-package external_interface
+package Anki_Vector_external_interface
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -2826,7 +2826,7 @@ const file_cube_proto_rawDesc = "" +
 	"\x15DELETION_MASK_UNKNOWN\x10\x00\x12&\n" +
 	"\"DELETION_MASK_FIXED_CUSTOM_OBJECTS\x10\x01\x12'\n" +
 	"#DELETION_MASK_CUSTOM_MARKER_OBJECTS\x10\x02\x12\x1c\n" +
-	"\x18DELETION_MASK_ARCHETYPES\x10\x03BNZLgithub.com/digital-dream-labs/vector-cloud/internal/proto/external_interfaceb\x06proto3"
+	"\x18DELETION_MASK_ARCHETYPES\x10\x03B Z\x1eAnki.Vector.external_interfaceb\x06proto3"
 
 var (
 	file_cube_proto_rawDescOnce sync.Once

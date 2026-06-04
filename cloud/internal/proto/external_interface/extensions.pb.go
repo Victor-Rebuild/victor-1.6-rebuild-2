@@ -20,7 +20,7 @@
 // 	protoc        v6.31.1
 // source: extensions.proto
 
-package external_interface
+package Anki_Vector_external_interface
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -59,7 +59,7 @@ var File_extensions_proto protoreflect.FileDescriptor
 const file_extensions_proto_rawDesc = "" +
 	"\n" +
 	"\x10extensions.proto\x12\x1eAnki.Vector.external_interface\x1a google/protobuf/descriptor.proto:=\n" +
-	"\bstreamed\x12\x1f.google.protobuf.MessageOptions\x18\xe0\xd4\x03 \x01(\bR\bstreamedBNZLgithub.com/digital-dream-labs/vector-cloud/internal/proto/external_interfaceb\x06proto3"
+	"\bstreamed\x12\x1f.google.protobuf.MessageOptions\x18\xe0\xd4\x03 \x01(\bR\bstreamedB Z\x1eAnki.Vector.external_interfaceb\x06proto3"
 
 var file_extensions_proto_goTypes = []any{
 	(*descriptorpb.MessageOptions)(nil), // 0: google.protobuf.MessageOptions

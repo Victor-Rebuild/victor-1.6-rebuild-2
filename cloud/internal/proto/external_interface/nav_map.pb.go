@@ -21,7 +21,7 @@
 // 	protoc        v6.31.1
 // source: nav_map.proto
 
-package external_interface
+package Anki_Vector_external_interface
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -397,7 +397,7 @@ const file_nav_map_proto_rawDesc = "" +
 	"\x1eNAV_NODE_OBSTACLE_UNRECOGNIZED\x10\x06\x12\x12\n" +
 	"\x0eNAV_NODE_CLIFF\x10\a\x12\x1d\n" +
 	"\x19NAV_NODE_INTERESTING_EDGE\x10\b\x12!\n" +
-	"\x1dNAV_NODE_NON_INTERESTING_EDGE\x10\tBNZLgithub.com/digital-dream-labs/vector-cloud/internal/proto/external_interfaceb\x06proto3"
+	"\x1dNAV_NODE_NON_INTERESTING_EDGE\x10\tB Z\x1eAnki.Vector.external_interfaceb\x06proto3"
 
 var (
 	file_nav_map_proto_rawDescOnce sync.Once

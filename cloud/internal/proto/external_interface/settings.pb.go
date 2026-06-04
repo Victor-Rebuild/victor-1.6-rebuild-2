@@ -20,7 +20,7 @@
 // 	protoc        v6.31.1
 // source: settings.proto
 
-package external_interface
+package Anki_Vector_external_interface
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -1826,7 +1826,7 @@ const file_settings_proto_rawDesc = "" +
 	"\n" +
 	"ResultCode\x12\x15\n" +
 	"\x11SETTINGS_ACCEPTED\x10\x00\x12\x1c\n" +
-	"\x18ERROR_UPDATE_IN_PROGRESS\x10\x01BNZLgithub.com/digital-dream-labs/vector-cloud/internal/proto/external_interfaceb\x06proto3"
+	"\x18ERROR_UPDATE_IN_PROGRESS\x10\x01B Z\x1eAnki.Vector.external_interfaceb\x06proto3"
 
 var (
 	file_settings_proto_rawDescOnce sync.Once

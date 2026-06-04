@@ -15,7 +15,7 @@
 // Add a decorator for streamed message handling in app
 
 syntax = "proto3";
-option go_package = "github.com/digital-dream-labs/vector-cloud/internal/proto/external_interface";
+option go_package = "Anki.Vector.external_interface";
 
 package Anki.Vector.external_interface;
 

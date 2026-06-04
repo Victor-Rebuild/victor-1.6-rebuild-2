@@ -20,7 +20,7 @@
 // 	protoc        v6.31.1
 // source: alexa.proto
 
-package external_interface
+package Anki_Vector_external_interface
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -357,7 +357,7 @@ const file_alexa_proto_rawDesc = "" +
 	"\x18ALEXA_AUTH_UNINITIALIZED\x10\x01\x12\x1e\n" +
 	"\x1aALEXA_AUTH_REQUESTING_AUTH\x10\x02\x12\x1f\n" +
 	"\x1bALEXA_AUTH_WAITING_FOR_CODE\x10\x03\x12\x19\n" +
-	"\x15ALEXA_AUTH_AUTHORIZED\x10\x04BNZLgithub.com/digital-dream-labs/vector-cloud/internal/proto/external_interfaceb\x06proto3"
+	"\x15ALEXA_AUTH_AUTHORIZED\x10\x04B Z\x1eAnki.Vector.external_interfaceb\x06proto3"
 
 var (
 	file_alexa_proto_rawDescOnce sync.Once

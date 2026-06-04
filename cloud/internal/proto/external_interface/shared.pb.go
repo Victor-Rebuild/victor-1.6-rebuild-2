@@ -20,7 +20,7 @@
 // 	protoc        v6.31.1
 // source: shared.proto
 
-package external_interface
+package Anki_Vector_external_interface
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -3725,7 +3725,7 @@ const file_shared_proto_rawDesc = "" +
 	"\x1cexternal_audio_stream_cancel\x18\x8a\x0e \x01(\v29.Anki.Vector.external_interface.ExternalAudioStreamCancelH\x00R\x19externalAudioStreamCancel\x12\x83\x01\n" +
 	"\x1eexternal_audio_stream_complete\x18\x8b\x0e \x01(\v2;.Anki.Vector.external_interface.ExternalAudioStreamCompleteH\x00R\x1bexternalAudioStreamComplete\x12\x83\x01\n" +
 	"\x1eexternal_audio_stream_response\x18\x8c\x0e \x01(\v2;.Anki.Vector.external_interface.ExternalAudioStreamResponseH\x00R\x1bexternalAudioStreamResponseB\x14\n" +
-	"\x12oneof_message_typeBNZLgithub.com/digital-dream-labs/vector-cloud/internal/proto/external_interfaceb\x06proto3"
+	"\x12oneof_message_typeB Z\x1eAnki.Vector.external_interfaceb\x06proto3"
 
 var (
 	file_shared_proto_rawDescOnce sync.Once

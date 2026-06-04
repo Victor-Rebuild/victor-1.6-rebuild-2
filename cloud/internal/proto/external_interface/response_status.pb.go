@@ -20,7 +20,7 @@
 // 	protoc        v6.31.1
 // source: response_status.proto
 
-package external_interface
+package Anki_Vector_external_interface
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -166,7 +166,7 @@ const file_response_status_proto_rawDesc = "" +
 	"\x02OK\x10\x03\x12\r\n" +
 	"\tFORBIDDEN\x10d\x12\r\n" +
 	"\tNOT_FOUND\x10e\x12\x1c\n" +
-	"\x18ERROR_UPDATE_IN_PROGRESS\x10fBNZLgithub.com/digital-dream-labs/vector-cloud/internal/proto/external_interfaceb\x06proto3"
+	"\x18ERROR_UPDATE_IN_PROGRESS\x10fB Z\x1eAnki.Vector.external_interfaceb\x06proto3"
 
 var (
 	file_response_status_proto_rawDescOnce sync.Once

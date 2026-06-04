@@ -20,7 +20,7 @@
 // - protoc             v6.31.1
 // source: external_interface.proto
 
-package external_interface
+package Anki_Vector_external_interface
 
 import (
 	context "context"

@@ -20,7 +20,7 @@
 // 	protoc        v6.31.1
 // source: behavior.proto
 
-package external_interface
+package Anki_Vector_external_interface
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -529,7 +529,7 @@ const file_behavior_proto_rawDesc = "" +
 	"\n" +
 	"keep_alive\x18\x03 \x01(\v2-.Anki.Vector.external_interface.KeepAlivePingH\x00R\tkeepAlive\x12|\n" +
 	"\x1breserved_control_lost_event\x18\x04 \x01(\v2;.Anki.Vector.external_interface.ReservedControlLostResponseH\x00R\x18reservedControlLostEventB\x0f\n" +
-	"\rresponse_typeBNZLgithub.com/digital-dream-labs/vector-cloud/internal/proto/external_interfaceb\x06proto3"
+	"\rresponse_typeB Z\x1eAnki.Vector.external_interfaceb\x06proto3"
 
 var (
 	file_behavior_proto_rawDescOnce sync.Once

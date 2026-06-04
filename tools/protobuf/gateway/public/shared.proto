@@ -15,9 +15,10 @@
 // External interface for robot <-> app and robot <-> sdk communication
 
 syntax = "proto3";
-option go_package = "github.com/digital-dream-labs/vector-cloud/internal/proto/external_interface";
 
 package Anki.Vector.external_interface;
+
+option go_package = "Anki.Vector.external_interface";
 
 import "behavior.proto";
 import "cube.proto";
