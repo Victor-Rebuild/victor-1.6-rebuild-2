@@ -44,7 +44,6 @@
 - More sensitive cliff detection
 - ReactToHand drives faster and is more forgiving on the angle
 - Classic beta alexa can be toggled in the CCIS configuration menu
-- Weather is more specific
 - Cozmo cube support ported from Viccyware ([Thank you AmyMC](https://github.com/Victor-Rebuild/victor-1.6-rebuild-2/commit/137bd65e4aa70f498ed29fcabb8f3b4bed32c0d8))
 - Prototype Eyes charger support ([Thank you AmyMC](https://github.com/Victor-Rebuild/victor-1.6-rebuild-2/commit/4316fa8b7ee710ca2540265a8e95821ece5f4674))
 - Can mute Vector from Voice Command (Hey Vector, Volume Mute)
