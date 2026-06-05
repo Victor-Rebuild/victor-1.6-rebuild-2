@@ -144,12 +144,12 @@ void BehaviorPossiblePerformance::OnBehaviorActivated()
   auto* action = new TriggerLiftSafeAnimationAction{ AnimationTrigger::Count };
 
   srand(time(0));
-  int randForSpaceUPerf = rand() % 21;
+  bool useSpace = GetRNG().RandBool();
 
   if (_iConfig.currAnim == "IntentionalPerformance") {
     action = new TriggerLiftSafeAnimationAction{ AnimationTrigger::IntentionalPerformance };
   } else if (_iConfig.currAnim == "UnintentionalPerformance") {
-    if (randForSpaceUPerf >= 15) {
+    if (useSpace) {
       action = new TriggerLiftSafeAnimationAction{ AnimationTrigger::UnintentionalPerformanceSpace };
       action->SetRenderInEyeHue( false );
     } else {
