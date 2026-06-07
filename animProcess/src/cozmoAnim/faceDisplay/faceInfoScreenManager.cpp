@@ -519,9 +519,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
       Util::FileUtils::DeleteFile("/data/data/rebuild/using-30-fps");
     }
 
-    if (!_isRestartRequired) {
-      _isRestartRequired = true;
-    }
+    _isRestartRequired = true;
 
     return ScreenName::ConfigurationSubmenu3;
   };
@@ -537,9 +535,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
       Util::FileUtils::DeleteFile("/data/data/user-do-not-auto-update");
     }
 
-    if (!_isRestartRequired) {
-      _isRestartRequired = true;
-    }
+    _isRestartRequired = true;
 
     return ScreenName::ConfigurationSubmenu3;
   };
@@ -555,9 +551,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
       Util::FileUtils::DeleteFile("/data/data/rebuild/wirelights");
     }
 
-    if (!_isRestartRequired) {
-      _isRestartRequired = true;
-    }
+    _isRestartRequired = true;
 
     return ScreenName::ConfigurationSubmenu;
   };
@@ -594,9 +588,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
       Util::FileUtils::DeleteFile("/data/data/rebuild/old-alexa");
     }
 
-    if (!_isRestartRequired) {
-      _isRestartRequired = true;
-    }
+    _isRestartRequired = true;
 
     return ScreenName::ConfigurationSubmenu4;
   };
@@ -612,9 +604,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
       Util::FileUtils::DeleteFile("/data/data/rebuild/dont-snore-at-night");
     }
 
-    if (!_isRestartRequired) {
-      _isRestartRequired = true;
-    }
+    _isRestartRequired = true;
 
     return ScreenName::ConfigurationSubmenu4;
   };
@@ -630,9 +620,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
       Util::FileUtils::DeleteFile("/data/data/rebuild/dttb-eye-randomizer");
     }
 
-    if (!_isRestartRequired) {
-      _isRestartRequired = true;
-    }
+    _isRestartRequired = true;
 
     return ScreenName::ConfigurationSubmenu4;
   };
