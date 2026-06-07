@@ -51,7 +51,6 @@ private:
     float cooldown_s;
     float probability;
     float rerollPeriod_s;
-    std::string currAnim;
   };
 
   struct PersistentVariables {
