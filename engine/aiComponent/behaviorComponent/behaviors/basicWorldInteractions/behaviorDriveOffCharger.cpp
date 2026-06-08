@@ -30,7 +30,6 @@
 #include "engine/moodSystem/moodManager.h"
 
 #include "coretech/common/engine/utils/timer.h"
-#include "util/fileUtils/fileUtils.h"
 
 
 namespace Anki {
@@ -152,14 +151,7 @@ bool BehaviorDriveOffCharger::WantsToBeActivatedBehavior() const
   // but that caused other issues (if the robot was bumped during wakeup, it wouldn't drive off the
   // charger). Now, we've gone back to OnChargerPlatform but fixed it to work better
   const bool onChargerPlatform = robotInfo.IsOnChargerPlatform();
-
-  bool leavecharger = true;
-
-  if (Util::FileUtils::FileExists("/data/data/rebuild/stayfuckingputanddontleaveyourdamncharger")) {
-    leavecharger = false;
-  }
-  
-  return leavecharger && onChargerPlatform;
+  return onChargerPlatform;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -201,23 +193,6 @@ void BehaviorDriveOffCharger::BehaviorUpdate()
   }
 
   const auto& robotInfo = GetBEI().GetRobotInfo();
-  
-  if(robotInfo.IsOnChargerPlatform() && !IsControlDelegated()) {
-    
-    const RobotTimeStamp_t recentTime_ms = robotInfo.GetLastImageTimeStamp() - (_iConfig.maxFaceAge_s * 1000);
-    const bool hasRecentFace = GetBEI().GetFaceWorld().HasAnyFaces(recentTime_ms, false);
-    
-    BlockWorldFilter cubeFilter;
-    cubeFilter.AddFilterFcn(&BlockWorldFilter::IsLightCubeFilter);
-    const auto* recentCube = GetBEI().GetBlockWorld().FindMostRecentlyObservedObject(cubeFilter);
-    const bool hasRecentCube = (recentCube != nullptr);
-    
-    if (hasRecentFace || hasRecentCube) {
-      SelectAndDrive();
-      return;
-    }
-  }
-
   if( robotInfo.IsOnChargerPlatform() ) {
     const bool onTreads = GetBEI().GetOffTreadsState() == OffTreadsState::OnTreads;
     if( !onTreads ) {

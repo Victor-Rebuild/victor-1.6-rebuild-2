@@ -19,8 +19,6 @@
 #include "engine/components/visionComponent.h"
 #include "engine/faceWorld.h"
 #include "util/console/consoleInterface.h"
-#include "util/fileUtils/fileUtils.h"
-#include "util/logging/logging.h"
 
 namespace Anki {
 namespace Vector {

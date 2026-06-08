@@ -32,7 +32,7 @@ namespace Vector {
 namespace{
 const char* kPowerOffAnimName         = "powerOffAnimName";
 const char* const kWaitForAnimMsgKey  = "waitForAnimMsg";
-const char* kFindChargerBehaviorKey = "goToChargerBehavior";
+const char* kFindChargerBehaviorKey   = "goToChargerBehavior";
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

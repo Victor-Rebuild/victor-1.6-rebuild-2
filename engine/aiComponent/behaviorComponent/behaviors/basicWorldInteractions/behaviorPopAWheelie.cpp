@@ -175,7 +175,7 @@ void BehaviorPopAWheelie::TransitionToPerformingAction(bool isRetry)
                                                                          maxTurnToFaceAngle,
                                                                          _iConfig.sayName);
   if( _iConfig.sayName ) {
-    goPopAWheelie->SetSayNameAnimationTrigger(AnimationTrigger::PopAWheeliePreActionNamedFace);
+    goPopAWheelie->SetNoNameAnimationTrigger(AnimationTrigger::PopAWheeliePreActionNamedFace);
     goPopAWheelie->SetNoNameAnimationTrigger(AnimationTrigger::PopAWheeliePreActionUnnamedFace);
   }
   
