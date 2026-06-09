@@ -345,6 +345,10 @@
     {
       "cloud_intent": "intent_victor_shutdown_satisfied",
       "user_intent": "victor_shutdown_satisfied"
+    },
+    {
+      "cloud_intent": "intent_play_keepaway",
+      "user_intent": "play_keepaway"
     }
   ],
 
