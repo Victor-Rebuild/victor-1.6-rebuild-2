@@ -131,7 +131,7 @@ void BehaviorBlackJack::InitBehavior()
 {
   const auto& BC = GetBEI().GetBehaviorContainer();
 
-  _iConfig.driveOffChargerBehavior = BC.FindBehaviorByID( BEHAVIOR_ID( DriveOffChargerStraight ) );
+  _iConfig.driveOffChargerBehavior = BC.FindBehaviorByID( BEHAVIOR_ID( DriveOffChargerFace ) );
 
   BC.FindBehaviorByIDAndDowncast( BEHAVIOR_ID(BlackJackHitOrStandPrompt),
                                   BEHAVIOR_CLASS(PromptUserForVoiceCommand),
