@@ -8,6 +8,7 @@
   "behaviors": [
     "Volume",
     "EyeColorVoiceCommand",
+    "CubeDriveVoiceCommand",
     "DoATrickVoiceCommand",
     "PlayAGameVoiceCommand",
     "FindYourCubeVoiceCommand",
