@@ -195,6 +195,7 @@ namespace Anki
       {
         LOG_INFO("SettingsManager.Destructor", "Stopping Rainbow Eyes thread during shutdown");
         _stopRainbowEyeThread.store(true, std::memory_order_release);
+        _rainbowEyeCV.notify_all();
         _rainbowEyeThread.join();
       }
 
@@ -675,6 +676,7 @@ namespace Anki
       if (_rainbowEyeThread.joinable())
       {
         _stopRainbowEyeThread.store(true, std::memory_order_release);
+        _rainbowEyeCV.notify_all();
         _rainbowEyeThread.join();
         _rainbowEyeThread = std::thread();                             // Reset the thread object
         _stopRainbowEyeThread.store(false, std::memory_order_release); // Reset the flag for future use
@@ -693,6 +695,7 @@ namespace Anki
       {
         const std::string rainbowEyesStr = "RAINBOW_EYES";
         const std::string rebuildEyesStr = "REBUILD_EYES";
+        // const std::string emilyEyesStr   = "EMILY_EYES";
         const auto &value = _currentSettings[key].asUInt();
         const auto &eyeColorName = EyeColor_Name(static_cast<external_interface::EyeColor>(value));
         LOG_INFO("SettingsManager.ApplySettingEyeColor.Apply", "Setting robot eye color to %s", eyeColorName.c_str());
@@ -717,9 +720,12 @@ namespace Anki
                 {
                   hue = 0.0f;
                 }
-                std::this_thread::sleep_for(std::chrono::milliseconds(30));
+                std::unique_lock<std::mutex> lock(_rainbowEyeMutex);
+                _rainbowEyeCV.wait_for(lock, std::chrono::milliseconds(30), [this]() {
+                  return _stopRainbowEyeThread.load(std::memory_order_acquire);
+                });
 
-                // Check if "RAINBOW_EYES" mode is still active by checking the setting
+                // Check if "RAINBOW_EYES" is still active by checking the setting
                 const std::string rainbowEyesStrInTh = "RAINBOW_EYES";
                 const auto& eyeval = _currentSettings[key].asUInt();
                 const auto& currentHueKey = EyeColor_Name(static_cast<external_interface::EyeColor>(eyeval));
@@ -823,7 +829,7 @@ namespace Anki
                 _robot->SendRobotMessage<RobotInterface::SetFaceHue>(color.hue);
                 _robot->SendRobotMessage<RobotInterface::SetFaceSaturation>(adjustedSaturation);
 
-                // Check if "REBUILD_EYES" mode is still active by checking the setting
+                // Check if "REBUILD_EYES" is still active by checking the setting
                 const std::string rebuildEyesStrInTh = "REBUILD_EYES";
                 const auto& eyeval = _currentSettings[key].asUInt();
                 const auto& currentHueKey = EyeColor_Name(static_cast<external_interface::EyeColor>(eyeval));
