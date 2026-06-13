@@ -76,6 +76,7 @@ enum EyeColor {
   CONFUSION_MATRIX_GREEN = 6;
   RAINBOW_EYES = 7;
   REBUILD_EYES = 8;
+  MYSTERY_EYES = 9;
 }
 
 message CustomEyeColor {

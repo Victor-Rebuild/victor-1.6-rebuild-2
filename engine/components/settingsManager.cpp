@@ -695,12 +695,15 @@ namespace Anki
       {
         const std::string rainbowEyesStr = "RAINBOW_EYES";
         const std::string rebuildEyesStr = "REBUILD_EYES";
-        // const std::string emilyEyesStr   = "EMILY_EYES";
+        const std::string mysteryEyesStr   = "MYSTERY_EYES";
         const auto &value = _currentSettings[key].asUInt();
         const auto &eyeColorName = EyeColor_Name(static_cast<external_interface::EyeColor>(value));
         LOG_INFO("SettingsManager.ApplySettingEyeColor.Apply", "Setting robot eye color to %s", eyeColorName.c_str());
 
         // Start custom dynamic eye color functions
+
+        // Wire - Rainbow Eyes
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         if (eyeColorName == rainbowEyesStr)
         {
           LOG_INFO("SettingsManager.ApplySettingEyeColor.Apply", "Starting Rainbow Eyes thread");
@@ -742,7 +745,7 @@ namespace Anki
           return true;
         }
 
-        // Emily - Rebuild Eyes :D
+        // Emily - Rebuild Eyes (XMB eyes) :D
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         else if (eyeColorName == rebuildEyesStr)
         {
@@ -754,10 +757,13 @@ namespace Anki
             _rebuildEyeThread = std::thread([this]()
             {
               int nextFifthHour = 0;
+              bool gotTime = false;
               while (!_stopRebuildEyeThread.load(std::memory_order_acquire))
               {
                 // Check if we have date/time yet or no
-                const bool gotTime = OSState::getInstance()->IsWallTimeSynced();
+                if (!gotTime) {
+                  gotTime = OSState::getInstance()->IsWallTimeSynced();
+                }
 
                 if (Util::FileUtils::DirectoryDoesNotExist("/data/data/rebuild")) {
                   LOG_WARNING("SettingsManager.RebuildEyes.CreateInital", "Creating inital files");
@@ -857,6 +863,11 @@ namespace Anki
           }
 
           return true;
+        } else if (eyeColorName == mysteryEyesStr) {
+          std::srand(std::time(nullptr));
+
+          hue = (std::rand() / (double)RAND_MAX) * 1.0;
+          saturation = (std::rand() / (double)RAND_MAX) * 2.0;
         }
         // End custom dynamic eye colors
         else
