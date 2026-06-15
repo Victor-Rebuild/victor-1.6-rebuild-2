@@ -1,0 +1,16 @@
+
+{
+  "behaviorID"       : "PowerRobotOff",
+  "behaviorClass"    : "PowerRobotOff",
+
+  "associatedActiveFeature": "NoFeature",
+
+  "respondToUserIntents": [
+    { "type": "victor_reboot" },
+    { "type": "victor_shutdown" },
+    { "type": "victor_shutdown_satisfied" }
+  ],
+
+  "goToChargerBehavior": "FindHomeForSleeping",
+  "powerOffAnimName" : "anim_gotosleep_getin_01"
+}
