@@ -74,6 +74,7 @@ namespace{
                                                                            BEHAVIOR_CLASS(PossiblePerformance) }};
 
   static const std::set<BehaviorClass> kBehaviorClassesToSuppressCliff = { BEHAVIOR_CLASS(BlackJack),
+                                                                           BEHAVIOR_CLASS(ReactToTouchPetting), // Add petting, otherwise there's false detections when held in palm
                                                                            BEHAVIOR_CLASS(CubeDrive)};
 
   static const std::set<BehaviorClass> kBehaviorClassesToSuppressTimerAntics = {{ BEHAVIOR_CLASS(BlackJack),

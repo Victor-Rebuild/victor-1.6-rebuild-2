@@ -318,7 +318,5 @@ std::string BehaviorWallDateCoordinator::GetTTSStringForDate()
   return ss.str();
 }
 
-
-
 } // namespace Vector
 } // namespace Anki
