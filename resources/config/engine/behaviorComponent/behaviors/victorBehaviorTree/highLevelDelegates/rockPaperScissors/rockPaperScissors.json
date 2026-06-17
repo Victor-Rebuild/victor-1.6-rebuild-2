@@ -1,14 +1,12 @@
 
 {
-  "behaviorID"       : "PowerRobotOff",
-  "behaviorClass"    : "PowerRobotOff",
+  "behaviorID"       : "RockPaperScissors",
+  "behaviorClass"    : "RockPaperScissors",
 
   "associatedActiveFeature": "NoFeature",
 
   "respondToUserIntents": [
-    { "type": "victor_reboot" },
-    { "type": "victor_shutdown" },
-    { "type": "victor_shutdown_satisfied" }
+    { "type": "play_rockPaperScissors" }
   ],
 
   "goToChargerBehavior": "FindHomeForSleeping",

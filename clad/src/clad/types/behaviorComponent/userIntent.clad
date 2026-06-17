@@ -161,6 +161,7 @@ union dupes_allowed UserIntent
   UserIntent_Void             play_keepaway,
   UserIntent_Void             play_pickupcube,
   UserIntent_Void             play_popawheelie,
+  UserIntent_Void             play_rockPaperScissors,
   UserIntent_Void             play_rockPaperScissorsRock,
   UserIntent_Void             play_rockPaperScissorsPaper,
   UserIntent_Void             play_rockPaperScissorsScissors,

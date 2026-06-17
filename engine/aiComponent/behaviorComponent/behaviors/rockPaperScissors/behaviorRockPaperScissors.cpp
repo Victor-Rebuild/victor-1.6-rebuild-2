@@ -85,7 +85,7 @@ void BehaviorRockPaperScissors::InitBehavior()
 bool BehaviorRockPaperScissors::WantsToBeActivatedBehavior() const
 {
   auto& uic = GetBehaviorComp<UserIntentComponent>();
-  return uic.IsUserIntentPending(USER_INTENT(play_rockPaperScissorsRock)) || uic.IsUserIntentPending(USER_INTENT(play_rockPaperScissorsPaper)) || uic.IsUserIntentPending(USER_INTENT(play_rockPaperScissorsScissors));
+  return uic.IsUserIntentPending(USER_INTENT(play_rockPaperScissors));
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -124,9 +124,9 @@ void BehaviorRockPaperScissors::OnBehaviorEnteredActivatableScope()
 void BehaviorRockPaperScissors::OnBehaviorActivated()
 {
   UserIntentComponent& uic = GetBehaviorComp<UserIntentComponent>();
-  UserIntentPtr intentDataReboot   = uic.GetUserIntentIfActive(USER_INTENT(play_rockPaperScissorsRock));
-  UserIntentPtr intentDataShutdown = uic.GetUserIntentIfActive(USER_INTENT(INVALID));
-  UserIntentPtr intentDataShutdownSatisfied = uic.GetUserIntentIfActive(USER_INTENT(INVALID));
+  UserIntentPtr intentDataReboot   = uic.GetUserIntentIfActive(USER_INTENT(play_rockPaperScissors));
+  // UserIntentPtr intentDataShutdown = uic.GetUserIntentIfActive(USER_INTENT(INVALID));
+  // UserIntentPtr intentDataShutdownSatisfied = uic.GetUserIntentIfActive(USER_INTENT(INVALID));
 
   // reset dynamic variables
   const bool prevShouldStartPowerOffAnimaiton = _dVars.shouldStartPowerOffAnimaiton;

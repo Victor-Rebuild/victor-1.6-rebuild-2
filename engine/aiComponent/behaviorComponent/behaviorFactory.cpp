@@ -166,6 +166,7 @@
 #include "engine/aiComponent/behaviorComponent/behaviors/reactions/behaviorReactToVoiceCommand.h"
 #include "engine/aiComponent/behaviorComponent/behaviors/rebootRobot/behaviorPowerRobotOff.h"
 #include "engine/aiComponent/behaviorComponent/behaviors/robotDrivenDialog/behaviorPromptUserForVoiceCommand.h"
+#include "engine/aiComponent/behaviorComponent/behaviors/rockPaperScissors/behaviorRockPaperScissors.h"
 #include "engine/aiComponent/behaviorComponent/behaviors/sdkBehaviors/behaviorSDKInterface.h"
 #include "engine/aiComponent/behaviorComponent/behaviors/sdkBehaviors/behaviorSDKLock.h"
 #include "engine/aiComponent/behaviorComponent/behaviors/simpleFaceBehaviors/behaviorDriveToFace.h"
@@ -1142,7 +1143,11 @@ ICozmoBehaviorPtr BehaviorFactory::CreateBehavior(const Json::Value& config)
       newBehavior = ICozmoBehaviorPtr(new BehaviorPromptUserForVoiceCommand(config));
       break;
     }
-    
+    case BehaviorClass::RockPaperScissors:
+    {
+      newBehavior = ICozmoBehaviorPtr(new BehaviorRockPaperScissors(config));
+      break;
+    }
     case BehaviorClass::SDKInterface:
     {
       newBehavior = ICozmoBehaviorPtr(new BehaviorSDKInterface(config));

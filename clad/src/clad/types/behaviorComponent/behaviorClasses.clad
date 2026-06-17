@@ -242,6 +242,9 @@ enum uint_8 BehaviorClass {
   // robotDrivenDialog
   PromptUserForVoiceCommand,
 
+  // rockPaperScissors
+  RockPaperScissors,
+
   // sdkBehaviors
   SDKInterface,
   SDKLock,

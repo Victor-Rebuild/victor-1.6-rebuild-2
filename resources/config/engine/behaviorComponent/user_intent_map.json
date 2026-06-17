@@ -355,6 +355,10 @@
       "user_intent": "play_cubedrive"
     },
     {
+      "cloud_intent": "intent_play_rockPaperScissors",
+      "user_intent": "play_rockPaperScissors"
+    },
+    {
       "cloud_intent": "intent_play_rockPaperScissorsRock",
       "user_intent": "play_rockPaperScissorsRock"
     },
