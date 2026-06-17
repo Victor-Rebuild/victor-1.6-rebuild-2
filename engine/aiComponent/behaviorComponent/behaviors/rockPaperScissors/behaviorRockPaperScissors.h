@@ -15,6 +15,8 @@
 #pragma once
 
 #include "engine/aiComponent/behaviorComponent/behaviors/iCozmoBehavior.h"
+#include "engine/aiComponent/behaviorComponent/behaviors/animationWrappers/behaviorTextToSpeechLoop.h"
+#include "engine/aiComponent/behaviorComponent/behaviors/robotDrivenDialog/behaviorPromptUserForVoiceCommand.h"
 
 namespace Anki {
 namespace Vector {
@@ -55,8 +57,9 @@ private:
     std::string powerOffAnimName;
     bool waitForAnimMsg;
 
-    std::string findChargerBehaviorName;
     ICozmoBehaviorPtr findChargerBehavior;
+    std::shared_ptr<BehaviorTextToSpeechLoop> ttsBehavior;
+    std::shared_ptr<BehaviorPromptUserForVoiceCommand> hitOrStandPromptBehavior;
   };
 
   struct DynamicVariables {
@@ -71,10 +74,8 @@ private:
   InstanceConfig _iConfig;
   DynamicVariables _dVars;
 
-  void TransitionToCharger();
-
-  void StartAnimation();
-  TimeStamp_t GetLengthOfAnimation_ms(const std::string& animName);
+  void StartTTSInit();
+  void RockPaperOrScissors();
 
   bool isPowerOff = false;
 

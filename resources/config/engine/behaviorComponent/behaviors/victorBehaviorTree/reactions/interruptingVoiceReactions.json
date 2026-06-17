@@ -7,6 +7,7 @@
 
   "behaviors": [
     "Volume",
+    "RockPaperScissors",
     "EyeColorVoiceCommand",
     "CubeDriveVoiceCommand",
     "DoATrickVoiceCommand",

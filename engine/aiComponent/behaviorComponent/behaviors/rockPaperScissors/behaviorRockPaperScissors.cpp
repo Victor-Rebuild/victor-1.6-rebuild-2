@@ -21,27 +21,22 @@
 #include "engine/aiComponent/behaviorComponent/behaviorExternalInterface/beiRobotInfo.h"
 #include "engine/aiComponent/behaviorComponent/userIntentComponent.h"
 #include "engine/aiComponent/behaviorComponent/userIntents.h"
-#include "engine/aiComponent/beiConditions/conditions/conditionTimePowerButtonPressed.h"
 #include "engine/components/dataAccessorComponent.h"
 #include "engine/externalInterface/externalInterface.h"
-#include "robot.h"
 
 namespace Anki {
 namespace Vector {
 
 namespace{
-const char* kPowerOffAnimName         = "powerOffAnimName";
-const char* const kWaitForAnimMsgKey  = "waitForAnimMsg";
-const char* kFindChargerBehaviorKey   = "goToChargerBehavior";
+  static const UserIntentTag scissorsIntent = USER_INTENT(play_rockPaperScissorsScissors);
+  static const UserIntentTag paperIntent = USER_INTENT(play_rockPaperScissorsPaper);
+  static const UserIntentTag rockIntent = USER_INTENT(play_rockPaperScissorsRock);
+  static const UserIntentTag silenceIntent = USER_INTENT(silence);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 BehaviorRockPaperScissors::InstanceConfig::InstanceConfig(const Json::Value& config)
 {
-  const std::string debugName = "BehaviorRockPaperScissors.InstanceConfig.MissingKey. ";
-  powerOffAnimName   = JsonTools::ParseString(config, kPowerOffAnimName, debugName + kPowerOffAnimName);
-
-  waitForAnimMsg = config.get( kWaitForAnimMsgKey, false ).asBool();
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -58,8 +53,6 @@ BehaviorRockPaperScissors::BehaviorRockPaperScissors(const Json::Value& config)
 : ICozmoBehavior(config)
 , _iConfig(config)
 {
-  auto debugStr = "BehaviorSleepCycle.Constructor.MissingDelegateID";
-  _iConfig.findChargerBehaviorName = JsonTools::ParseString(config, kFindChargerBehaviorKey, debugStr);
   SubscribeToTags({RobotInterface::RobotToEngineTag::startShutdownAnim});
 }
 
@@ -73,11 +66,14 @@ BehaviorRockPaperScissors::~BehaviorRockPaperScissors()
 void BehaviorRockPaperScissors::InitBehavior()
 {
   auto& BC = GetBEI().GetBehaviorContainer();
-  {
-    BehaviorID delegateID = BehaviorTypesWrapper::BehaviorIDFromString(_iConfig.findChargerBehaviorName);
-    _iConfig.findChargerBehaviorName.clear();
-    _iConfig.findChargerBehavior = BC.FindBehaviorByID( delegateID );
-  }
+
+  BC.FindBehaviorByIDAndDowncast( BEHAVIOR_ID(DefaultTextToSpeechLoop),
+                                  BEHAVIOR_CLASS(TextToSpeechLoop),
+                                  _iConfig.ttsBehavior );
+
+  BC.FindBehaviorByIDAndDowncast( BEHAVIOR_ID(BlackJackHitOrStandPrompt),
+                                  BEHAVIOR_CLASS(PromptUserForVoiceCommand),
+                                  _iConfig.hitOrStandPromptBehavior );
 }
 
 
@@ -100,17 +96,13 @@ void BehaviorRockPaperScissors::GetBehaviorOperationModifiers(BehaviorOperationM
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BehaviorRockPaperScissors::GetAllDelegates(std::set<IBehavior*>& delegates) const
 {
-  delegates.insert(_iConfig.findChargerBehavior.get());
+  delegates.insert( _iConfig.ttsBehavior.get() );
+  delegates.insert( _iConfig.hitOrStandPromptBehavior.get() );
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BehaviorRockPaperScissors::GetBehaviorJsonKeys(std::set<const char*>& expectedKeys) const
 {
-  const char* list[] = {
-    kPowerOffAnimName,
-    kFindChargerBehaviorKey,
-  };
-  expectedKeys.insert( std::begin(list), std::end(list) );
 }
 
 
@@ -128,15 +120,7 @@ void BehaviorRockPaperScissors::OnBehaviorActivated()
   // UserIntentPtr intentDataShutdown = uic.GetUserIntentIfActive(USER_INTENT(INVALID));
   // UserIntentPtr intentDataShutdownSatisfied = uic.GetUserIntentIfActive(USER_INTENT(INVALID));
 
-  // reset dynamic variables
-  const bool prevShouldStartPowerOffAnimaiton = _dVars.shouldStartPowerOffAnimaiton;
   _dVars = DynamicVariables();
-
-  // make shouldStartPowerOffAnimaiton persist if _iConfig.waitForAnimMsg, since this behavior WantToBeActivated
-  // iff shouldStartPowerOffAnimaiton, whenever _iConfig.waitForAnimMsg
-  if( _iConfig.waitForAnimMsg ) {
-    _dVars.shouldStartPowerOffAnimaiton = prevShouldStartPowerOffAnimaiton;
-  }
 
   // if (intentDataShutdown || intentDataShutdownSatisfied) {
   //   _dVars.isShutdown = true;
@@ -145,17 +129,16 @@ void BehaviorRockPaperScissors::OnBehaviorActivated()
     _dVars.isShutdown = false;
   }
 
-  // if (intentDataShutdownSatisfied) {
-  //   TransitionToCharger();
-  // } else {
-    StartAnimation();
-  // }
+  StartTTSInit();
 }
 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BehaviorRockPaperScissors::BehaviorUpdate()
 {
+  if(!IsActivated()){
+    return;
+  }
 }
 
 
@@ -173,74 +156,70 @@ void BehaviorRockPaperScissors::AlwaysHandleInScope(const RobotToEngineEvent& ev
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// void BehaviorRockPaperScissors::TransitionToCharger()
-// {
-//   if( GetBEI().GetRobotInfo().IsOnChargerContacts() ) {
-//     // skip straight to powering off
-//     LOG_WARNING("BehaviorRockPaperScissors.TransitionToCharger.WontRun", "On charger");
-//     TransitionToPoweringOff();
-//   }
-//   else {
-//     CancelDelegates(false);
-//     if( _iConfig.findChargerBehavior != nullptr
-//         && _iConfig.findChargerBehavior->WantsToBeActivated() ) {
-//       DelegateIfInControl( _iConfig.findChargerBehavior.get(),
-//                            &BehaviorRockPaperScissors::TransitionToPoweringOff );
-//     }
-//     else {
-//       LOG_WARNING("BehaviorRockPaperScissors.TransitionToCharger.WontRun",
-//                   "Not on charger contacts, but find charger behavior doesn't want to activate");
-//       TransitionToPoweringOff();
-//     }
-//   }
-// }
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void BehaviorRockPaperScissors::StartAnimation()
+void BehaviorRockPaperScissors::StartTTSInit()
 {
-  const u32 numLoops = 1;
-  const bool interruptRunning = true;
-  const u8 tracksToLock = (u8)AnimTrackFlag::NO_TRACKS;
-  const float timeout_sec = PlayAnimationAction::GetDefaultTimeoutInSeconds();
+  auto* greetingAnimAction = new TriggerLiftSafeAnimationAction( AnimationTrigger::GreetAfterLongTime );
 
-  auto callback = [this](const AnimationComponent::AnimResult res, u32 streamTimeAnimEnded) {
-    _dVars.waitingForAnimationCallback = false;
-    if (res == AnimationComponent::AnimResult::Completed) {
-      _dVars.timeLastPowerAnimStopped_ms = 0;
-      if (_dVars.isShutdown) {
-        // GetBEI().GetRobotInfo()._robot.SendRobotMessage<RobotInterface::Shutdown>();
-      // } else {
-        (void)system("/usr/bin/sudo /usr/sbin/reboot");
-      }
-    } else {
-      _dVars.timeLastPowerAnimStopped_ms = streamTimeAnimEnded;
+  _iConfig.ttsBehavior->SetTextToSay( "Rock, Paper, Or Scissors?" );
+
+  DelegateIfInControl(greetingAnimAction,
+    // Callback, will be activated after animation
+    // DelegateIfInControl does not hang until completion of action
+    [this](){
+      // example of defining a new action
+      DelegateIfInControl(_iConfig.ttsBehavior.get(), [this]() {
+        DelegateIfInControl(_iConfig.hitOrStandPromptBehavior.get(), &BehaviorRockPaperScissors::RockPaperOrScissors);
+      });
     }
-  };
-  DelegateIfInControl(new PlayAnimationAction("", numLoops, interruptRunning,
-                                              tracksToLock, timeout_sec, 0, callback));
-
+  );
 }
 
-
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TimeStamp_t BehaviorRockPaperScissors::GetLengthOfAnimation_ms(const std::string& animName)
+void BehaviorRockPaperScissors::RockPaperOrScissors()
 {
-  auto& dataAccessorComp = GetBEI().GetComponentWrapper(BEIComponentID::DataAccessor).GetComponent<DataAccessorComponent>();
-  const auto* animContainer = dataAccessorComp.GetCannedAnimationContainer();
-  auto length_ms = 0;
-  if((animContainer != nullptr) && !_iConfig.powerOffAnimName.empty()){
-    auto animPtr = animContainer->GetAnimation(_iConfig.powerOffAnimName);
-    if(animPtr != nullptr){
-      length_ms = animPtr->GetLastKeyFrameEndTime_ms();
-    }else{
-      PRINT_NAMED_ERROR("BehaviorRockPaperScissors.GetLengthOfAnimation_ms.MissingAnimation",
-                        "Animation named %s is not accessible in engine", animName.c_str());
+  UserIntentComponent& uic = GetBehaviorComp<UserIntentComponent>();
+
+  int whatdidplayerchoose = 0;
+
+  if (uic.IsUserIntentPending(rockIntent)) {
+    uic.DropUserIntent(rockIntent);
+    whatdidplayerchoose = 0;
+  } else if (uic.IsUserIntentPending(paperIntent)) {
+    uic.DropUserIntent(paperIntent);
+    whatdidplayerchoose = 1;
+  } else if (uic.IsUserIntentPending(scissorsIntent)) {
+    uic.DropUserIntent(scissorsIntent);
+    whatdidplayerchoose = 2;
+  } else {
+    // Stand if:
+    // 1. We received a valid playerStandIntent or imperative_negative
+    if(uic.IsUserIntentPending(silenceIntent)) {
+      uic.DropUserIntent(silenceIntent);
     }
+    whatdidplayerchoose = 3;
   }
 
-  return length_ms;
-}
+  std::string chosenOne = "";
 
+  if (whatdidplayerchoose == 1) {
+    chosenOne = "rock";
+  } else if (whatdidplayerchoose == 2) {
+    chosenOne = "paper";
+  } else if (whatdidplayerchoose == 3) {
+    chosenOne = "scissors";
+  }
+
+  std::string ttstring = "";
+  if (whatdidplayerchoose != 3) {
+    std::string ttstring = "Player chose " + chosenOne;
+  } else {
+    _iConfig.ttsBehavior->SetTextToSay( "Player did not chose, Vector wins" );
+  }
+
+  _iConfig.ttsBehavior->SetTextToSay( ttstring );
+
+  DelegateIfInControl(_iConfig.ttsBehavior.get(), [this](){CancelSelf();});
+}
 
 }
 }
