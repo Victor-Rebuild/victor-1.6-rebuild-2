@@ -18,6 +18,9 @@
       "/{*}"
     ]
   },
+  "BehaviorRockPaperScissors.RockPaperOrScissors": {
+    "translation": "Rock Paper Or Scissors?"
+  },
   "BehaviorRockPaperScissors.DrawQuestion": {
     "translation": "Your choice?"
   },
@@ -34,10 +37,13 @@
     "translation": "Player Chose"
   },
   "RockPaperScissors.VectorChose": {
-    "translation": "Vector Chose"
+    "translation": "I Chose"
+  },
+  "RockPaperScissors.NoChoice": {
+    "translation": "Player did not choose, Vector wins"
   },
   "RockPaperScissors.VectorTurn": {
-    "translation": "Vector's Turn!"
+    "translation": "My Turn!"
   },
   "RockPaperScissors.VectorWins": {
     "translation": "You lose!"

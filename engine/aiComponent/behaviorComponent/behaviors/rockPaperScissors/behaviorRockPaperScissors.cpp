@@ -167,8 +167,8 @@ void BehaviorRockPaperScissors::AlwaysHandleInScope(const RobotToEngineEvent& ev
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BehaviorRockPaperScissors::StartTTSInit()
 {
-
-  _iConfig.ttsBehavior->SetTextToSay( "Rock, Paper, Or Scissors?" );
+  const auto & localeComponent = GetBEI().GetRobotInfo().GetLocaleComponent();
+  _iConfig.ttsBehavior->SetTextToSay( localeComponent.GetString("BehaviorRockPaperScissors.RockPaperOrScissors") );
 
   DelegateIfInControl(_iConfig.ttsBehavior.get(), [this]() {
     DelegateIfInControl(_iConfig.rockPaperScissorsPromptBehavior.get(), &BehaviorRockPaperScissors::RockPaperOrScissors);
@@ -210,7 +210,7 @@ void BehaviorRockPaperScissors::RockPaperOrScissors()
   if (_dVars.whatdidplayerchoose != 3) {
     chosenOne = choiceStringLocalized[_dVars.whatdidplayerchoose];
   } else {
-    _iConfig.ttsBehavior->SetTextToSay( "Player did not choose, Vector wins" );
+    _iConfig.ttsBehavior->SetTextToSay( localeComponent.GetString("RockPaperScissors.NoChoice") );
     _dVars.winLoseTie = 2;
     DelegateIfInControl(_iConfig.ttsBehavior.get(), &BehaviorRockPaperScissors::PlayWinLoseTieAnim);
   }
@@ -224,6 +224,7 @@ void BehaviorRockPaperScissors::RockPaperOrScissors()
   DelegateIfInControl(_iConfig.ttsBehavior.get(), &BehaviorRockPaperScissors::RockPaperOrScissorsVectorSearch);
 }
 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BehaviorRockPaperScissors::RockPaperOrScissorsVectorSearch()
 {
   CompoundActionSequential *messageAnimation = new CompoundActionSequential();
@@ -234,6 +235,7 @@ void BehaviorRockPaperScissors::RockPaperOrScissorsVectorSearch()
   DelegateIfInControl(messageAnimation, &BehaviorRockPaperScissors::RockPaperOrScissorsVector);
 }
 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BehaviorRockPaperScissors::RockPaperOrScissorsVector()
 {
 
@@ -290,6 +292,7 @@ void BehaviorRockPaperScissors::RockPaperOrScissorsVector()
   DelegateIfInControl(_iConfig.rockPaperScissorsVectorResponseBehavior.get(), &BehaviorRockPaperScissors::PlayWinLoseTieAnim);
 }
 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BehaviorRockPaperScissors::PlayWinLoseTieAnim()
 {
   CompoundActionSequential *messageAnimation = new CompoundActionSequential();
