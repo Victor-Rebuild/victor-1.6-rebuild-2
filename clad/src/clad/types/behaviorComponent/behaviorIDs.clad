@@ -218,7 +218,10 @@ enum uint_16 BehaviorID {
   // victorBehaviorTree/highLevelDelegates
   InitialPickupAnimation,
   InteractWithFaces,
+
+  // victorBehaviorTree/highLevelDelegates/rockPaperScissors
   RockPaperScissors,
+  RockPaperScissorsChooseMovePrompt,
 
   // victorBehaviorTree/highLevelDelegates/investigateCube
   InteractWithStaticCube,

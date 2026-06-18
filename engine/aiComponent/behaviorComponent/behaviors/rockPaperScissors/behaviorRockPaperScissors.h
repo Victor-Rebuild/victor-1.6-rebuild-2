@@ -53,22 +53,15 @@ private:
   struct InstanceConfig {
     InstanceConfig(const Json::Value& config);
     std::shared_ptr<IBEICondition> activateBehaviorCondition;
-    std::string powerOnAnimName;
-    std::string powerOffAnimName;
-    bool waitForAnimMsg;
-
-    ICozmoBehaviorPtr findChargerBehavior;
     std::shared_ptr<BehaviorTextToSpeechLoop> ttsBehavior;
-    std::shared_ptr<BehaviorPromptUserForVoiceCommand> hitOrStandPromptBehavior;
+    std::shared_ptr<BehaviorTextToSpeechLoop> rockPaperScissorsVectorResponseBehavior;
+    std::shared_ptr<BehaviorPromptUserForVoiceCommand> rockPaperScissorsPromptBehavior;
   };
 
   struct DynamicVariables {
     DynamicVariables();
-    bool waitingForAnimationCallback;
-    TimeStamp_t timeLastPowerAnimStopped_ms;
-    std::string lastAnimPlayedName;
-    bool shouldStartPowerOffAnimaiton;
-    bool isShutdown;
+    int whatdidplayerchoose;
+    int winLoseTie;
   };
 
   InstanceConfig _iConfig;
@@ -76,6 +69,9 @@ private:
 
   void StartTTSInit();
   void RockPaperOrScissors();
+  void RockPaperOrScissorsVectorSearch();
+  void RockPaperOrScissorsVector();
+  void PlayWinLoseTieAnim();
 
   bool isPowerOff = false;
 

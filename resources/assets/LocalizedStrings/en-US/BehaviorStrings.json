@@ -122,5 +122,8 @@
   },
   "BehaviorRespondToName.ImX": {
     "translation": "I'm"
+  },
+  "BehaviorRockPaperScissors.DrawQuestion": {
+    "translation": "your choice?"
   }
 }
