@@ -26,6 +26,8 @@
 #include "engine/components/dataAccessorComponent.h"
 #include "engine/components/localeComponent.h"
 #include "engine/externalInterface/externalInterface.h"
+#include "util/logging/logging.h"
+#include <string>
 
 namespace Anki {
 namespace Vector {
@@ -35,6 +37,9 @@ namespace{
   static const UserIntentTag paperIntent = USER_INTENT(play_rockPaperScissorsPaper);
   static const UserIntentTag rockIntent = USER_INTENT(play_rockPaperScissorsRock);
   static const UserIntentTag silenceIntent = USER_INTENT(silence);
+  constexpr const char * kRockPaperScissorsRock = "RockPaperScissors.Rock";
+  constexpr const char * kRockPaperScissorsPaper = "RockPaperScissors.Paper";
+  constexpr const char * kRockPaperScissorsScissors = "RockPaperScissors.Scissors";
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -166,7 +171,9 @@ void BehaviorRockPaperScissors::StartTTSInit()
 void BehaviorRockPaperScissors::RockPaperOrScissors()
 {
   UserIntentComponent& uic = GetBehaviorComp<UserIntentComponent>();
-  // const auto & localeComponent = GetBEI().GetRobotInfo().GetLocaleComponent();
+  const auto & localeComponent = GetBEI().GetRobotInfo().GetLocaleComponent();
+  std::string chosenOne = "";
+  std::stringstream ss;
 
   if (uic.IsUserIntentPending(rockIntent)) {
     uic.DropUserIntent(rockIntent);
@@ -186,22 +193,25 @@ void BehaviorRockPaperScissors::RockPaperOrScissors()
     _dVars.whatdidplayerchoose = 3;
   }
 
-  std::string chosenOne = "";
+  const std::string choiceStringLocalized[] = {
+    localeComponent.GetString(kRockPaperScissorsRock),
+    localeComponent.GetString(kRockPaperScissorsPaper),
+    localeComponent.GetString(kRockPaperScissorsScissors)
+  };
 
-  if (_dVars.whatdidplayerchoose == 0) {
-    chosenOne = "rock";
-  } else if (_dVars.whatdidplayerchoose == 1) {
-    chosenOne = "paper";
-  } else if (_dVars.whatdidplayerchoose == 2) {
-    chosenOne = "scissors";
-  }
-
-  std::string ttstring = "Player chose " + chosenOne + ",Vector's turn!";
-  if (_dVars.whatdidplayerchoose == 3) {
+  if (_dVars.whatdidplayerchoose != 3) {
+    chosenOne = choiceStringLocalized[_dVars.whatdidplayerchoose];
+  } else {
     _iConfig.ttsBehavior->SetTextToSay( "Player did not choose, Vector wins" );
+    _dVars.winLoseTie = 2;
+    DelegateIfInControl(_iConfig.ttsBehavior.get(), &BehaviorRockPaperScissors::PlayWinLoseTieAnim);
   }
 
-  _iConfig.ttsBehavior->SetTextToSay( ttstring );
+  ss << localeComponent.GetString("RockPaperScissors.PlayerChose") + " " + chosenOne + ", " + localeComponent.GetString("RockPaperScissors.VectorTurn");
+
+  LOG_WARNING("BehaviorRockPaperScissors", "Final string is: %s", ss.str().c_str());
+
+  _iConfig.ttsBehavior->SetTextToSay( ss.str() );
 
   DelegateIfInControl(_iConfig.ttsBehavior.get(), &BehaviorRockPaperScissors::RockPaperOrScissorsVectorSearch);
 }
@@ -221,23 +231,23 @@ void BehaviorRockPaperScissors::RockPaperOrScissorsVector()
 
   srand(BaseStationTimer::getInstance()->GetCurrentTimeInSeconds());
   int whatdidvectorchoose = rand() % 3;
-  // const auto & localeComponent = GetBEI().GetRobotInfo().GetLocaleComponent();
+  const auto & localeComponent = GetBEI().GetRobotInfo().GetLocaleComponent();
 
   std::string chosenOne = "";
   std::string finalString = "";
   std::string winLoosePush = "";
 
-  const std::string vectorWins = "You Lose";
-  const std::string vectorLost = "You Win!";
-  const std::string vectorTied = "Push";
+  const std::string vectorWins = localeComponent.GetString("RockPaperScissors.VectorWins");
+  const std::string vectorLost = localeComponent.GetString("RockPaperScissors.VectorLoss");
+  const std::string vectorTied = localeComponent.GetString("RockPaperScissors.VectorTied");
 
-  if (whatdidvectorchoose == 0) {
-    chosenOne = "rock";
-  } else if (whatdidvectorchoose == 1) {
-    chosenOne = "paper";
-  } else if (whatdidvectorchoose == 2) {
-    chosenOne = "scissors";
-  }
+  const std::string choiceStringLocalized[] = {
+    localeComponent.GetString(kRockPaperScissorsRock),
+    localeComponent.GetString(kRockPaperScissorsPaper),
+    localeComponent.GetString(kRockPaperScissorsScissors)
+  };
+
+  chosenOne = choiceStringLocalized[whatdidvectorchoose];
 
   if ((whatdidvectorchoose == 0 && _dVars.whatdidplayerchoose == 0) ||
    (whatdidvectorchoose == 1 && _dVars.whatdidplayerchoose == 1) ||
@@ -266,7 +276,7 @@ void BehaviorRockPaperScissors::RockPaperOrScissorsVector()
     _dVars.winLoseTie = 2;
   }
 
-  finalString = "Vector chose " + chosenOne + "." + winLoosePush;
+  finalString = localeComponent.GetString("RockPaperScissors.VectorChose") + " " + chosenOne + "." + winLoosePush;
 
   _iConfig.rockPaperScissorsVectorResponseBehavior->SetTextToSay( finalString );
   DelegateIfInControl(_iConfig.rockPaperScissorsVectorResponseBehavior.get(), &BehaviorRockPaperScissors::PlayWinLoseTieAnim);

@@ -1,0 +1,54 @@
+{
+  "smartling": {
+    "translate_paths": [
+      "*/translation"
+    ],
+    "variants_enabled": true,
+    "translate_mode": "custom",
+    "placeholder_format_custom": [
+      "%%[^%]+?%%",
+      "%[^%]+?%",
+      "##[^#]+?##",
+      "__[^_]+?__",
+      "[$]\\{[^\\}\\{]+?\\}",
+      "\\{\\{[^\\}\\{]+?\\}\\}",
+      "(?<!\\{)\\{[^\\}\\{]+?\\}(?!\\})"
+    ],
+    "source_key_paths": [
+      "/{*}"
+    ]
+  },
+  "BehaviorRockPaperScissors.DrawQuestion": {
+    "translation": "Your choice?"
+  },
+  "RockPaperScissors.Rock": {
+    "translation": "Rock"
+  },
+  "RockPaperScissors.Paper": {
+    "translation": "Paper"
+  },
+  "RockPaperScissors.Scissors": {
+    "translation": "Scissors"
+  },
+  "RockPaperScissors.PlayerChose": {
+    "translation": "Player Chose"
+  },
+  "RockPaperScissors.VectorChose": {
+    "translation": "Vector Chose"
+  },
+  "RockPaperScissors.VectorTurn": {
+    "translation": "Vector's Turn!"
+  },
+  "RockPaperScissors.VectorWins": {
+    "translation": "You lose!"
+  },
+  "RockPaperScissors.VectorLoss": {
+    "translation": "You Win!"
+  },
+  "RockPaperScissors.VectorTied": {
+    "translation": "Tie."
+  },
+  "BlackJack.DealerScore": {
+    "translation": "{0}"
+  }
+}
