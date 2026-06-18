@@ -55,6 +55,7 @@ private:
     std::shared_ptr<IBEICondition> activateBehaviorCondition;
     std::shared_ptr<BehaviorTextToSpeechLoop> ttsBehavior;
     std::shared_ptr<BehaviorTextToSpeechLoop> rockPaperScissorsVectorResponseBehavior;
+    std::shared_ptr<BehaviorPromptUserForVoiceCommand> playAgainPromptBehavior;
     std::shared_ptr<BehaviorPromptUserForVoiceCommand> rockPaperScissorsPromptBehavior;
   };
 
@@ -72,6 +73,8 @@ private:
   void RockPaperOrScissorsVectorSearch();
   void RockPaperOrScissorsVector();
   void PlayWinLoseTieAnim();
+  void TransitionToPlayAgainPrompt();
+  void TransitionToPlayAgain();
 
   bool isPowerOff = false;
 

@@ -37,6 +37,9 @@ namespace{
   static const UserIntentTag paperIntent = USER_INTENT(play_rockPaperScissorsPaper);
   static const UserIntentTag rockIntent = USER_INTENT(play_rockPaperScissorsRock);
   static const UserIntentTag silenceIntent = USER_INTENT(silence);
+  static const UserIntentTag affirmativeIntent = USER_INTENT(imperative_affirmative);
+  static const UserIntentTag negativeIntent = USER_INTENT(imperative_negative);
+  static const UserIntentTag playAgainIntent = USER_INTENT(blackjack_playagain);
   constexpr const char * kRockPaperScissorsRock = "RockPaperScissors.Rock";
   constexpr const char * kRockPaperScissorsPaper = "RockPaperScissors.Paper";
   constexpr const char * kRockPaperScissorsScissors = "RockPaperScissors.Scissors";
@@ -81,6 +84,10 @@ void BehaviorRockPaperScissors::InitBehavior()
                                   BEHAVIOR_CLASS(PromptUserForVoiceCommand),
                                   _iConfig.rockPaperScissorsPromptBehavior );
 
+  BC.FindBehaviorByIDAndDowncast( BEHAVIOR_ID(BlackJackRequestToPlayAgain),
+                                  BEHAVIOR_CLASS(PromptUserForVoiceCommand),
+                                  _iConfig.playAgainPromptBehavior );
+
   BC.FindBehaviorByIDAndDowncast( BEHAVIOR_ID(KnowledgeGraphTTS),
                                   BEHAVIOR_CLASS(TextToSpeechLoop),
                                   _iConfig.rockPaperScissorsVectorResponseBehavior );
@@ -108,6 +115,7 @@ void BehaviorRockPaperScissors::GetAllDelegates(std::set<IBehavior*>& delegates)
 {
   delegates.insert( _iConfig.ttsBehavior.get() );
   delegates.insert( _iConfig.rockPaperScissorsPromptBehavior.get() );
+  delegates.insert(_iConfig.playAgainPromptBehavior.get());
   delegates.insert( _iConfig.rockPaperScissorsVectorResponseBehavior.get() );
 }
 
@@ -292,7 +300,36 @@ void BehaviorRockPaperScissors::PlayWinLoseTieAnim()
   } else if (_dVars.winLoseTie == 2) {
     messageAnimation->AddAction(new TriggerLiftSafeAnimationAction(AnimationTrigger::BlackJack_VictorWin), true);
   }
-  DelegateIfInControl(messageAnimation, [this](){CancelSelf();});
+  DelegateIfInControl(messageAnimation, &BehaviorRockPaperScissors::TransitionToPlayAgainPrompt);
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void BehaviorRockPaperScissors::TransitionToPlayAgainPrompt()
+{
+  if(_iConfig.playAgainPromptBehavior->WantsToBeActivated()){
+    DelegateIfInControl(_iConfig.playAgainPromptBehavior.get(), &BehaviorRockPaperScissors::TransitionToPlayAgain);
+  }
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void BehaviorRockPaperScissors::TransitionToPlayAgain()
+{
+  UserIntentComponent& uic = GetBehaviorComp<UserIntentComponent>();
+
+  if(uic.IsUserIntentPending(playAgainIntent)){
+    uic.DropUserIntent(playAgainIntent);
+    OnBehaviorActivated();
+  } else if(uic.IsUserIntentPending(affirmativeIntent)){
+    uic.DropUserIntent(affirmativeIntent);
+    OnBehaviorActivated();
+  } else {
+    if (uic.IsUserIntentPending(negativeIntent)){
+      uic.DropUserIntent(negativeIntent);
+    } else if(uic.IsUserIntentPending(silenceIntent)) {
+      uic.DropUserIntent(silenceIntent);
+    }
+    DelegateIfInControl(new TriggerAnimationAction(AnimationTrigger::BlackJack_Quit), [this](){CancelSelf();});
+  }
 }
 
 }
