@@ -63,6 +63,7 @@ private:
   struct DynamicVariables {
     DynamicVariables();
     int whatdidplayerchoose;
+    int howManyBadRequests;
     int winLoseTie;
   };
 

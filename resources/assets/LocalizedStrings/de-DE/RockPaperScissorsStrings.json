@@ -19,37 +19,37 @@
     ]
   },
   "BehaviorRockPaperScissors.RockPaperOrScissors": {
-    "translation": "Rock Paper Or Scissors?"
+    "translation": "Schere, Stein, Papier?"
   },
   "BehaviorRockPaperScissors.DrawQuestion": {
-    "translation": "Your choice?"
+    "translation": "Ihre Wahl?"
   },
   "RockPaperScissors.Rock": {
-    "translation": "Rock"
+    "translation": "Felsen"
   },
   "RockPaperScissors.Paper": {
-    "translation": "Paper"
+    "translation": "Papier"
   },
   "RockPaperScissors.Scissors": {
-    "translation": "Scissors"
+    "translation": "Schere"
   },
   "RockPaperScissors.PlayerChose": {
-    "translation": "Player Chose"
+    "translation": "Spieler gewählt"
   },
   "RockPaperScissors.VectorChose": {
-    "translation": "I Chose"
+    "translation": "Ich habe gewählt"
   },
   "RockPaperScissors.VectorTurn": {
-    "translation": "My Turn!"
+    "translation": "Ich bin dran!"
   },
   "RockPaperScissors.VectorWins": {
-    "translation": "You lose!"
+    "translation": "Du verlierst!"
   },
   "RockPaperScissors.VectorLoss": {
-    "translation": "You Win!"
+    "translation": "Sie gewinnen!"
   },
   "RockPaperScissors.VectorTied": {
-    "translation": "Tie."
+    "translation": "Binden."
   },
   "BlackJack.DealerScore": {
     "translation": "{0}"

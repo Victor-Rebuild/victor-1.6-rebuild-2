@@ -53,6 +53,7 @@ BehaviorRockPaperScissors::InstanceConfig::InstanceConfig(const Json::Value& con
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 BehaviorRockPaperScissors::DynamicVariables::DynamicVariables()
 : whatdidplayerchoose()
+, howManyBadRequests()
 , winLoseTie()
 {
 }
@@ -209,6 +210,8 @@ void BehaviorRockPaperScissors::RockPaperOrScissors()
 
   if (_dVars.whatdidplayerchoose != 3) {
     chosenOne = choiceStringLocalized[_dVars.whatdidplayerchoose];
+  } else if (_dVars.whatdidplayerchoose == 3 && _dVars.howManyBadRequests <= 3) {
+    DelegateIfInControl(_iConfig.rockPaperScissorsPromptBehavior.get(), &BehaviorRockPaperScissors::RockPaperOrScissors);
   } else {
     _iConfig.ttsBehavior->SetTextToSay( localeComponent.GetString("RockPaperScissors.NoChoice") );
     _dVars.winLoseTie = 2;
