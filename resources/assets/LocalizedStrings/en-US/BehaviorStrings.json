@@ -121,6 +121,6 @@
     "translation": "I don't know"
   },
   "BehaviorRespondToName.ImX": {
-    "translation": "I'm"
+    "translation": "I'm {0}"
   }
 }

@@ -20,16 +20,13 @@
 #include "engine/aiComponent/behaviorComponent/userIntents.h"
 #include "engine/components/backpackLights/engineBackpackLightComponent.h"
 #include "engine/components/localeComponent.h"
-#include "engine/events/ankiEvent.h"
-#include "engine/externalInterface/externalInterface.h"
-#include "util/cladHelpers/cladFromJSONHelpers.h"
 
 
 namespace Anki {
 namespace Vector {
   
 namespace JsonKeys {
-  // static const char * const AnimationTriggerKey = "animationTrigger";
+
 }
 
 namespace LocalizationKey {
@@ -42,20 +39,13 @@ BehaviorRespondToName::BehaviorRespondToName(const Json::Value& config)
 : ICozmoBehavior(config)
 , _name("")
 {
-  SubscribeToTags({EngineToGameTag::RobotRenamedEnrolledFace});
-  
-  //  const std::string& animTriggerString = config.get(JsonKeys::AnimationTriggerKey, "MeetCozmoRenameFaceSayName").asString();
-  //  _animTrigger = AnimationTriggerFromString(animTriggerString.c_str());
   
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BehaviorRespondToName::GetBehaviorJsonKeys(std::set<const char*>& expectedKeys) const
 {
-  //  const char* list[] = {
-  //    JsonKeys::AnimationTriggerKey,
-  //  };
-  //  expectedKeys.insert( std::begin(list), std::end(list) );
+
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -116,25 +106,6 @@ void BehaviorRespondToName::OnBehaviorActivated()
     }
   }
   
-  //  PRINT_CH_INFO("Behaviors", "BehaviorRespondToName.InitInternal",
-  //                "Responding to rename of %s with %s",
-  //                Util::HidePersonallyIdentifiableInfo(_name.c_str()),
-  //                EnumToString(_animTrigger));
-  
-  // TODO: Try to turn towards a/the face first COZMO-7991
-  //  For some reason the following didn't work (action immediately completed) and I ran
-  //  out of time figuring out why. I also tried simply turning towards last face pose with
-  //  no luck.
-  //
-  //  const bool kSayName = true;
-  //  TurnTowardsFaceAction* turnTowardsFace = new TurnTowardsLastFacePoseAction(_faceID, M_PI_F, kSayName);
-  //
-  //  // Play the animation trigger whether or not we find the face
-  //  turnTowardsFace->SetSayNameAnimationTrigger(_animTrigger);
-  //  turnTowardsFace->SetNoNameAnimationTrigger(_animTrigger);
-  //  
-  //  DelegateIfInControl(turnTowardsFace);
-  
   auto* action = new CompoundActionSequential();
   if (isSetNameVc) {
     {
@@ -145,11 +116,12 @@ void BehaviorRespondToName::OnBehaviorActivated()
     }
   }
   
-  const std::string & localizedImName = GetLocalizedImX();
+  const auto& localeComponent = GetBEI().GetRobotInfo().GetLocaleComponent();
+  const std::string & localizedImName = localeComponent.GetString(LocalizationKey::kImX, _name);
 
   {
     // 2. Repeat name (Or say it once if not setname)
-    SayTextAction* sayNameAction2 = isSetNameVc ? new SayTextAction(_name) : new SayTextAction(localizedImName + _name);
+    SayTextAction* sayNameAction2 = isSetNameVc ? new SayTextAction(_name) : new SayTextAction(localizedImName);
     isSetNameVc ? sayNameAction2->SetAnimationTrigger(AnimationTrigger::MeetVictorSayNameAgain) : sayNameAction2->SetAnimationTrigger(AnimationTrigger::InteractWithFacesInitialNamed);
     action->AddAction(sayNameAction2);
   }
@@ -167,12 +139,6 @@ void BehaviorRespondToName::OnBehaviorDeactivated()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// Get localized version of "I'm, X"
-std::string BehaviorRespondToName::GetLocalizedImX() const
-{
-  return GetLocalizedString(LocalizationKey::kImX);
-}
-
 std::string BehaviorRespondToName::GetLocalizedString(const std::string & key) const
 {
   const auto& localeComponent = GetBEI().GetRobotInfo().GetLocaleComponent();
