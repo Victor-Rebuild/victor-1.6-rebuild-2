@@ -82,7 +82,11 @@ void RobotDataLoader::LoadConfigData()
 {
   // Text-to-speech config
   {
-    static const std::string & tts_config = "config/engine/tts_config.json";
+    bool useAltConfig = Util::FileUtils::FileExists("/data/data/rebuild/tts_config.json");
+    if (useAltConfig) {
+      LOG_WARNING("RobotDataLoader.TextToSpeechConfig", "using alternate config");
+    }
+    static const std::string & tts_config = useAltConfig ? "../../../../data/data/rebuild/tts_config.json" : "config/engine/tts_config.json";
     const bool success = _platform->readAsJson(Util::Data::Scope::Resources, tts_config, _tts_config);
     if (!success)
     {
