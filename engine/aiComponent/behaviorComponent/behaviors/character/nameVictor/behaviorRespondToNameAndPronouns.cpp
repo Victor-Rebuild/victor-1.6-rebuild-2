@@ -66,9 +66,9 @@ bool BehaviorRespondToNameAndPronouns::WantsToBeActivatedBehavior() const
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BehaviorRespondToNameAndPronouns::OnBehaviorActivated()
 {
-  // The intent code was used from wireOS (https://github.com/kercre123/victor/blob/snowboy/engine/aiComponent/behaviorComponent/behaviors/victor/behaviorWireTest.cpp)
-  UserIntentPtr intentDataSet = SmartActivateUserIntent(USER_INTENT(name_victor_setname));
-  UserIntentPtr intentDataSay = SmartActivateUserIntent(USER_INTENT(name_victor_sayname));
+  UserIntentComponent& uic = GetBehaviorComp<UserIntentComponent>();
+  UserIntentPtr intentDataSet = uic.GetUserIntentIfActive(USER_INTENT(name_victor_setname));
+  UserIntentPtr intentDataSay = uic.GetUserIntentIfActive(USER_INTENT(name_victor_sayname));
 
   if (!intentDataSet && !intentDataSay) {
     PRINT_NAMED_WARNING("BehaviorRespondToNameAndPronouns.OnBehaviorActivated", "No pending 'name_victor_say' intent found");

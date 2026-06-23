@@ -3,5 +3,10 @@
   "behaviorID"       : "RespondToNameAndPronouns",
   "behaviorClass"    : "RespondToNameAndPronouns",
 
-  "associatedActiveFeature": "NoFeature"
+  "associatedActiveFeature": "NoFeature",
+
+  "respondToUserIntents": [
+    { "type": "name_victor_setname" },
+    { "type": "name_victor_sayname" }
+  ]
 }
