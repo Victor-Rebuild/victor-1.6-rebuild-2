@@ -228,7 +228,7 @@ void BehaviorCubeDrive::BehaviorUpdate() {
 
     float deadZoneSize = _iConfig.deadZoneSize;
 
-    DelegateIfInControl( new TriggerAnimationAction( AnimationTriggerFromString("ObservingIdleEyesOnly") ) );
+    DelegateIfInControl(new TriggerAnimationAction(AnimationTriggerFromString("ObservingIdleEyesOnly")));
 
     if (abs(leftWheelMmps) < deadZoneSize) {
       leftWheelMmps = 0.0f;
