@@ -10,7 +10,7 @@
  *
  **/
 
-#include "engine/aiComponent/behaviorComponent/behaviors/character/nameVictor/behaviorRespondToName.h"
+#include "engine/aiComponent/behaviorComponent/behaviors/character/nameVictor/behaviorRespondToNameAndPronouns.h"
 
 #include "aiComponent/behaviorComponent/behaviorExternalInterface/beiRobotInfo.h"
 #include "clad/externalInterface/messageEngineToGame.h"
@@ -35,7 +35,7 @@ namespace LocalizationKey {
   
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-BehaviorRespondToName::BehaviorRespondToName(const Json::Value& config)
+BehaviorRespondToNameAndPronouns::BehaviorRespondToNameAndPronouns(const Json::Value& config)
 : ICozmoBehavior(config)
 , _name("")
 {
@@ -43,13 +43,13 @@ BehaviorRespondToName::BehaviorRespondToName(const Json::Value& config)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void BehaviorRespondToName::GetBehaviorJsonKeys(std::set<const char*>& expectedKeys) const
+void BehaviorRespondToNameAndPronouns::GetBehaviorJsonKeys(std::set<const char*>& expectedKeys) const
 {
 
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void BehaviorRespondToName::HandleWhileInScopeButNotActivated(const EngineToGameEvent& event)
+void BehaviorRespondToNameAndPronouns::HandleWhileInScopeButNotActivated(const EngineToGameEvent& event)
 {
   
   auto & msg = event.GetData().Get_RobotRenamedEnrolledFace();
@@ -57,32 +57,32 @@ void BehaviorRespondToName::HandleWhileInScopeButNotActivated(const EngineToGame
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool BehaviorRespondToName::WantsToBeActivatedBehavior() const
+bool BehaviorRespondToNameAndPronouns::WantsToBeActivatedBehavior() const
 {
   auto& uic = GetBehaviorComp<UserIntentComponent>();
   return uic.IsUserIntentPending(USER_INTENT(name_victor_setname)) || uic.IsUserIntentPending(USER_INTENT(name_victor_sayname));
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void BehaviorRespondToName::OnBehaviorActivated()
+void BehaviorRespondToNameAndPronouns::OnBehaviorActivated()
 {
   // The intent code was used from wireOS (https://github.com/kercre123/victor/blob/snowboy/engine/aiComponent/behaviorComponent/behaviors/victor/behaviorWireTest.cpp)
   UserIntentPtr intentDataSet = SmartActivateUserIntent(USER_INTENT(name_victor_setname));
   UserIntentPtr intentDataSay = SmartActivateUserIntent(USER_INTENT(name_victor_sayname));
 
   if (!intentDataSet && !intentDataSay) {
-    PRINT_NAMED_WARNING("BehaviorRespondToName.OnBehaviorActivated", "No pending 'name_victor_say' intent found");
+    PRINT_NAMED_WARNING("BehaviorRespondToNameAndPronouns.OnBehaviorActivated", "No pending 'name_victor_say' intent found");
     return;
   }
   
   if (intentDataSet) {
-    isSetNameVc = 1;
+    isSetNameVc = true;
   } else if (intentDataSay) {
-    isSetNameVc = 0;
+    isSetNameVc = false;
   }
 
   // Log that the behavior was activated
-  PRINT_NAMED_INFO("BehaviorRespondToName.OnBehaviorActivated", "Activated 'name_victor_say' intent");
+  PRINT_NAMED_INFO("BehaviorRespondToNameAndPronouns.OnBehaviorActivated", "Activated 'name_victor_say' intent");
 
   if (Util::FileUtils::FileExists("/data/data/rebuild/customBotName")) {
     _name = Util::FileUtils::ReadFile("/data/data/rebuild/customBotName");
@@ -101,7 +101,7 @@ void BehaviorRespondToName::OnBehaviorActivated()
     {
       // Now, we should NEVER reach this point where the name is STILL empty because we forcefully set it above.
       // If we somehow do. we'll restore the original logic.
-      PRINT_NAMED_ERROR("BehaviorRespondToName.InitInternal.EmptyName", "");
+      PRINT_NAMED_ERROR("BehaviorRespondToNameAndPronouns.InitInternal.EmptyName", "");
       return;
     }
   }
@@ -132,17 +132,10 @@ void BehaviorRespondToName::OnBehaviorActivated()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void BehaviorRespondToName::OnBehaviorDeactivated()
+void BehaviorRespondToNameAndPronouns::OnBehaviorDeactivated()
 {
   auto& blc = GetBEI().GetBackpackLightComponent();
   blc.ClearAllBackpackLightConfigs();
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::string BehaviorRespondToName::GetLocalizedString(const std::string & key) const
-{
-  const auto& localeComponent = GetBEI().GetRobotInfo().GetLocaleComponent();
-  return localeComponent.GetString(key);
 }
 
 

@@ -184,7 +184,7 @@ enum uint_8 BehaviorClass {
   PlaybackMessage,
 
   // nameVictor
-  RespondToName,
+  RespondToNameAndPronouns,
 
   // observing
   ObservingLookAtFaces,

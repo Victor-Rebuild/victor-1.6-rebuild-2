@@ -254,7 +254,7 @@ enum uint_16 BehaviorID {
   PlaybackMessage,
 
   // victorBehaviorTree/highLevelDelegates/nameVictor
-  RespondToName,
+  RespondToNameAndPronouns,
 
   // victorBehaviorTree/highLevelDelegates
   NothingToDo_Idle,

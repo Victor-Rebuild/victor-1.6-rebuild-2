@@ -49,7 +49,7 @@
 #include "engine/aiComponent/behaviorComponent/behaviors/basicWorldInteractions/behaviorWiggleOntoChargerContacts.h"
 #include "engine/aiComponent/behaviorComponent/behaviors/blackjack/behaviorBlackJack.h"
 #include "engine/aiComponent/behaviorComponent/behaviors/character/howOldAreYou/behaviorHowOldAreYou.h"
-#include "engine/aiComponent/behaviorComponent/behaviors/character/nameVictor/behaviorRespondToName.h"
+#include "engine/aiComponent/behaviorComponent/behaviors/character/nameVictor/behaviorRespondToNameAndPronouns.h"
 #include "engine/aiComponent/behaviorComponent/behaviors/coordinators/behaviorCoordinateGlobalInterrupts.h"
 #include "engine/aiComponent/behaviorComponent/behaviors/coordinators/behaviorCoordinateInHabitat.h"
 #include "engine/aiComponent/behaviorComponent/behaviors/coordinators/behaviorCoordinateWhileHeldInPalm.h"
@@ -922,9 +922,9 @@ ICozmoBehaviorPtr BehaviorFactory::CreateBehavior(const Json::Value& config)
       break;
     }
     
-    case BehaviorClass::RespondToName:
+    case BehaviorClass::RespondToNameAndPronouns:
     {
-      newBehavior = ICozmoBehaviorPtr(new BehaviorRespondToName(config));
+      newBehavior = ICozmoBehaviorPtr(new BehaviorRespondToNameAndPronouns(config));
       break;
     }
 

@@ -10,21 +10,21 @@
  *
  **/
 
-#ifndef __Cozmo_Basestation_Behaviors_BehaviorRespondToName_H__
-#define __Cozmo_Basestation_Behaviors_BehaviorRespondToName_H__
+#ifndef __Cozmo_Basestation_Behaviors_BehaviorRespondToNameAndPronouns_H__
+#define __Cozmo_Basestation_Behaviors_BehaviorRespondToNameAndPronouns_H__
 
 #include "engine/aiComponent/behaviorComponent/behaviors/iCozmoBehavior.h"
 
 namespace Anki {
 namespace Vector {
   
-class BehaviorRespondToName : public ICozmoBehavior
+class BehaviorRespondToNameAndPronouns : public ICozmoBehavior
 {
 private:
   
   // Enforce creation through BehaviorFactory
   friend class BehaviorFactory;
-  BehaviorRespondToName(const Json::Value& config);
+  BehaviorRespondToNameAndPronouns(const Json::Value& config);
   
 public:
   virtual bool WantsToBeActivatedBehavior() const override;
@@ -40,16 +40,6 @@ private:
   
   std::string      _name;
   bool isSetNameVc = false;
-
-  // Below is taken from behaviorenrollface.cpp/.h
-
-  // Get localized version of "I'm, X"
-  std::string GetLocalizedImX() const;
-
-  // Get localized string "I'm, X"
-  std::string GetLocalizedString(const std::string & key) const;
-  std::string GetLocalizedString(const std::string & key, const std::string & arg0) const;
-  std::string GetLocalizedString(const std::string & key, const std::string & arg0, const std::string & arg1) const;
   
 }; // class BehaviorReactToRenameFace
   
@@ -57,4 +47,4 @@ private:
 } // namespace Vector
 } // namespace Anki
 
-#endif // __Cozmo_Basestation_Behaviors_BehaviorRespondToName_H__
+#endif // __Cozmo_Basestation_Behaviors_BehaviorRespondToNameAndPronouns_H__

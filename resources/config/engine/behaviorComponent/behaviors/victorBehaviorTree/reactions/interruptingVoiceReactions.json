@@ -33,7 +33,7 @@
     "RespondToRenameFace", // not actually a voice command, but is paired with MeetVictor so I'm putting it here
     "MeetVictor",
     "PowerRobotOff",
-    "RespondToName",
+    "RespondToNameAndPronouns",
     "ReactToAffirmative", // must come somewhere after blackjack or other behaviors which use the affirmative intent
     "ReactToNegative", // must come somewhere after blackjack or other behaviors which use the negative intent
     "DanceToTheBeatVoiceCommand"
