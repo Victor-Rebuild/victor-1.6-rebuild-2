@@ -199,6 +199,7 @@ void BehaviorRockPaperScissors::RockPaperOrScissors()
   if (_dVars.whatdidplayerchoose != 3) {
     chosenOne = choiceStringLocalized[_dVars.whatdidplayerchoose];
   } else if (_dVars.whatdidplayerchoose == 3 && _dVars.howManyBadRequests <= 3) {
+    _dVars.howManyBadRequests = _dVars.howManyBadRequests + 1;
     DelegateIfInControl(_iConfig.rockPaperScissorsPromptBehavior.get(), &BehaviorRockPaperScissors::RockPaperOrScissors);
   } else {
     _iConfig.ttsBehavior->SetTextToSay( localeComponent.GetString("RockPaperScissors.NoChoice") );
