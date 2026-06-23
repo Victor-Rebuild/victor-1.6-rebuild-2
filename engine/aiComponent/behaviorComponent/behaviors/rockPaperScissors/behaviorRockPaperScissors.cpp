@@ -2,9 +2,9 @@
  * File: BehaviorRockPaperScissors.cpp
  *
  * Author: Emily Modder
- * Created: 2026-03-14
+ * Created: 2026-06-15
  *
- * Description: Behavior which powers off or reboots the robot on a vc
+ * Description: Rock paper scissors, playable on Vector
  *
  * Copyright: Victor-Rebuild, 2026
  *
@@ -15,19 +15,14 @@
 
 #include "aiComponent/behaviorComponent/behaviorContainer.h"
 #include "cannedAnimLib/cannedAnims/cannedAnimationContainer.h"
-#include "clad/robotInterface/messageEngineToRobot.h"
-#include "clad/robotInterface/messageRobotToEngine.h"
 #include "coretech/common/engine/utils/timer.h"
 #include "engine/actions/animActions.h"
 #include "engine/aiComponent/behaviorComponent/behaviorContainer.h"
 #include "engine/aiComponent/behaviorComponent/behaviorExternalInterface/beiRobotInfo.h"
 #include "engine/aiComponent/behaviorComponent/userIntentComponent.h"
 #include "engine/aiComponent/behaviorComponent/userIntents.h"
-#include "engine/components/dataAccessorComponent.h"
 #include "engine/components/localeComponent.h"
 #include "engine/externalInterface/externalInterface.h"
-#include "util/logging/logging.h"
-#include <string>
 
 namespace Anki {
 namespace Vector {
@@ -71,7 +66,6 @@ BehaviorRockPaperScissors::~BehaviorRockPaperScissors()
 {
 }
 
-
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BehaviorRockPaperScissors::InitBehavior()
 {
@@ -93,7 +87,6 @@ void BehaviorRockPaperScissors::InitBehavior()
                                   BEHAVIOR_CLASS(TextToSpeechLoop),
                                   _iConfig.rockPaperScissorsVectorResponseBehavior );
 }
-
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool BehaviorRockPaperScissors::WantsToBeActivatedBehavior() const
@@ -135,11 +128,6 @@ void BehaviorRockPaperScissors::OnBehaviorEnteredActivatableScope()
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BehaviorRockPaperScissors::OnBehaviorActivated()
 {
-  UserIntentComponent& uic = GetBehaviorComp<UserIntentComponent>();
-  UserIntentPtr intentDataReboot   = uic.GetUserIntentIfActive(USER_INTENT(play_rockPaperScissors));
-  // UserIntentPtr intentDataShutdown = uic.GetUserIntentIfActive(USER_INTENT(INVALID));
-  // UserIntentPtr intentDataShutdownSatisfied = uic.GetUserIntentIfActive(USER_INTENT(INVALID));
-
   _dVars = DynamicVariables();
 
   StartTTSInit();

@@ -1,10 +1,10 @@
 /**
- * File: BehaviorRockPaperScissors.cpp
+ * File: BehaviorRockPaperScissors.h
  *
  * Author: Emily Modder
- * Created: 2026-03-14
+ * Created: 2026-06-15
  *
- * Description: Behavior which powers off or reboots the robot on a vc
+ * Description: Rock paper scissors, playable on Vector
  *
  * Copyright: Victor-Rebuild, 2026
  *
