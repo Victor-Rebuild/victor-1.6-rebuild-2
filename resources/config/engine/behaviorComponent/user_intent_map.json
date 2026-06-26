@@ -267,9 +267,24 @@
       "app_intent": "intent_name_victor_set"
     },
     {
+      "user_intent": "name_victor_setpronouns",
+      "cloud_intent": "intent_pronouns_victor_set",
+      "app_intent": "intent_pronouns_victor_set"
+    },
+    {
       "user_intent": "name_victor_sayname",
       "cloud_intent": "intent_name_victor_say",
       "app_intent": "intent_name_victor_say"
+    },
+    {
+      "user_intent": "name_victor_saynameandpronouns",
+      "cloud_intent": "intent_pronounsandname_victor_say",
+      "app_intent": "intent_pronounsandname_victor_say"
+    },
+    {
+      "user_intent": "name_victor_saypronouns",
+      "cloud_intent": "intent_pronouns_victor_say",
+      "app_intent": "intent_pronouns_victor_say"
     },
     {
       "user_intent": "silence",

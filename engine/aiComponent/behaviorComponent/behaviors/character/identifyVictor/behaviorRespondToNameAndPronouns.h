@@ -27,19 +27,22 @@ private:
   BehaviorRespondToNameAndPronouns(const Json::Value& config);
   
 public:
-  virtual bool WantsToBeActivatedBehavior() const override;
+  bool WantsToBeActivatedBehavior() const override;
   
 protected:
-  virtual void GetBehaviorOperationModifiers(BehaviorOperationModifiers& modifiers) const override {}
-  virtual void GetBehaviorJsonKeys(std::set<const char*>& expectedKeys) const override;
-  virtual void OnBehaviorActivated()   override;
-  virtual void OnBehaviorDeactivated()   override;
-  virtual void HandleWhileInScopeButNotActivated(const EngineToGameEvent& event) override;
+  void GetBehaviorOperationModifiers(BehaviorOperationModifiers& modifiers) const override {}
+  void GetBehaviorJsonKeys(std::set<const char*>& expectedKeys) const override;
+  void OnBehaviorActivated()   override;
+  void RespondToName();
+  void RespondToPronouns();
+  void OnBehaviorDeactivated()   override;
+  void HandleWhileInScopeButNotActivated(const EngineToGameEvent& event) override;
   
 private:
   
   std::string      _name;
-  bool isSetNameVc = false;
+  bool _isSetNameVc = false;
+  bool _isPronounVc = false;
   
 }; // class BehaviorReactToRenameFace
   

@@ -10,7 +10,7 @@
  *
  **/
 
-#include "engine/aiComponent/behaviorComponent/behaviors/character/nameVictor/behaviorRespondToNameAndPronouns.h"
+#include "engine/aiComponent/behaviorComponent/behaviors/character/identifyVictor/behaviorRespondToNameAndPronouns.h"
 
 #include "aiComponent/behaviorComponent/behaviorExternalInterface/beiRobotInfo.h"
 #include "clad/externalInterface/messageEngineToGame.h"
@@ -37,7 +37,6 @@ namespace LocalizationKey {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 BehaviorRespondToNameAndPronouns::BehaviorRespondToNameAndPronouns(const Json::Value& config)
 : ICozmoBehavior(config)
-, _name("")
 {
   
 }
@@ -52,8 +51,6 @@ void BehaviorRespondToNameAndPronouns::GetBehaviorJsonKeys(std::set<const char*>
 void BehaviorRespondToNameAndPronouns::HandleWhileInScopeButNotActivated(const EngineToGameEvent& event)
 {
   
-  auto & msg = event.GetData().Get_RobotRenamedEnrolledFace();
-  _name   = msg.name;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -69,20 +66,36 @@ void BehaviorRespondToNameAndPronouns::OnBehaviorActivated()
   UserIntentComponent& uic = GetBehaviorComp<UserIntentComponent>();
   UserIntentPtr intentDataSet = uic.GetUserIntentIfActive(USER_INTENT(name_victor_setname));
   UserIntentPtr intentDataSay = uic.GetUserIntentIfActive(USER_INTENT(name_victor_sayname));
+  // UserIntentPtr intentDataSet = uic.GetUserIntentIfActive(USER_INTENT(name_victor_setname));
+  // UserIntentPtr intentDataSay = uic.GetUserIntentIfActive(USER_INTENT(name_victor_sayname));
 
   if (!intentDataSet && !intentDataSay) {
     PRINT_NAMED_WARNING("BehaviorRespondToNameAndPronouns.OnBehaviorActivated", "No pending 'name_victor_say' intent found");
     return;
   }
   
+  if (intentDataSet || intentDataSay) {
+    RespondToName();
+  }
+
+  _name.clear();
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void BehaviorRespondToNameAndPronouns::RespondToName()
+{
+  UserIntentComponent& uic = GetBehaviorComp<UserIntentComponent>();
+  UserIntentPtr intentDataSet = uic.GetUserIntentIfActive(USER_INTENT(name_victor_setname));
+  UserIntentPtr intentDataSay = uic.GetUserIntentIfActive(USER_INTENT(name_victor_sayname));
+
   if (intentDataSet) {
-    isSetNameVc = true;
+    _isSetNameVc = true;
   } else if (intentDataSay) {
-    isSetNameVc = false;
+    _isSetNameVc = false;
   }
 
   // Log that the behavior was activated
-  PRINT_NAMED_INFO("BehaviorRespondToNameAndPronouns.OnBehaviorActivated", "Activated 'name_victor_say' intent");
+  PRINT_NAMED_INFO("BehaviorRespondToNameAndPronouns.OnBehaviorActivated", "Activated naming behavior");
 
   if (Util::FileUtils::FileExists("/data/data/rebuild/customBotName")) {
     _name = Util::FileUtils::ReadFile("/data/data/rebuild/customBotName");
@@ -107,7 +120,7 @@ void BehaviorRespondToNameAndPronouns::OnBehaviorActivated()
   }
   
   auto* action = new CompoundActionSequential();
-  if (isSetNameVc) {
+  if (_isSetNameVc) {
     {
       // 1. Say name once (If this is setname)
       SayTextAction* sayNameAction1 = new SayTextAction(_name + "?");
@@ -121,14 +134,73 @@ void BehaviorRespondToNameAndPronouns::OnBehaviorActivated()
 
   {
     // 2. Repeat name (Or say it once if not setname)
-    SayTextAction* sayNameAction2 = isSetNameVc ? new SayTextAction(_name) : new SayTextAction(localizedImName);
-    isSetNameVc ? sayNameAction2->SetAnimationTrigger(AnimationTrigger::MeetVictorSayNameAgain) : sayNameAction2->SetAnimationTrigger(AnimationTrigger::InteractWithFacesInitialNamed);
+    SayTextAction* sayNameAction2 = _isSetNameVc ? new SayTextAction(_name) : new SayTextAction(localizedImName);
+    _isSetNameVc ? sayNameAction2->SetAnimationTrigger(AnimationTrigger::MeetVictorSayNameAgain) : sayNameAction2->SetAnimationTrigger(AnimationTrigger::InteractWithFacesInitialNamed);
     action->AddAction(sayNameAction2);
   }
   
   DelegateIfInControl(action);
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void BehaviorRespondToNameAndPronouns::RespondToPronouns()
+{
+  UserIntentComponent& uic = GetBehaviorComp<UserIntentComponent>();
+  UserIntentPtr intentDataSet = uic.GetUserIntentIfActive(USER_INTENT(name_victor_setpronouns));
+  UserIntentPtr intentDataSay = uic.GetUserIntentIfActive(USER_INTENT(name_victor_saypronouns));
+
+  if (intentDataSet) {
+    _isSetNameVc = true;
+  } else if (intentDataSay) {
+    _isSetNameVc = false;
+  }
+
+  // Log that the behavior was activated
+  PRINT_NAMED_INFO("BehaviorRespondToNameAndPronouns.OnBehaviorActivated", "Activated naming behavior");
+
+  if (Util::FileUtils::FileExists("/data/data/rebuild/customBotPronouns")) {
+    _name = Util::FileUtils::ReadFile("/data/data/rebuild/customBotPronouns");
+  } else if (Util::FileUtils::FileExists("/data/data/customBotPronouns")) {
+    _name = Util::FileUtils::ReadFile("/data/data/customBotPronouns");
+  } else {
+    _name = "he/him";
+  }
+
+  if (_name.empty())
+  {
+    // The only case this can happen is if the custom name file IS made, but is blank,
+    // for that case, we'll default to `Vector`, just like above
+    _name = "he/him";
+    if (_name.empty())
+    {
+      // Now, we should NEVER reach this point where the name is STILL empty because we forcefully set it above.
+      // If we somehow do. we'll restore the original logic.
+      PRINT_NAMED_ERROR("BehaviorRespondToNameAndPronouns.InitInternal.EmptyPronouns", "");
+      return;
+    }
+  }
   
-  _name.clear();
+  auto* action = new CompoundActionSequential();
+  if (_isSetNameVc) {
+    {
+      // 1. Say name once (If this is setname)
+      SayTextAction* sayNameAction1 = new SayTextAction(_name + "?");
+      sayNameAction1->SetAnimationTrigger(AnimationTrigger::MeetVictorSayName);
+      action->AddAction(sayNameAction1);
+    }
+  }
+
+  const auto& localeComponent = GetBEI().GetRobotInfo().GetLocaleComponent();
+  const std::string & localizedImName = localeComponent.GetString(LocalizationKey::kImX, _name);
+
+  {
+    // 2. Repeat name (Or say it once if not setname)
+    SayTextAction* sayNameAction2 = _isSetNameVc ? new SayTextAction(_name) : new SayTextAction(localizedImName);
+    _isSetNameVc ? sayNameAction2->SetAnimationTrigger(AnimationTrigger::MeetVictorSayNameAgain) : sayNameAction2->SetAnimationTrigger(AnimationTrigger::InteractWithFacesInitialNamed);
+    action->AddAction(sayNameAction2);
+  }
+
+  DelegateIfInControl(action);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
