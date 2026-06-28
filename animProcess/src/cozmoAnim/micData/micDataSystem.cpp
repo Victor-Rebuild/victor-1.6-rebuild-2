@@ -842,7 +842,7 @@ void MicDataSystem::SetAlexaState(AlexaSimpleState state)
   const bool active = (_alexaState == AlexaSimpleState::Active);
   // UK/AU seem to be worse at handling self-loops
   if (((_locale.GetCountry() == Util::Locale::CountryISO2::GB) && kAlexaEnabledInUK)
-      || ((_locale.GetCountry() == Util::Locale::CountryISO2::AU) && kAlexaEnabledInUK)) {
+      || ((_locale.GetCountry() == Util::Locale::CountryISO2::AU) && kAlexaEnabledInAU)) {
     _speechRecognizerSystem->ToggleNotchDetector( active );
   }
   else {

@@ -18,7 +18,7 @@ if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 endif()
 
 # Build options
-option(USE_DAS "Enable DAS reporting" ON)
+option(USE_DAS "Enable DAS reporting" OFF)
 
 # Use ccache if it is installed
 include(ccache)

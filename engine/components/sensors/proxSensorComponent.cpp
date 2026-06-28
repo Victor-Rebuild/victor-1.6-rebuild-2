@@ -235,12 +235,7 @@ bool ProxSensorComponent::CheckLiftOcclusion()
   return isInFOV;
 }
 
-
-
-
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-
 bool ProxSensorComponent::VerifyLiftCalibration() const
 {
   // track the number of transitions in history outside allowed noise range
