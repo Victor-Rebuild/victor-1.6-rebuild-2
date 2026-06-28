@@ -42,7 +42,7 @@ private:
   
   std::string      _name;
   bool _isSetNameVc = false;
-  bool _isPronounVc = false;
+  bool _isSetPronounVc = false;
   
 }; // class BehaviorReactToRenameFace
   

@@ -66,16 +66,20 @@ void BehaviorRespondToNameAndPronouns::OnBehaviorActivated()
   UserIntentComponent& uic = GetBehaviorComp<UserIntentComponent>();
   UserIntentPtr intentDataSet = uic.GetUserIntentIfActive(USER_INTENT(name_victor_setname));
   UserIntentPtr intentDataSay = uic.GetUserIntentIfActive(USER_INTENT(name_victor_sayname));
-  // UserIntentPtr intentDataSet = uic.GetUserIntentIfActive(USER_INTENT(name_victor_setname));
-  // UserIntentPtr intentDataSay = uic.GetUserIntentIfActive(USER_INTENT(name_victor_sayname));
+  UserIntentPtr intentDataSetPronouns = uic.GetUserIntentIfActive(USER_INTENT(name_victor_setpronouns));
+  UserIntentPtr intentDataSayPronouns = uic.GetUserIntentIfActive(USER_INTENT(name_victor_saypronouns));
 
   if (!intentDataSet && !intentDataSay) {
     PRINT_NAMED_WARNING("BehaviorRespondToNameAndPronouns.OnBehaviorActivated", "No pending 'name_victor_say' intent found");
     return;
   }
-  
+
   if (intentDataSet || intentDataSay) {
     RespondToName();
+  } else if (intentDataSetPronouns || intentDataSayPronouns) {
+    RespondToPronouns();
+  } else {
+    CancelSelf();
   }
 
   _name.clear();
@@ -150,13 +154,13 @@ void BehaviorRespondToNameAndPronouns::RespondToPronouns()
   UserIntentPtr intentDataSay = uic.GetUserIntentIfActive(USER_INTENT(name_victor_saypronouns));
 
   if (intentDataSet) {
-    _isSetNameVc = true;
+    _isSetPronounVc = true;
   } else if (intentDataSay) {
-    _isSetNameVc = false;
+    _isSetPronounVc = false;
   }
 
   // Log that the behavior was activated
-  PRINT_NAMED_INFO("BehaviorRespondToNameAndPronouns.OnBehaviorActivated", "Activated naming behavior");
+  PRINT_NAMED_INFO("BehaviorRespondToNameAndPronouns.OnBehaviorActivated", "Activated pronoun behavior");
 
   if (Util::FileUtils::FileExists("/data/data/rebuild/customBotPronouns")) {
     _name = Util::FileUtils::ReadFile("/data/data/rebuild/customBotPronouns");
@@ -168,8 +172,8 @@ void BehaviorRespondToNameAndPronouns::RespondToPronouns()
 
   if (_name.empty())
   {
-    // The only case this can happen is if the custom name file IS made, but is blank,
-    // for that case, we'll default to `Vector`, just like above
+    // The only case this can happen is if the custom pronoun file IS made, but is blank,
+    // for that case, we'll default to `he/him`, just like above
     _name = "he/him";
     if (_name.empty())
     {
@@ -181,7 +185,7 @@ void BehaviorRespondToNameAndPronouns::RespondToPronouns()
   }
   
   auto* action = new CompoundActionSequential();
-  if (_isSetNameVc) {
+  if (_isSetPronounVc) {
     {
       // 1. Say name once (If this is setname)
       SayTextAction* sayNameAction1 = new SayTextAction(_name + "?");
@@ -190,13 +194,10 @@ void BehaviorRespondToNameAndPronouns::RespondToPronouns()
     }
   }
 
-  const auto& localeComponent = GetBEI().GetRobotInfo().GetLocaleComponent();
-  const std::string & localizedImName = localeComponent.GetString(LocalizationKey::kImX, _name);
-
   {
     // 2. Repeat name (Or say it once if not setname)
-    SayTextAction* sayNameAction2 = _isSetNameVc ? new SayTextAction(_name) : new SayTextAction(localizedImName);
-    _isSetNameVc ? sayNameAction2->SetAnimationTrigger(AnimationTrigger::MeetVictorSayNameAgain) : sayNameAction2->SetAnimationTrigger(AnimationTrigger::InteractWithFacesInitialNamed);
+    SayTextAction* sayNameAction2 = new SayTextAction(_name);
+    _isSetPronounVc ? sayNameAction2->SetAnimationTrigger(AnimationTrigger::MeetVictorSayNameAgain) : sayNameAction2->SetAnimationTrigger(AnimationTrigger::InteractWithFacesInitialNamed);
     action->AddAction(sayNameAction2);
   }
 

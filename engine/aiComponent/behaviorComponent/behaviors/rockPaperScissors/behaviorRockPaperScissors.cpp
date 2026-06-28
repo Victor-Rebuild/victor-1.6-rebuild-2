@@ -58,7 +58,6 @@ BehaviorRockPaperScissors::BehaviorRockPaperScissors(const Json::Value& config)
 : ICozmoBehavior(config)
 , _iConfig(config)
 {
-  SubscribeToTags({RobotInterface::RobotToEngineTag::startShutdownAnim});
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
