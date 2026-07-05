@@ -76,11 +76,11 @@ public:
   // if synced, approximate otherwise. Returns empty string on error.
   void GetDayOfWeek(int& dayWeekString);
 
+  bool IsTimeSynced();
+
 private:
 
   WallTime();
-
-  bool IsTimeSynced();
   
   // checking for time sync is a syscall, so avoid doing it too often by keeping a cache and refreshing based
   // on a different timer

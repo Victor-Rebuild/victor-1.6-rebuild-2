@@ -16,6 +16,7 @@
 #include "util/logging/DAS.h"
 #include "util/logging/logging.h"
 #include "util/string/stringUtils.h"
+#include "wallTime.h"
 
 #include <exception>
 #include <iomanip>
@@ -72,7 +73,20 @@ WeatherConditionType WeatherIntentParser::GetCondition(const UserIntent_WeatherR
 tm WeatherIntentParser::GetLocalDateTime(const UserIntent_WeatherResponse& weatherIntent) const
 {
   tm localTime;
-  strptime(weatherIntent.localDateTime.c_str(), "%Y-%m-%dT%H:%M%S-", &localTime);
+  auto* wallTime = WallTime::getInstance();
+
+  bool hasWallTime = wallTime->IsTimeSynced();
+  if( !hasWallTime ) {
+    hasWallTime = wallTime->GetApproximateLocalTime(localTime);
+  } else {
+    hasWallTime = wallTime->GetLocalTime(localTime);
+  }
+
+  if( !hasWallTime ) {
+    PRINT_NAMED_WARNING("WeatherIntentParser.GetLocalDateTime.Failed",
+                        "Could not retrieve local time");
+  }
+
   return localTime;
 }
 

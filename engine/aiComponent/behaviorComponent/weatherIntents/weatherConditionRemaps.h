@@ -51,10 +51,6 @@ private:
 
     // and vs or
     bool allSpecifiedConditionsMustBeMet = false;
-
-    // day or night. Empty means doesn't matter, this uses a cloud-returned specification of day or night
-    // rather than relying on local time.
-    std::string dayOrNightSpecifier;
   };
 
   std::unordered_map<WeatherConditionType, std::vector<RemapEntry>, Anki::Util::EnumHasher> _remaps;
