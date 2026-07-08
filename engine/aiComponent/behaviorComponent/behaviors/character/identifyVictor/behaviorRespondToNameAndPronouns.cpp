@@ -57,7 +57,10 @@ void BehaviorRespondToNameAndPronouns::HandleWhileInScopeButNotActivated(const E
 bool BehaviorRespondToNameAndPronouns::WantsToBeActivatedBehavior() const
 {
   auto& uic = GetBehaviorComp<UserIntentComponent>();
-  return uic.IsUserIntentPending(USER_INTENT(name_victor_setname)) || uic.IsUserIntentPending(USER_INTENT(name_victor_sayname));
+  return uic.IsUserIntentPending(USER_INTENT(name_victor_setname))
+  || uic.IsUserIntentPending(USER_INTENT(name_victor_sayname))
+  || uic.IsUserIntentPending(USER_INTENT(name_victor_setpronouns))
+  || uic.IsUserIntentPending(USER_INTENT(name_victor_saypronouns));
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -69,7 +72,7 @@ void BehaviorRespondToNameAndPronouns::OnBehaviorActivated()
   UserIntentPtr intentDataSetPronouns = uic.GetUserIntentIfActive(USER_INTENT(name_victor_setpronouns));
   UserIntentPtr intentDataSayPronouns = uic.GetUserIntentIfActive(USER_INTENT(name_victor_saypronouns));
 
-  if (!intentDataSet && !intentDataSay) {
+  if (!intentDataSet && !intentDataSay && !intentDataSetPronouns && !intentDataSayPronouns) {
     PRINT_NAMED_WARNING("BehaviorRespondToNameAndPronouns.OnBehaviorActivated", "No pending 'name_victor_say' intent found");
     return;
   }
@@ -184,6 +187,8 @@ void BehaviorRespondToNameAndPronouns::RespondToPronouns()
     }
   }
   
+  _name = _name + "!";
+
   auto* action = new CompoundActionSequential();
   if (_isSetPronounVc) {
     {
