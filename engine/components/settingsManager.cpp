@@ -879,7 +879,7 @@ namespace Anki
           hue = eyeColorData["Hue"].asFloat();
           saturation = eyeColorData["Saturation"].asFloat();
           if (IsXray()) {
-            saturation = saturation + 0.15;
+            saturation = saturation + 0.2;
           }
         }
       }
