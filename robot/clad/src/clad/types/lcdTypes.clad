@@ -7,6 +7,7 @@ namespace Vector {
 
 enum uint_8 LCDBrightness {
   LCDLevelOff = 0,
+  LCDLevel_1mA = 1,
   LCDLevel_5mA = 5,
   LCDLevel_10mA = 10,
   LCDLevel_15mA = 15,

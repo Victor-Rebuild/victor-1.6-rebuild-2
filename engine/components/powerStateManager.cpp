@@ -46,7 +46,7 @@ CONSOLE_VAR( bool, kPowerSave_ProxSensorMap, CONSOLE_GROUP, true);
 
 CONSOLE_VAR( bool, kForceCalmMode, CONSOLE_GROUP, false);
 
-static constexpr const LCDBrightness kLCDBrightnessLow = LCDBrightness::LCDLevel_5mA;
+static constexpr const LCDBrightness kLCDBrightnessLow = LCDBrightness::LCDLevel_1mA;
 static constexpr const LCDBrightness kLCDBrightnessNormal = LCDBrightness::LCDLevel_10mA;
 
 static constexpr const DesiredCPUFrequency kCPUFreqSaveLow = DesiredCPUFrequency::Manual200MHz;
@@ -117,6 +117,14 @@ void PowerStateManager::UpdateDependent(const RobotCompMap& dependentComps)
     }
     else {
       ExitPowerSave(dependentComps);
+    }
+  }
+
+  if( _inPowerSaveMode && kPowerSave_Camera ) {
+    const bool cameraShouldBeOff = _cameraExemptionRequests.empty();
+    const bool cameraCurrentlyOff = ( _enabledSettings.find(PowerSaveSetting::Camera) != _enabledSettings.end() );
+    if( cameraShouldBeOff != cameraCurrentlyOff ) {
+      TogglePowerSaveSetting( dependentComps, PowerSaveSetting::Camera, cameraShouldBeOff );
     }
   }
 
@@ -376,6 +384,22 @@ void PowerStateManager::RequestLCDBrightnessChange(const LCDBrightness& level) c
         RobotInterface::EngineToRobot( RobotInterface::SetLCDBrightnessLevel( level ) ) );
 }
 
+void PowerStateManager::RequestCameraPowerSaveExemption(const std::string& requester)
+{
+  PRINT_CH_DEBUG("PowerStates", "PowerStateManager.Camera.AddExemption",
+                 "Adding camera power save exemption from '%s'",
+                 requester.c_str());
+  _cameraExemptionRequests.insert(requester);
+}
+
+void PowerStateManager::RemoveCameraPowerSaveExemption(const std::string& requester)
+{
+  const size_t numRemoved = _cameraExemptionRequests.erase(requester);
+  PRINT_CH_DEBUG("PowerStates", "PowerStateManager.Camera.RemoveExemption",
+                 "Removed %zu exemption(s) for '%s'",
+                 numRemoved,
+                 requester.c_str());
+}
 
 void PowerStateManager::EnterPowerSave(const RobotCompMap& components)
 {
@@ -386,7 +410,7 @@ void PowerStateManager::EnterPowerSave(const RobotCompMap& components)
     TogglePowerSaveSetting( components, PowerSaveSetting::CalmMode, true );
   }
 
-  if( kPowerSave_Camera ) {
+  if( kPowerSave_Camera && _cameraExemptionRequests.empty() ) {
     TogglePowerSaveSetting( components, PowerSaveSetting::Camera, true );
   }
 
@@ -423,6 +447,13 @@ void PowerStateManager::ExitPowerSave(const RobotCompMap& components)
   BOUNDED_WHILE( limit, !_enabledSettings.empty() ) {
     const auto setting = *_enabledSettings.begin();
     TogglePowerSaveSetting( components, setting, false );
+  }
+
+  if( !_cameraExemptionRequests.empty() ) {
+    PRINT_NAMED_WARNING("PowerStateManager.Exit.StaleCameraExemptions",
+                        "%zu camera power save exemption(s) still active on exit, clearing them",
+                        _cameraExemptionRequests.size());
+    _cameraExemptionRequests.clear();
   }
 
   const float currTime_s = BaseStationTimer::getInstance()->GetCurrentTimeInSeconds();

@@ -27,6 +27,7 @@
 #include "engine/charger.h"
 #include "engine/components/carryingComponent.h"
 #include "engine/components/robotStatsTracker.h"
+#include "engine/components/powerStateManager.h"
 #include "engine/components/visionComponent.h"
 #include "engine/drivingAnimationHandler.h"
 #include "engine/navMap/mapComponent.h"
@@ -233,6 +234,9 @@ void BehaviorGoHome::OnBehaviorActivated()
     return;
   }
   
+  // Drop the brightness
+  GetBEI().GetPowerStateManager().RequestLCDBrightnessChange(LCDBrightness::LCDLevel_1mA);
+
   PushDrivingAnims();
   
   _dVars.chargerID = object->GetID();
@@ -253,6 +257,9 @@ void BehaviorGoHome::OnBehaviorDeactivated()
 {
   PopDrivingAnims();
   
+  // Set the brightness back to normal
+  GetBEI().GetPowerStateManager().RequestLCDBrightnessChange(LCDBrightness::LCDLevel_10mA);
+
   // If we had a clear success or failure, log it here
   if (_dVars.HasResult()) {
     DASMSG(go_home_result, "go_home.result", "Result of GoHome behavior");

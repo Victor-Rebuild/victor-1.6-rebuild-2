@@ -25,6 +25,7 @@
 #include "engine/blockWorld/blockWorldFilter.h"
 #include "engine/charger.h"
 #include "engine/components/carryingComponent.h"
+#include "engine/components/powerStateManager.h"
 #include "engine/moodSystem/moodManager.h"
 #include "engine/navMap/mapComponent.h"
 #include "engine/navMap/memoryMap/memoryMapTypes.h"
@@ -86,6 +87,9 @@ namespace {
 
   const float kIncidenceForObservation_rad = DEG_TO_RAD(75.f);
   const float kNumRandomPosesForObservation = 10;
+
+  const LCDBrightness kPowerSaveLCDBrightness = LCDBrightness::LCDLevel_1mA;
+  const LCDBrightness kNormalLCDBrightness = LCDBrightness::LCDLevel_10mA;
 }
 
 
@@ -265,6 +269,9 @@ void BehaviorFindHome::OnBehaviorDeactivated()
     chargerSeen = (now-chrgObsTime) < kMaxAgeForChargerSeenRecently_ms;
   }
 
+  // Set the brightness back to normal
+  GetBEI().GetPowerStateManager().RequestLCDBrightnessChange(kNormalLCDBrightness);
+
   DASMSG(find_home_result, "find_home.result", "Whether the FindHome behavior succeeded in locating the object");
   DASMSG_SET(i1, chargerSeen, "Success/failure on locating the charger. 1=success 0=failuire");
   DASMSG_SET(i2, _dVars.numFramesOfMarkers, "Count of total number of processed image frames searching for Markers");
@@ -293,6 +300,8 @@ void BehaviorFindHome::TransitionToStartSearch()
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BehaviorFindHome::TransitionToLookInPlace()
 {
+  // Knock down the bot's brightness a bit, will get overridden by lowlight if needed
+  GetBEI().GetPowerStateManager().RequestLCDBrightnessChange(kPowerSaveLCDBrightness);
   if(ANKI_VERIFY(_iConfig.observeChargerBehavior->WantsToBeActivated(), 
                  "BehaviorFindHome.TransitionToLookInPlace.ObserveChargerBehavior.NotActivatable", "" )) {
     DelegateIfInControl(_iConfig.observeChargerBehavior.get(), &BehaviorFindHome::TransitionToSearchTurn);

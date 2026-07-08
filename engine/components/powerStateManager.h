@@ -80,6 +80,10 @@ public:
 
   void RequestLCDBrightnessChange(const LCDBrightness& level) const;
 
+  // I'd like to keep the cam active sometimes
+  void RequestCameraPowerSaveExemption(const std::string& requester);
+  void RemoveCameraPowerSaveExemption(const std::string& requester);
+
   // NOTE: In an ideal system, we'd work the opposite way, where specific behaviors or pieces of code could
   // request a higher power mode, and the _default_ would be power save. This would potentially allow better
   // power saving, but also be harder to debug and have systems understand what to do and not do in power save
@@ -123,6 +127,8 @@ private:
   bool _cpuThrottleLow = true;
   
   float _nextSendWebVizDataTime_sec = 0.0f;
+
+  std::set<std::string> _cameraExemptionRequests;
 };
 
 }
