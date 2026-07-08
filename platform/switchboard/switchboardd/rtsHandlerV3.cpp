@@ -270,10 +270,6 @@ void RtsHandlerV3::HandleRtsChallengeMessage(const Vector::ExternalComms::RtsCon
 }
 
 void RtsHandlerV3::HandleRtsWifiConnectRequest(const Vector::ExternalComms::RtsConnection_3& msg) {
-  if(!IsAuthenticated()) {
-    return;
-  }
-
   if(_state == RtsPairingPhase::ConfirmedSharedSecret) {
     Anki::Vector::ExternalComms::RtsWifiConnectRequest wifiConnectMessage = msg.Get_RtsWifiConnectRequest();
 
@@ -309,8 +305,8 @@ void RtsHandlerV3::HandleRtsWifiConnectRequest(const Vector::ExternalComms::RtsC
     if(connected == Wifi::ConnectWifiResult::CONNECT_SUCCESS) {
       Log::Write("Connected to wifi.");
 
-      // We use chrony to keep the time in vector upto date. Normally it assumes that the
-      // wifi is connected and pings the NTP servers to update the time. Here we know for
+      // We use chrony to keep the time in vector upto date. Normally it assumes that the 
+      // wifi is connected and pings the NTP servers to update the time. Here we know for 
       // sure the wifi is connected and try to restart the service.
       int res = system("sudo systemctl restart chronyd");
       if (res != 0) {
@@ -329,10 +325,6 @@ void RtsHandlerV3::HandleRtsWifiConnectRequest(const Vector::ExternalComms::RtsC
 }
 
 void RtsHandlerV3::HandleRtsWifiIpRequest(const Vector::ExternalComms::RtsConnection_3& msg) {
-  if(!IsAuthenticated()) {
-    return;
-  }
-
   if(_state == RtsPairingPhase::ConfirmedSharedSecret) {
     std::array<uint8_t, 4> ipV4;
     std::array<uint8_t, 16> ipV6;
@@ -348,10 +340,6 @@ void RtsHandlerV3::HandleRtsWifiIpRequest(const Vector::ExternalComms::RtsConnec
 }
 
 void RtsHandlerV3::HandleRtsStatusRequest(const Vector::ExternalComms::RtsConnection_3& msg) {
-  if(!IsAuthenticated()) {
-    return;
-  }
-
   if(_state == RtsPairingPhase::ConfirmedSharedSecret) {
     SendStatusResponse();
   } else {
@@ -360,10 +348,6 @@ void RtsHandlerV3::HandleRtsStatusRequest(const Vector::ExternalComms::RtsConnec
 }
 
 void RtsHandlerV3::HandleRtsWifiScanRequest(const Vector::ExternalComms::RtsConnection_3& msg) {
-  if(!IsAuthenticated()) {
-    return;
-  }
-
   if(_state == RtsPairingPhase::ConfirmedSharedSecret) {
     UpdateFace(Anki::Vector::SwitchboardInterface::ConnectionStatus::SETTING_WIFI);
     SendWifiScanResult();
@@ -373,10 +357,6 @@ void RtsHandlerV3::HandleRtsWifiScanRequest(const Vector::ExternalComms::RtsConn
 }
 
 void RtsHandlerV3::HandleRtsWifiForgetRequest(const Vector::ExternalComms::RtsConnection_3& msg) {
-  if(!IsAuthenticated()) {
-    return;
-  }
-
   if(_state == RtsPairingPhase::ConfirmedSharedSecret) {
     // Get message
     Anki::Vector::ExternalComms::RtsWifiForgetRequest forgetMsg = msg.Get_RtsWifiForgetRequest();
@@ -427,10 +407,6 @@ void RtsHandlerV3::HandleRtsOtaCancelRequest(const Vector::ExternalComms::RtsCon
 }
 
 void RtsHandlerV3::HandleRtsWifiAccessPointRequest(const Vector::ExternalComms::RtsConnection_3& msg) {
-  if(!IsAuthenticated()) {
-    return;
-  }
-
   if(_state == RtsPairingPhase::ConfirmedSharedSecret) {
     Anki::Vector::ExternalComms::RtsWifiAccessPointRequest accessPointMessage = msg.Get_RtsWifiAccessPointRequest();
     if(accessPointMessage.enable) {
@@ -792,10 +768,6 @@ void RtsHandlerV3::SendChallengeSuccess() {
 }
 
 void RtsHandlerV3::SendStatusResponse() {
-  if(!IsAuthenticated()) {
-    return;
-  }
-
   Wifi::WiFiState state = Wifi::GetWiFiState();
   uint8_t bleState = 1; // for now, if we are sending this message, we are connected
   uint8_t batteryState = 0; // for now, ignore this field until we have a way to get that info
@@ -810,19 +782,11 @@ void RtsHandlerV3::SendStatusResponse() {
 }
 
 void RtsHandlerV3::SendWifiAccessPointResponse(bool success, std::string ssid, std::string pw) {
-  if(!IsAuthenticated()) {
-    return;
-  }
-
   // Send challenge and update state
   SendRtsMessage<RtsWifiAccessPointResponse>(success, ssid, pw);
 }
 
 void RtsHandlerV3::SendWifiScanResult() {
-  if(!IsAuthenticated()) {
-    return;
-  }
-
   std::vector<Wifi::WiFiScanResult> wifiResults;
   Wifi::WifiScanErrorCode code = Wifi::ScanForWiFiAccessPoints(wifiResults);
 
@@ -845,10 +809,6 @@ void RtsHandlerV3::SendWifiScanResult() {
 }
 
 void RtsHandlerV3::SendWifiConnectResult(Wifi::ConnectWifiResult result) {
-  if(!IsAuthenticated()) {
-    return;
-  }
-
   // Re-enable autoconnect
   if(_wifiWatcher != nullptr) {
     _wifiWatcher->Enable();
