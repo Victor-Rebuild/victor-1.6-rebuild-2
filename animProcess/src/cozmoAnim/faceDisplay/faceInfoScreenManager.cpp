@@ -1652,10 +1652,7 @@ void FaceInfoScreenManager::DrawServerInfo()
     if (reader.parse(jsonContents, config)) {
       if (config.isMember("chipper") && config["chipper"].isString()) {
         std::string chipperUrl = config["chipper"].asString();
-        
-        if (chipperUrl.find("escapepod.local") != std::string::npos) {
-          servConf = chipperUrl;
-        }
+        servConf = chipperUrl;
       } else {
         LOG_WARNING("Failed to Find chipper url in the server config file. Could the config be empty?", "");
         servConf = "Invalid";
