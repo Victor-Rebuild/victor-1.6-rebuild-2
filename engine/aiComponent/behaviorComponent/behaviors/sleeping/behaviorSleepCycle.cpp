@@ -584,12 +584,13 @@ void BehaviorSleepCycle::BehaviorUpdate()
         _dVars.currState == SleepStateID::DeepSleep ) {
 
       if( _dVars.nextPersonCheckTime_s > 0.0f &&
-          currTime_s >= _dVars.nextPersonCheckTime_s ) {
+        currTime_s >= _dVars.nextPersonCheckTime_s ) {
         LOG_INFO("BehaviorSleepCycle.TimeForPersonCheck",
-                 "In state '%s', reached t=%f (>= %f), time to do a person check",
-                 SleepStateIDToString( _dVars.currState ),
-                 currTime_s,
-                 _dVars.nextPersonCheckTime_s);
+                "In state '%s', reached t=%f (>= %f), time to do a person check",
+                SleepStateIDToString( _dVars.currState ),
+                currTime_s,
+                _dVars.nextPersonCheckTime_s);
+
         TransitionToCheckingForPerson();
         return;
       }
@@ -598,6 +599,11 @@ void BehaviorSleepCycle::BehaviorUpdate()
     if( _dVars.reactionState == SleepReactionType::NotReacting &&
         ShouldReactToSoundInState(_dVars.currState) &&
         _iConfig.sleepingSoundReactionBehavior->WantsToBeActivated() ) {
+
+      if (GetBEI().GetSleepTracker().IsNightTime() && _disableReactToSound) {
+        return;
+      }
+
       CancelDelegates(false);
       SetReactionState(SleepReactionType::Sound);
       DelegateIfInControl(_iConfig.sleepingSoundReactionBehavior.get());
@@ -902,6 +908,10 @@ void BehaviorSleepCycle::SetConditionsActiveForState(SleepStateID state, bool ac
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BehaviorSleepCycle::TransitionToCheckingForPerson()
 {
+  if (GetBEI().GetSleepTracker().IsNightTime() && _disablePersonCheck) {
+    return;
+  }
+
   SetState(SleepStateID::CheckingForPerson);
 
   // sleep states will set the next time appropriately, for now disable the next check

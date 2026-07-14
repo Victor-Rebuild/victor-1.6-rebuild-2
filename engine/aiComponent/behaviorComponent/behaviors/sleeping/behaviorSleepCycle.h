@@ -108,6 +108,9 @@ private:
 
   int denyGoHome = 0;
 
+  bool _disablePersonCheck = Util::FileUtils::FileExists("/data/data/rebuild/dont-look-for-people-at-night");
+  bool _disableReactToSound = Util::FileUtils::FileExists("/data/data/rebuild/dont-react-to-sound-at-night");
+
   struct InstanceConfig {
     std::string awakeDelegateName;
     std::string findChargerBehaviorName;
