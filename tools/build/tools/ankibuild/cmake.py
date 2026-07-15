@@ -9,6 +9,7 @@ import re
 import string
 import subprocess
 import sys
+import shutil
 
 # ankibuild
 
@@ -82,10 +83,7 @@ def install_cmake(version):
 
 def find_cmake(required_ver, cmake_exe=None):
     if not cmake_exe:
-        try:
-            cmake_exe = subprocess.check_output(['which', 'cmake'], universal_newlines=True).rstrip()
-        except subprocess.CalledProcessError as e:
-            pass
+        cmake_exe = shutil.which('cmake')
 
     if get_cmake_version_from_command(cmake_exe) == required_ver:
         return cmake_exe

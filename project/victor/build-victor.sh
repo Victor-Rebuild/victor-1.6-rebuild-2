@@ -361,6 +361,10 @@ fi
 
 # Set protobuf location
 HOST=`uname -a | awk '{print tolower($1);}' | sed -e 's/darwin/mac/'`
+if [[ `uname -a` == *"aarch64"* && $HOST == "linux" ]]; then
+	HOST+="-arm64"
+fi
+echo $HOST
 PROTOBUF_HOME=${TOPLEVEL}/EXTERNALS/deps/protobuf/${HOST}
 
 # Build protocCppPlugin if needed
