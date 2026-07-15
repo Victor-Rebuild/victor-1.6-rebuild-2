@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -e
 set -u
 
@@ -16,37 +16,22 @@ function vlog()
 
 pushd "${TOPLEVEL}" > /dev/null 2>&1
 
-#vlog "Check brew installation."
+vlog "Check brew installation."
 is_brew=`which brew`
 set -e
 
 if [ -z "$is_brew" ]; then
-   echo "Brew not found installing now.  You will be prompted."
-   /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+   vlog "Brew not found. Please install it."
+   exit 1
 fi
 
 vlog "Check homebrew dependencies"
 ./tools/build/tools/ankibuild/installBuildDeps.py \
-    -d python2 \
-    ninja \
+    -d ninja \
     python3 \
-    libsndfile \
-    node \
     rsync \
-    openssl \
+    wget \
     curl
-
-vlog "vicos sdk"
-#./tools/build/tools/ankibuild/vicos.py --install 5.3.0-r07
-
-vlog "CMake"
-./tools/build/tools/ankibuild/cmake.py
-
-#vlog "Go"
-#./tools/build/tools/ankibuild/go.py
-
-# vlog "git-lfs"
-# $GIT lfs install
 
 if [ -d "/Applications/Webots.app" ]; then
   vlog "check webots version"
