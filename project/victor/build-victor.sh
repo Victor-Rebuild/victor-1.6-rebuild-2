@@ -163,8 +163,7 @@ fi
 
 if [ $IGNORE_EXTERNAL_DEPENDENCIES -eq 0 ]; then
     echo "Attempting to run fetch-build-deps.sh"
-#   EXTERNALS_UPDATE_SKIP=$EXTERNALS_UPDATE_SKIP DONT_ANIM=$DONT_ANIM ${TOPLEVEL}/project/victor/scripts/fetch-build-deps.sh
-    EXTERNALS_UPDATE_SKIP=$EXTERNALS_UPDATE_SKIP DONT_ANIM=$DONT_ANIM ${TOPLEVEL}/project/victor/scripts/fetch-build-deps.sh
+    DONT_ANIM=$DONT_ANIM ${TOPLEVEL}/project/victor/scripts/fetch-build-deps.sh
 else
     echo "Ignore external dependencies"
 fi
@@ -361,10 +360,10 @@ fi
 
 # Set protobuf location
 HOST=`uname -a | awk '{print tolower($1);}' | sed -e 's/darwin/mac/'`
-if [[ `uname -a` == *"aarch64"* && $HOST == "linux" ]]; then
+if [[ `uname -a` == *"aarch64"* && $HOST == "linux" ]] || [[ "$(uname -a)" == *"arm64"* && "$(uname -a)" == *"Darwin"* ]]; then
 	HOST+="-arm64"
 fi
-echo $HOST
+echo "Protobuf platform: $HOST"
 PROTOBUF_HOME=${TOPLEVEL}/EXTERNALS/deps/protobuf/${HOST}
 
 # Build protocCppPlugin if needed
@@ -525,10 +524,10 @@ else
   if [[ ${GENERATOR} == *"Makefiles"* ]]; then
     TARGET_ARG="-j$(nproc) $TARGET_ARG"
   fi
-  $CMAKE_EXE --build . -j $(nproc) $TARGET_ARG $*
+  $CMAKE_EXE --build . $TARGET_ARG $*
   if [[ "$PLATFORM" == "vicos" && $RUN_INSTALL -eq 1 ]]; then
     # run install target on robot-platforms
-    $CMAKE_EXE --build . -j $(nproc) --target install
+    $CMAKE_EXE --build . --target install
     cp -f compile_commands.json ../../../
     echo "-- Copied compile_commands.json"
     ../../../tools/build/build-scripts/gen-clangd.sh
