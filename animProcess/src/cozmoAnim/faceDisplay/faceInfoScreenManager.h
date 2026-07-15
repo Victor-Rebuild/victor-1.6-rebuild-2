@@ -254,6 +254,8 @@ private:
   bool _isRestartRequired = false;
 
   bool _snoringDisabled = Util::FileUtils::FileExists("/data/data/rebuild/dont-snore-at-night");
+  bool _disablePersonCheck = Util::FileUtils::FileExists("/data/data/rebuild/dont-look-for-people-at-night");
+  bool _disableReactToSound = Util::FileUtils::FileExists("/data/data/rebuild/dont-react-to-sound-at-night");
 
   std::string _sysconVersion = "";
   

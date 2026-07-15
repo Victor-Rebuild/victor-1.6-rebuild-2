@@ -66,7 +66,7 @@
 - C++ upgrade engine from WireOS
 - Reonboard menu to easily connect Vector to the voice command server
 - Change slot option in CCIS to change Vector's system slot
-- Useful configuration menu in CCIS
+- Useful configuration menu in CCIS [MORE INFO:](/CONFIG_MENU.md)
 - Gamma correction and camera denoiser from WireOS
 - Intent Graph optimizations
 - Brightness changing on the fly to help battery life

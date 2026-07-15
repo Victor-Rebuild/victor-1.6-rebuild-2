@@ -253,11 +253,14 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   ADD_SCREEN_WITH_TEXT(ConfigurationSubmenu2, ConfigurationSubmenu2, {"CONFIGURATION PAGE 2"});
   ADD_SCREEN_WITH_TEXT(ConfigurationSubmenu3, ConfigurationSubmenu3, {"CONFIGURATION PAGE 3"});
   ADD_SCREEN_WITH_TEXT(ConfigurationSubmenu4, ConfigurationSubmenu4, {"CONFIGURATION PAGE 4"});
+  ADD_SCREEN_WITH_TEXT(SleepSettings, SleepSettings, {"SLEEP SETTINGS"});
   ADD_SCREEN_WITH_TEXT(DTTBRandomEyes, DTTBRandomEyes, {"TOGGLE DTTB EYES?"});
   ADD_SCREEN_WITH_TEXT(OldNewAlexa, OldNewAlexa, {_classicAlexa ? "USE MODERN ALEXA?" : "USE BETA ALEXA?"});
   ADD_SCREEN_WITH_TEXT(Reloading, Reloading, {"RELOADING..."});
   ADD_SCREEN_WITH_TEXT(Reonboarding, Reonboarding, {"REONBOARDING..."});
   ADD_SCREEN_WITH_TEXT(Reonboard, Reonboard, {"REONBOARD?"});
+  ADD_SCREEN_WITH_TEXT(RTS, RTS, {_disableReactToSound ? "ENABLE RTS?" : "DISABLE RTS?"});
+  ADD_SCREEN_WITH_TEXT(RTP, RTP, {_disablePersonCheck ? "ENABLE RTP?" : "DISABLE RTP?"});
   ADD_SCREEN_WITH_TEXT(SetFrequency, SetFrequency, {"SET SPEED TO?"});
   ADD_SCREEN_WITH_TEXT(Snoring, Snoring, {_snoringDisabled ? "ENABLE SNORING?" : "DISABLE SNORING?"});
   ADD_SCREEN_WITH_TEXT(SwitchSlot, SwitchSlot, {"SWAP SYS SLOT?"});
@@ -423,10 +426,16 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   // === Screen 4 ===
   ADD_MENU_ITEM(ConfigurationSubmenu4, "EXIT", Main);
   ADD_MENU_ITEM_WITH_ACTION(ConfigurationSubmenu4, "PREV PAGE", incSlotDown);
-  ADD_MENU_ITEM(ConfigurationSubmenu4, _snoringDisabled ? "ENABLE SNORING" : "DISABLE SNORING", Snoring);
+  ADD_MENU_ITEM(ConfigurationSubmenu4, "SLEEP SETTINGS", SleepSettings);
   ADD_MENU_ITEM(ConfigurationSubmenu4, "DTTB RANDOM EYES", DTTBRandomEyes);
   ADD_MENU_ITEM(ConfigurationSubmenu4, _classicAlexa ? "USE MODERN ALEXA" : "USE BETA ALEXA", OldNewAlexa);
   DISABLE_TIMEOUT(ConfigurationSubmenu)
+
+  // Sleep settings
+  ADD_MENU_ITEM(SleepSettings, "BACK", ConfigurationSubmenu4);
+  ADD_MENU_ITEM(SleepSettings, _disablePersonCheck ? "ENABLE RTP" : "DISABLE RTP", RTP);
+  ADD_MENU_ITEM(SleepSettings, _disableReactToSound ? "ENABLE RTS" : "DISABLE RTS", RTS);
+  ADD_MENU_ITEM(SleepSettings, _snoringDisabled ? "ENABLE SNORING" : "DISABLE SNORING", Snoring);
 
   // === User Data Menu ===
   ADD_MENU_ITEM(UserDataSubmenu, "EXIT", Main);
@@ -435,7 +444,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   DISABLE_TIMEOUT(UserDataSubmenu);
 
   // === Self test screen ===
-  ADD_MENU_ITEM(SelfTest, "EXIT", ConfigurationSubmenu);
+  ADD_MENU_ITEM(SelfTest, "BACK", ConfigurationSubmenu);
   FaceInfoScreen::MenuItemAction confirmSelfTest = [animStreamer, this]() {
     animStreamer->Abort();
     animStreamer->EnableKeepFaceAlive(false, 0);
@@ -459,7 +468,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
     this->Reboot();
     return ScreenName::Rebooting;
   };
-  ADD_MENU_ITEM(ClearUserData, "EXIT", UserDataSubmenu);
+  ADD_MENU_ITEM(ClearUserData, "BACK", UserDataSubmenu);
   ADD_MENU_ITEM_WITH_ACTION(ClearUserData, "CONFIRM", confirmClearUserData);
   SET_TIMEOUT(ClearUserDataFail, 3.f, UserDataSubmenu);
 
@@ -483,7 +492,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
     (void)system("curl 'http://localhost:8080/api/extra/restartvic' &");
     return ScreenName::Reonboarding;
   };
-  ADD_MENU_ITEM(Reonboard, "EXIT", UserDataSubmenu);
+  ADD_MENU_ITEM(Reonboard, "BACK", UserDataSubmenu);
   ADD_MENU_ITEM_WITH_ACTION(Reonboard, "CONFIRM", confirmReonboard);
   DISABLE_TIMEOUT(Reonboard);
 
@@ -505,7 +514,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
     (void)system("curl 'http://localhost:8080/api/mods/FreqChange/set?freq=2'");
     return ScreenName::ConfigurationSubmenu2;
   };
-  ADD_MENU_ITEM(SetFrequency, "EXIT", ConfigurationSubmenu2);
+  ADD_MENU_ITEM(SetFrequency, "BACK", ConfigurationSubmenu2);
   ADD_MENU_ITEM_WITH_ACTION(SetFrequency, "REGULAR", confirmSetSpeedReg);
   ADD_MENU_ITEM_WITH_ACTION(SetFrequency, "BALANCED", confirmSetSpeedBal);
   ADD_MENU_ITEM_WITH_ACTION(SetFrequency, "PERFORMANCE", confirmSetSpeedPerf);
@@ -523,7 +532,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
 
     return ScreenName::ConfigurationSubmenu3;
   };
-  ADD_MENU_ITEM(Toggle30fps, "EXIT", ConfigurationSubmenu3);
+  ADD_MENU_ITEM(Toggle30fps, "BACK", ConfigurationSubmenu3);
   ADD_MENU_ITEM_WITH_ACTION(Toggle30fps, "CONFIRM", confirmToggle30fps);
 
   // === Disable/Enable auto updates ===
@@ -539,7 +548,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
 
     return ScreenName::ConfigurationSubmenu3;
   };
-  ADD_MENU_ITEM(AutoUpdates, "EXIT", ConfigurationSubmenu3);
+  ADD_MENU_ITEM(AutoUpdates, "BACK", ConfigurationSubmenu3);
   ADD_MENU_ITEM_WITH_ACTION(AutoUpdates, "CONFIRM", confirmAutoUpdates);
 
   // === Swap backpack lights screen ===
@@ -555,7 +564,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
 
     return ScreenName::ConfigurationSubmenu;
   };
-  ADD_MENU_ITEM(BackpackLights, "EXIT", ConfigurationSubmenu);
+  ADD_MENU_ITEM(BackpackLights, "BACK", ConfigurationSubmenu);
   ADD_MENU_ITEM_WITH_ACTION(BackpackLights, "CONFIRM", confirmToggleLights);
 
   // === SwitchSlot screen ===
@@ -565,7 +574,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
     this->Reboot();
     return ScreenName::SwitchSlotReboot;
   };
-  ADD_MENU_ITEM(SwitchSlot, "EXIT", ConfigurationSubmenu);
+  ADD_MENU_ITEM(SwitchSlot, "BACK", ConfigurationSubmenu);
   ADD_MENU_ITEM_WITH_ACTION(SwitchSlot, "CONFIRM", confirmSlotSwitch);
   DISABLE_TIMEOUT(SwitchSlot);
     
@@ -575,7 +584,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
     (void)system("/usr/sbin/reboot recovery");
     return ScreenName::Rebooting;
   };
-  ADD_MENU_ITEM(BootRecovery, "EXIT", ConfigurationSubmenu2);
+  ADD_MENU_ITEM(BootRecovery, "BACK", ConfigurationSubmenu2);
   ADD_MENU_ITEM_WITH_ACTION(BootRecovery, "CONFIRM", confirmBootRecovery);
   DISABLE_TIMEOUT(BootRecovery);
 
@@ -592,12 +601,12 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
 
     return ScreenName::ConfigurationSubmenu4;
   };
-  ADD_MENU_ITEM(OldNewAlexa, "EXIT", ConfigurationSubmenu4);
+  ADD_MENU_ITEM(OldNewAlexa, "BACK", ConfigurationSubmenu4);
   ADD_MENU_ITEM_WITH_ACTION(OldNewAlexa, "CONFIRM", confirmOldNewAlexa);
 
   // === Toggle Snoring ===
   FaceInfoScreen::MenuItemAction confirmToggleSnoring = [this] {
-    LOG_INFO("FaceInfoScreenManager.OldNewAlexa.Confirmed", "");
+    LOG_INFO("FaceInfoScreenManager.Snoring.Confirmed", "");
     if (Util::FileUtils::FileDoesNotExist("/data/data/rebuild/dont-snore-at-night")) {
       Util::FileUtils::WriteFile("/data/data/rebuild/dont-snore-at-night", "");
     } else {
@@ -606,10 +615,42 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
 
     _isRestartRequired = true;
 
-    return ScreenName::ConfigurationSubmenu4;
+    return ScreenName::SleepSettings;
   };
-  ADD_MENU_ITEM(Snoring, "EXIT", ConfigurationSubmenu4);
+  ADD_MENU_ITEM(Snoring, "BACK", SleepSettings);
   ADD_MENU_ITEM_WITH_ACTION(Snoring, "CONFIRM", confirmToggleSnoring);
+
+  // === Toggle React to Sound ===
+  FaceInfoScreen::MenuItemAction confirmToggleRTS = [this] {
+    LOG_INFO("FaceInfoScreenManager.ReacttoSound.Confirmed", "");
+    if (Util::FileUtils::FileDoesNotExist("/data/data/rebuild/dont-react-to-sound-at-night")) {
+      Util::FileUtils::WriteFile("/data/data/rebuild/dont-react-to-sound-at-night", "");
+    } else {
+      Util::FileUtils::DeleteFile("/data/data/rebuild/dont-react-to-sound-at-night");
+    }
+
+    _isRestartRequired = true;
+
+    return ScreenName::SleepSettings;
+  };
+  ADD_MENU_ITEM(RTS, "BACK", SleepSettings);
+  ADD_MENU_ITEM_WITH_ACTION(RTS, "CONFIRM", confirmToggleRTS);
+
+  // === Toggle React to Person ===
+  FaceInfoScreen::MenuItemAction confirmToggleRTP = [this] {
+    LOG_INFO("FaceInfoScreenManager.ReacttoPerson.Confirmed", "");
+    if (Util::FileUtils::FileDoesNotExist("/data/data/rebuild/dont-look-for-people-at-night")) {
+      Util::FileUtils::WriteFile("/data/data/rebuild/dont-look-for-people-at-night", "");
+    } else {
+      Util::FileUtils::DeleteFile("/data/data/rebuild/dont-look-for-people-at-night");
+    }
+
+    _isRestartRequired = true;
+
+    return ScreenName::SleepSettings;
+  };
+  ADD_MENU_ITEM(RTP, "BACK", SleepSettings);
+  ADD_MENU_ITEM_WITH_ACTION(RTP, "CONFIRM", confirmToggleRTP);
 
   // === DTTB random eye colors screen ===
   FaceInfoScreen::MenuItemAction confirmToggleDTTBEyes = [this] {
@@ -624,7 +665,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
 
     return ScreenName::ConfigurationSubmenu4;
   };
-  ADD_MENU_ITEM(DTTBRandomEyes, "EXIT", ConfigurationSubmenu4);
+  ADD_MENU_ITEM(DTTBRandomEyes, "BACK", ConfigurationSubmenu4);
   ADD_MENU_ITEM_WITH_ACTION(DTTBRandomEyes, "CONFIRM", confirmToggleDTTBEyes);
 
   // === Camera screen ===
@@ -2296,6 +2337,7 @@ void FaceInfoScreenManager::DrawScratch()
     _currScreen == GetScreen(ScreenName::ConfigurationSubmenu2) ||
     _currScreen == GetScreen(ScreenName::ConfigurationSubmenu3) ||
     _currScreen == GetScreen(ScreenName::ConfigurationSubmenu4) ||
+    _currScreen == GetScreen(ScreenName::SleepSettings) ||
     _currScreen == GetScreen(ScreenName::SetFrequency))
   {
     _currScreen->DrawMenuVertical(*_scratchDrawingImg);
