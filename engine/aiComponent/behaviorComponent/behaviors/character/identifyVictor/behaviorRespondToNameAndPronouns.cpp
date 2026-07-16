@@ -186,8 +186,12 @@ void BehaviorRespondToNameAndPronouns::RespondToPronouns()
       return;
     }
   }
-  
-  _name = _name + "!";
+
+  if (_name == "Any!") {
+    _name = "Any Pronouns!";
+  } else if (_name == "He/Him") {
+    _name = "";
+  }
 
   auto* action = new CompoundActionSequential();
   if (_isSetPronounVc) {
