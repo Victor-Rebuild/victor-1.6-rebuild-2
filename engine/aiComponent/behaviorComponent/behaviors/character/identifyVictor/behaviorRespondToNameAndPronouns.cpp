@@ -189,8 +189,6 @@ void BehaviorRespondToNameAndPronouns::RespondToPronouns()
 
   if (_name == "Any!") {
     _name = "Any Pronouns!";
-  } else if (_name == "He/Him") {
-    _name = "";
   }
 
   auto* action = new CompoundActionSequential();
