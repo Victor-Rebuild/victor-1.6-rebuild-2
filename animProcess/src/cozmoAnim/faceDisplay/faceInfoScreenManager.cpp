@@ -111,10 +111,25 @@ bool isDeployed() {
 }
 
 bool checkAutoUpdatesOn() {
-  if(Util::FileUtils::FileExists("/data/data/user-do-not-auto-update")) {
+  if (Util::FileUtils::FileExists("/data/data/user-do-not-auto-update")) {
     return false;
   } else {
     return true;
+  }
+}
+
+bool needsUpdate() {
+  if (Util::FileUtils::FileExists("/run/rebuild/needs-update")) {
+    return true;
+  } else if (Util::FileUtils::FileExists("/run/rebuild/dont-need-update")) {
+    return false;
+  } else if (!Util::FileUtils::FileExists("/run/rebuild/needs-update") &&
+             !Util::FileUtils::FileExists("/run/rebuild/dont-need-update"))
+  {
+    execl("/usr/sbin/update-engine-rebuild", "-c", 0);
+    return needsUpdate();
+  } else {
+    return false;
   }
 }
 
@@ -246,13 +261,14 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   ADD_SCREEN(Main, Network);
 
   // Start rebuild custom screens
-  ADD_SCREEN_WITH_TEXT(AutoUpdates, AutoUpdates, {checkAutoUpdatesOn() ? "DISABLE UPDATES?" : "ENABLE UPDATES?"});
+  ADD_SCREEN_WITH_TEXT(AutoUpdates, AutoUpdates, {"UPDATE SETTINGS"});
   ADD_SCREEN_WITH_TEXT(BackpackLights, BackpackLights, {_wireoslights() ? "USE ANKI LIGHTS?" : "USE WIREOS LIGHTS?"});
   ADD_SCREEN_WITH_TEXT(BootRecovery, BootRecovery, {"RECOVERY MODE?"});
   ADD_SCREEN_WITH_TEXT(ConfigurationSubmenu, ConfigurationSubmenu, {"CONFIGURATION PAGE 1"});
   ADD_SCREEN_WITH_TEXT(ConfigurationSubmenu2, ConfigurationSubmenu2, {"CONFIGURATION PAGE 2"});
   ADD_SCREEN_WITH_TEXT(ConfigurationSubmenu3, ConfigurationSubmenu3, {"CONFIGURATION PAGE 3"});
   ADD_SCREEN_WITH_TEXT(ConfigurationSubmenu4, ConfigurationSubmenu4, {"CONFIGURATION PAGE 4"});
+  ADD_SCREEN_WITH_TEXT(DisableAutoUpdates, DisableAutoUpdates, {checkAutoUpdatesOn() ? "DISABLE UPDATES?" : "ENABLE UPDATES?"});
   ADD_SCREEN_WITH_TEXT(SleepSettings, SleepSettings, {"SLEEP SETTINGS"});
   ADD_SCREEN_WITH_TEXT(DTTBRandomEyes, DTTBRandomEyes, {"TOGGLE DTTB EYES?"});
   ADD_SCREEN_WITH_TEXT(OldNewAlexa, OldNewAlexa, {_classicAlexa ? "USE MODERN ALEXA?" : "USE BETA ALEXA?"});
@@ -420,7 +436,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   ADD_MENU_ITEM_WITH_ACTION(ConfigurationSubmenu3, "NEXT PAGE", incSlotUp);
   ADD_MENU_ITEM_WITH_ACTION(ConfigurationSubmenu3, "PREV PAGE", incSlotDown);
   ADD_MENU_ITEM(ConfigurationSubmenu3, _using30fps() ? "TOGGLE 60 FPS" : "TOGGLE 30 FPS", Toggle30fps);
-  ADD_MENU_ITEM(ConfigurationSubmenu3, checkAutoUpdatesOn() ? "DISABLE UPDATING" : "ENABLE UPDATING", AutoUpdates);
+  ADD_MENU_ITEM(ConfigurationSubmenu3, "UPDATE SETTINGS", AutoUpdates);
   DISABLE_TIMEOUT(ConfigurationSubmenu)
 
   // === Screen 4 ===
@@ -535,7 +551,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   ADD_MENU_ITEM(Toggle30fps, "BACK", ConfigurationSubmenu3);
   ADD_MENU_ITEM_WITH_ACTION(Toggle30fps, "CONFIRM", confirmToggle30fps);
 
-  // === Disable/Enable auto updates ===
+  // === Update Settings ===
   FaceInfoScreen::MenuItemAction confirmAutoUpdates = [this] {
     LOG_INFO("FaceInfoScreenManager.AutoUpdates.Confirmed", "");
     if (checkAutoUpdatesOn()) {
@@ -549,7 +565,9 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
     return ScreenName::ConfigurationSubmenu3;
   };
   ADD_MENU_ITEM(AutoUpdates, "BACK", ConfigurationSubmenu3);
-  ADD_MENU_ITEM_WITH_ACTION(AutoUpdates, "CONFIRM", confirmAutoUpdates);
+  ADD_MENU_ITEM(AutoUpdates, checkAutoUpdatesOn() ? "DISABLE UPDATING" : "ENABLE UPDATING", DisableAutoUpdates);
+  ADD_MENU_ITEM(DisableAutoUpdates, "BACK", AutoUpdates);
+  ADD_MENU_ITEM_WITH_ACTION(DisableAutoUpdates, "CONFIRM", confirmAutoUpdates);
 
   // === Swap backpack lights screen ===
   FaceInfoScreen::MenuItemAction confirmToggleLights = [this] {
@@ -1585,7 +1603,9 @@ void FaceInfoScreenManager::DrawMain()
     }
   }
 
-  const std::string serialNo = namedRobot() ? "BOT: " + botname : "ESN: " + esn;
+  const std::string name = namedRobot() ? "BOT: " + botname : "BOT: Vector";
+
+  const std::string serialNo = "ESN: " + esn;
 
   const std::string hwVer    = "HW: "   + std::to_string(IsXray() ? 8 : Factory::GetEMR()->fields.HW_VER);
 
@@ -1593,8 +1613,6 @@ void FaceInfoScreenManager::DrawMain()
 
   // osVer will be sha if deployed build
   std::string osVer = isDeployed() ? "SHA: "  + osstate->GetBuildSha() : "VER: " + osstate->GetOSBuildVersion();
-
-  const std::string ssid     = "SSID: " + osstate->GetSSID(true);
 
   std::string ip             = osstate->GetIPAddress();
   if (ip.empty()) {
@@ -1609,10 +1627,10 @@ void FaceInfoScreenManager::DrawMain()
   } else {
     // ESN/serialNo and the HW version are drawn on the same line with serialNo default left aligned and
     // HW version right aligned.
-    ColoredTextLines lines = { { {serialNo},  {hwVer, NamedColors::WHITE, false} },
+    ColoredTextLines lines = {{ {name},  {hwVer, NamedColors::WHITE, false} },
+                              {serialNo},
                               {osProject},
                               {osVer},
-                              {ssid},
                               { {"IP: "}, {ip, (osstate->IsValidIPAddress(ip) ? NamedColors::GREEN : NamedColors::RED)} },
                             };
 
@@ -2332,13 +2350,15 @@ void FaceInfoScreenManager::EnableMirrorModeScreen(bool enable)
 void FaceInfoScreenManager::DrawScratch()
 {
 
-  if (_currScreen == GetScreen(ScreenName::UserDataSubmenu) ||
-    _currScreen == GetScreen(ScreenName::ConfigurationSubmenu) ||
-    _currScreen == GetScreen(ScreenName::ConfigurationSubmenu2) ||
-    _currScreen == GetScreen(ScreenName::ConfigurationSubmenu3) ||
-    _currScreen == GetScreen(ScreenName::ConfigurationSubmenu4) ||
-    _currScreen == GetScreen(ScreenName::SleepSettings) ||
-    _currScreen == GetScreen(ScreenName::SetFrequency))
+  if (_currScreen == GetScreen(ScreenName::AutoUpdates) ||
+      _currScreen == GetScreen(ScreenName::ConfigurationSubmenu) ||
+      _currScreen == GetScreen(ScreenName::ConfigurationSubmenu2) ||
+      _currScreen == GetScreen(ScreenName::ConfigurationSubmenu3) ||
+      _currScreen == GetScreen(ScreenName::ConfigurationSubmenu4) ||
+      _currScreen == GetScreen(ScreenName::DisableAutoUpdates) ||
+      _currScreen == GetScreen(ScreenName::SleepSettings) ||
+      _currScreen == GetScreen(ScreenName::SetFrequency) ||
+      _currScreen == GetScreen(ScreenName::UserDataSubmenu))
   {
     _currScreen->DrawMenuVertical(*_scratchDrawingImg);
   } else {

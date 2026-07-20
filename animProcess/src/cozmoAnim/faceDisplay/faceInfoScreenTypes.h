@@ -57,10 +57,12 @@ enum class ScreenName : uint8_t {
   AutoUpdates,
   BackpackLights,
   BootRecovery,
+  CheckForUpdates,
   ConfigurationSubmenu, // Let's you change configurations and has some other useful options
   ConfigurationSubmenu2, // ^
   ConfigurationSubmenu3, // ^^
   ConfigurationSubmenu4, // ^^^
+  DisableAutoUpdates,
   DTTBRandomEyes,
   OldNewAlexa,
   Reloading,
