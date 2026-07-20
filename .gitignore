@@ -419,3 +419,4 @@ log.txt
 robot_sshkey
 singletask.lock
 
+.sim/
