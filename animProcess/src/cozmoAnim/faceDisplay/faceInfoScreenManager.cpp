@@ -58,6 +58,7 @@
 
 #include <chrono>
 #include <cstddef>
+#include <cstdlib>
 #include <fstream>
 #include <iomanip>
 #include <thread>
@@ -126,7 +127,7 @@ bool needsUpdate() {
   } else if (!Util::FileUtils::FileExists("/run/rebuild/needs-update") &&
              !Util::FileUtils::FileExists("/run/rebuild/dont-need-update"))
   {
-    execl("/usr/sbin/update-engine-rebuild", "-c", 0);
+    (void)system("/usr/sbin/update-engine-rebuild -c");
     return needsUpdate();
   } else {
     return false;
@@ -282,6 +283,8 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   ADD_SCREEN_WITH_TEXT(SwitchSlot, SwitchSlot, {"SWAP SYS SLOT?"});
   ADD_SCREEN_WITH_TEXT(SwitchSlotReboot, SwitchSlotReboot, {"SWITCHING SLOT..."});
   ADD_SCREEN_WITH_TEXT(Toggle30fps, Toggle30fps, {_using30fps() ? "TOGGLE 60 FPS?" : "TOGGLE 30 FPS?"});
+  ADD_SCREEN(UpdateRebuild, UpdateRebuild);
+  ADD_SCREEN(Updating, Updating);
   ADD_SCREEN_WITH_TEXT(UserDataSubmenu, UserDataSubmenu, {"DATA OPTIONS"});
   // end rebuild custom screens
 
@@ -566,8 +569,25 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   };
   ADD_MENU_ITEM(AutoUpdates, "BACK", ConfigurationSubmenu3);
   ADD_MENU_ITEM(AutoUpdates, checkAutoUpdatesOn() ? "DISABLE UPDATING" : "ENABLE UPDATING", DisableAutoUpdates);
+  ADD_MENU_ITEM(AutoUpdates, "CHECK FOR UPDATES", UpdateRebuild);
   ADD_MENU_ITEM(DisableAutoUpdates, "BACK", AutoUpdates);
   ADD_MENU_ITEM_WITH_ACTION(DisableAutoUpdates, "CONFIRM", confirmAutoUpdates);
+  DISABLE_TIMEOUT(AutoUpdates);
+
+  auto prepareUpdateRebuild = [this]() {
+    DrawUpdatePrompt();
+  };
+  SET_ENTER_ACTION(UpdateRebuild, prepareUpdateRebuild);
+  ADD_MENU_ITEM(UpdateRebuild, "BACK", AutoUpdates);
+
+  auto updateRebuild = [this]() {
+    DrawUpdate();
+  };
+  if (needsUpdate()) {
+    ADD_MENU_ITEM(UpdateRebuild, "UPDATE", Updating);
+  }
+  SET_ENTER_ACTION(Updating, updateRebuild);
+  DISABLE_TIMEOUT(Updating);
 
   // === Swap backpack lights screen ===
   FaceInfoScreen::MenuItemAction confirmToggleLights = [this] {
@@ -594,7 +614,6 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   };
   ADD_MENU_ITEM(SwitchSlot, "BACK", ConfigurationSubmenu);
   ADD_MENU_ITEM_WITH_ACTION(SwitchSlot, "CONFIRM", confirmSlotSwitch);
-  DISABLE_TIMEOUT(SwitchSlot);
     
   // === Recovery screen ===
   FaceInfoScreen::MenuItemAction confirmBootRecovery = [] {
@@ -604,7 +623,6 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   };
   ADD_MENU_ITEM(BootRecovery, "BACK", ConfigurationSubmenu2);
   ADD_MENU_ITEM_WITH_ACTION(BootRecovery, "CONFIRM", confirmBootRecovery);
-  DISABLE_TIMEOUT(BootRecovery);
 
   // === Old/New alexa screen ===
   FaceInfoScreen::MenuItemAction confirmOldNewAlexa = [this] {
@@ -806,6 +824,7 @@ bool FaceInfoScreenManager::IsActivelyDrawingToScreen() const
     case ScreenName::None:
     case ScreenName::Pairing:
     case ScreenName::ToggleMute:
+    case ScreenName::Updating:
     case ScreenName::AlexaNotification:
     case ScreenName::SelfTestRunning:
       return false;
@@ -1621,6 +1640,10 @@ void FaceInfoScreenManager::DrawMain()
 
   confPageNumber = 1;
 
+  if (!ip.empty()) {
+    (void)system("/usr/sbin/update-engine-rebuild -c");
+  }
+
   if (_isRestartRequired) {
     (void)system("curl 'http://localhost:8080/api/extra/restartvic' &");
     SetScreen(ScreenName::Reloading);
@@ -2063,8 +2086,55 @@ void FaceInfoScreenManager::DrawMuteAnimation()
   const bool shouldInterrupt = true;
   const bool shouldOverrideEyeHue = true;
   const bool shouldRenderInEyeHue = false;
-  _animationStreamer->SetStreamingAnimation(animName, 0, 1, shouldInterrupt,
+  _animationStreamer->SetStreamingAnimation(animName, 0, 1, 0, shouldInterrupt,
                                             shouldOverrideEyeHue, shouldRenderInEyeHue);
+
+}
+
+void FaceInfoScreenManager::DrawUpdatePrompt()
+{
+  if (needsUpdate()) {
+    auto *osstate = OSState::getInstance();
+
+    const std::string okToUpdate = "UPDATE REBUILD?";
+
+    const std::string currOSVer = IsXray() ? "CURR: " + osstate->GetOSBuildVersion() : "CURRENT: " + osstate->GetOSBuildVersion();
+
+    std::string targetOSVer = IsXray() ? "TARG: " : "TARGET: ";
+
+    if (Util::FileUtils::FileExists("/run/rebuild/target-ver")) {
+      targetOSVer = targetOSVer + Util::FileUtils::ReadFile("/run/rebuild/target-ver");
+    } else {
+      targetOSVer = targetOSVer + "UNDEFINED";
+    }
+
+    ColoredTextLines lines = {{okToUpdate},
+                              {},
+                              {currOSVer},
+                              {targetOSVer},
+                            };
+
+    DrawTextOnScreen(lines);
+  } else {
+    const std::string upToDate = "REBUILD UP TO DATE";
+    const std::string niceDay = "HAVE A NICE DAY";
+    ColoredTextLines lines = {{upToDate},
+                              {},
+                              {niceDay},
+                            };
+    DrawTextOnScreen(lines);
+  }
+}
+
+void FaceInfoScreenManager::DrawUpdate()
+{
+  (void)system("systemctl start update-engine-rebuild-victor-only");
+  const std::string animName = "anim_pairing_icon_update";
+  const bool shouldInterrupt = true;
+  const bool shouldOverrideEyeHue = true;
+  const bool shouldRenderInEyeHue = false;
+  _animationStreamer->SetStreamingAnimation(animName, 0, 0, 0, shouldInterrupt,
+                                      shouldOverrideEyeHue, shouldRenderInEyeHue);
 
 }
 

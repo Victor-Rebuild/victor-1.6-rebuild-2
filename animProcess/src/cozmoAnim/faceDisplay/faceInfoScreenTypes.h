@@ -73,6 +73,8 @@ enum class ScreenName : uint8_t {
   ServerInformation,
   SetFrequency,
   Toggle30fps,
+  UpdateRebuild,
+  Updating,
   UserDataSubmenu,
   // end rebuild custom screens
   

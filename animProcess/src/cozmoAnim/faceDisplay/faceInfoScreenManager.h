@@ -190,6 +190,9 @@ private:
   void DrawAlexaNotification();
   void DrawServerInfo();
   
+  void DrawUpdate();
+  void DrawUpdatePrompt();
+
   // Draw the _scratchDrawingImg to the face
   void DrawScratch();
 
