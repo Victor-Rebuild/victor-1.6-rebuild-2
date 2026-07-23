@@ -58,7 +58,6 @@
 
 #include <chrono>
 #include <cstddef>
-#include <cstdlib>
 #include <fstream>
 #include <iomanip>
 #include <thread>
@@ -1640,10 +1639,6 @@ void FaceInfoScreenManager::DrawMain()
 
   confPageNumber = 1;
 
-  if (!ip.empty()) {
-    (void)system("/usr/sbin/update-engine-rebuild -c");
-  }
-
   if (_isRestartRequired) {
     (void)system("curl 'http://localhost:8080/api/extra/restartvic' &");
     SetScreen(ScreenName::Reloading);
@@ -2085,7 +2080,7 @@ void FaceInfoScreenManager::DrawMuteAnimation()
   const std::string animName = muted ? "anim_micstate_micoff_01" : "anim_micstate_micon_01";
   const bool shouldInterrupt = true;
   const bool shouldOverrideEyeHue = true;
-  const bool shouldRenderInEyeHue = false;
+  const bool shouldRenderInEyeHue = true;
   _animationStreamer->SetStreamingAnimation(animName, 0, 1, 0, shouldInterrupt,
                                             shouldOverrideEyeHue, shouldRenderInEyeHue);
 
@@ -2093,6 +2088,12 @@ void FaceInfoScreenManager::DrawMuteAnimation()
 
 void FaceInfoScreenManager::DrawUpdatePrompt()
 {
+  auto osstate = OSState::getInstance();
+
+  if (osstate->IsValidIPAddress(osstate->GetIPAddress()) && !needsUpdate()) {
+    (void)system("/usr/sbin/update-engine-rebuild -c");
+  }
+
   if (needsUpdate()) {
     auto *osstate = OSState::getInstance();
 
