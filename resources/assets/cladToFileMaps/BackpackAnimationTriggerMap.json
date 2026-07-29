@@ -32,10 +32,6 @@
       "AnimName": "petting"
   },
   {
-      "CladEvent": "Idle_09",
-      "AnimName": "idle_09"
-  },
-  {
       "CladEvent": "LowBattery",
       "AnimName": "badCharger"
   },
@@ -50,10 +46,6 @@
   {
       "CladEvent": "Offline",
       "AnimName": "offline"
-  },
-  {
-      "CladEvent": "Offline_Off",
-      "AnimName": "offline_off"
   },
   {
       "CladEvent": "Overheated",

@@ -249,15 +249,12 @@ std::string BehaviorWallDateCoordinator::GetTTSStringForDate()
   std::string dayStringEnd;
   struct tm localDate;
 
-  int currentMonth = localDate.tm_mon + 1;
+  int currentMonth = localDate.tm_mon;
   int currentDay = localDate.tm_mday;
   int dayWeek = 0;
 
   WallTime::getInstance()->GetLocalTime(localDate);
   WallTime::getInstance()->GetDayOfWeek(dayWeek);
-
-  currentMonth = localDate.tm_mon;
-  currentDay = localDate.tm_mday;
 
   const auto & localeComponent = GetBEI().GetRobotInfo().GetLocaleComponent();
 
