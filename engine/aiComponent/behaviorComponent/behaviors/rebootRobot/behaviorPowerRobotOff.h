@@ -39,7 +39,6 @@ protected:
 
   virtual void InitBehavior() override;
   virtual bool WantsToBeActivatedBehavior() const override;
-  virtual void OnBehaviorEnteredActivatableScope() override;
   virtual void OnBehaviorActivated() override;
   virtual void BehaviorUpdate() override;
   virtual void OnBehaviorLeftActivatableScope() override;
@@ -51,9 +50,7 @@ private:
   struct InstanceConfig {
     InstanceConfig(const Json::Value& config);
     std::shared_ptr<IBEICondition> activateBehaviorCondition;
-    std::string powerOnAnimName;
     std::string powerOffAnimName;
-    bool waitForAnimMsg;
 
     std::string findChargerBehaviorName;
     ICozmoBehaviorPtr findChargerBehavior;
