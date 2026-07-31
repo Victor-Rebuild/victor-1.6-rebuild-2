@@ -250,22 +250,18 @@ void BehaviorRockPaperScissors::RockPaperOrScissorsVector()
 
   chosenOne = choiceStringLocalized[whatdidvectorchoose];
 
-  if ((whatdidvectorchoose == 0 && _dVars.whatdidplayerchoose == 0) ||
-   (whatdidvectorchoose == 1 && _dVars.whatdidplayerchoose == 1) ||
-   (whatdidvectorchoose == 2 && _dVars.whatdidplayerchoose == 2))
+  if (whatdidvectorchoose == _dVars.whatdidplayerchoose)
   {
     winLoosePush = vectorTied;
-  } else if (whatdidvectorchoose == 0 && _dVars.whatdidplayerchoose == 1) {
+  } else if ((whatdidvectorchoose == 0 && _dVars.whatdidplayerchoose == 1) ||
+             (whatdidvectorchoose == 1 && _dVars.whatdidplayerchoose == 2) ||
+             (whatdidvectorchoose == 2 && _dVars.whatdidplayerchoose == 0))
+  {
     winLoosePush = vectorLost;
-  } else if (whatdidvectorchoose == 0 && _dVars.whatdidplayerchoose == 2) {
-    winLoosePush = vectorWins;
-  } else if (whatdidvectorchoose == 1 && _dVars.whatdidplayerchoose == 0) {
-    winLoosePush = vectorWins;
-  } else if (whatdidvectorchoose == 1 && _dVars.whatdidplayerchoose == 2) {
-    winLoosePush = vectorLost;
-  } else if (whatdidvectorchoose == 2 && _dVars.whatdidplayerchoose == 0) {
-    winLoosePush = vectorLost;
-  } else if (whatdidvectorchoose == 2 && _dVars.whatdidplayerchoose == 1) {
+  } else if ((whatdidvectorchoose == 0 && _dVars.whatdidplayerchoose == 2) ||
+             (whatdidvectorchoose == 1 && _dVars.whatdidplayerchoose == 0) ||
+             (whatdidvectorchoose == 2 && _dVars.whatdidplayerchoose == 1))
+  {
     winLoosePush = vectorWins;
   }
 
