@@ -37,6 +37,8 @@ namespace Anim {
 CONSOLE_VAR(u32, kOfflineTimeBeforeLights_ms, "Backpacklights", (1000*60*2));
 CONSOLE_VAR(u32, kOfflineCheckFreq_ms,        "Backpacklights", 5000);
 
+#define IS_STATUS_FLAG_SET(x) (((uint32_t)RobotStatusFlag::x) != 0)
+
 enum class BackpackLightSourcePrivate : BackpackLightSourceType
 {
   Engine = Util::EnumToUnderlying(BackpackLightSource::Count),
@@ -135,10 +137,19 @@ void BackpackLightComponent::UpdateCriticalBackpackLightConfig(bool isCloudStrea
   {
     trigger = BackpackAnimationTrigger::ChargingOverheated;
   }
-  else if ( !_isOnChargerContacts && _isBatteryDisconnected )
+  else if ( _isBatteryFull && _isOnChargerContacts && _isBatteryCharging && _isBatteryDisconnected )
   {
     trigger = BackpackAnimationTrigger::Overheated;
   }
+  // else if( _isOnChargerContacts && IS_STATUS_FLAG_SET(IS_BATTERY_OVERHEATED) ) {
+
+  //   trigger = BackpackAnimationTrigger::Overheated;
+  // }
+  // else if( _isBatteryLow && !_isOnChargerContacts && IS_STATUS_FLAG_SET(IS_BATTERY_OVERHEATED) )
+  // {
+  //   trigger = BackpackAnimationTrigger::LowBatteryOverheated;
+  // }
+  // If we have been offline for long enough
   else if(_offlineAtTime_ms > 0 &&
           ((TimeStamp_t)curTime_ms - _offlineAtTime_ms > kOfflineTimeBeforeLights_ms))
   {
