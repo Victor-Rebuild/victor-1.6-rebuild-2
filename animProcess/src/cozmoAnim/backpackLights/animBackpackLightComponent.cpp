@@ -13,7 +13,6 @@
 
 #include "cozmoAnim/backpackLights/animBackpackLightComponent.h"
 
-#include "clad/types/backpackAnimationTriggers.h"
 #include "coretech/common/engine/utils/data/dataPlatform.h"
 #include "coretech/common/engine/utils/timer.h"
 #include "cozmoAnim/animTimeStamp.h"
@@ -21,7 +20,6 @@
 #include "cozmoAnim/micData/micDataSystem.h"
 #include "cozmoAnim/robotDataLoader.h"
 #include "clad/robotInterface/messageEngineToRobot.h"
-#include "clad/types/robotStatusAndActions.h"
 #include "util/console/consoleInterface.h"
 #include "util/fileUtils/fileUtils.h"
 #include "util/internetUtils/internetUtils.h"
@@ -36,8 +34,6 @@ namespace Anim {
 
 CONSOLE_VAR(u32, kOfflineTimeBeforeLights_ms, "Backpacklights", (1000*60*2));
 CONSOLE_VAR(u32, kOfflineCheckFreq_ms,        "Backpacklights", 5000);
-
-#define IS_STATUS_FLAG_SET(x) (((uint32_t)RobotStatusFlag::x) != 0)
 
 enum class BackpackLightSourcePrivate : BackpackLightSourceType
 {
@@ -129,25 +125,9 @@ void BackpackLightComponent::UpdateCriticalBackpackLightConfig(bool isCloudStrea
 
     trigger = BackpackAnimationTrigger::LowBattery;
   }
-  else if( _isBatteryLow && _isOnChargerContacts && _isBatteryCharging && _isBatteryDisconnected )
-  {
-    trigger = BackpackAnimationTrigger::ChargingLowBatteryOverheated;
-  }
-  else if ( !_isBatteryFull && _isOnChargerContacts && _isBatteryCharging && _isBatteryDisconnected )
-  {
-    trigger = BackpackAnimationTrigger::ChargingOverheated;
-  }
-  else if ( _isBatteryFull && _isOnChargerContacts && _isBatteryCharging && _isBatteryDisconnected )
-  {
-    trigger = BackpackAnimationTrigger::Overheated;
-  }
-  // else if( _isOnChargerContacts && IS_STATUS_FLAG_SET(IS_BATTERY_OVERHEATED) ) {
-
-  //   trigger = BackpackAnimationTrigger::Overheated;
-  // }
-  // else if( _isBatteryLow && !_isOnChargerContacts && IS_STATUS_FLAG_SET(IS_BATTERY_OVERHEATED) )
+  // else if( _isBatteryLow && _isOnChargerContacts )
   // {
-  //   trigger = BackpackAnimationTrigger::LowBatteryOverheated;
+  //   trigger = BackpackAnimationTrigger::Charging;
   // }
   // If we have been offline for long enough
   else if(_offlineAtTime_ms > 0 &&

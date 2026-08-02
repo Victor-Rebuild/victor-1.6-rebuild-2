@@ -8,14 +8,6 @@
       "AnimName": "charging"
   },
   {
-      "CladEvent": "ChargingLowBatteryOverheated",
-      "AnimName": "chargingLowBatteryOverheated"
-  },
-  {
-      "CladEvent": "ChargingOverheated",
-      "AnimName": "chargingOverheated"
-  },
-  {
       "CladEvent": "DanceToTheBeat",
       "AnimName": "danceToTheBeat"
   },
@@ -36,20 +28,12 @@
       "AnimName": "badCharger"
   },
   {
-      "CladEvent": "LowBatteryOverheated",
-      "AnimName": "badChargerOverheated"
-  },
-  {
       "CladEvent": "Off",
       "AnimName": "off"
   },
   {
       "CladEvent": "Offline",
       "AnimName": "offline"
-  },
-  {
-      "CladEvent": "Overheated",
-      "AnimName": "overheated"
   },
   {
       "CladEvent": "SpinnerBlueCelebration",
