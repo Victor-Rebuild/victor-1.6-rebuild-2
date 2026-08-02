@@ -185,13 +185,16 @@ void RobotDataLoader::LoadNonConfigData()
                                      _spriteSequenceContainer.get(), 
                                      _loadingCompleteRatio, _abortLoad);
 
-    const auto& fileInfo = animLoader.CollectAnimFiles({kPathToEngineBackpackLightsStock});
-     if(_wireoslights()){
-      const auto& fileInfo = animLoader.CollectAnimFiles({kPathToEngineBackpackLightsWireOS});
-    } else if(_userlights()) {
+    if(_userlights()){
       const auto& fileInfo = animLoader.CollectAnimFiles({kPathToEngineBackpackLightsUser});
+      LoadBackpackLightAnimations(fileInfo);
+    } else if(_wireoslights()) {
+      const auto& fileInfo = animLoader.CollectAnimFiles({kPathToEngineBackpackLightsWireOS});
+      LoadBackpackLightAnimations(fileInfo);
+    } else {
+      const auto& fileInfo = animLoader.CollectAnimFiles({kPathToEngineBackpackLightsStock});
+      LoadBackpackLightAnimations(fileInfo);
     }
-    LoadBackpackLightAnimations(fileInfo);
   }
 
   {
