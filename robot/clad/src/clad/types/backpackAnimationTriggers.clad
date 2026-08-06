@@ -49,11 +49,8 @@ enum int_32 BackpackAnimationTrigger
 enum_concept string EnumToString[BackpackAnimationTrigger] {
   AlexaNotification             = verbatim "AlexaNotification",
   Charging                      = verbatim "Charging",
-  ChargingLowBatteryOverheated  = verbatim "ChargingLowBatteryOverheated",
-  ChargingOverheated            = verbatim "ChargingOverheated",
   DanceToTheBeat                = verbatim "DanceToTheBeat",
   LowBattery                    = verbatim "LowBattery",
-  LowBatteryOverheated          = verbatim "LowBatteryOverheated",
   MeetVictor                    = verbatim "MeetVictor",
   Muted                         = verbatim "Muted",
   Off                           = verbatim "Off",
