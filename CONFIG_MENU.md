@@ -32,8 +32,13 @@ Vector has 3 performance profiles provided by Wired. `REGULAR`, `BALANCED`, and 
 ### TOGGLE 30 FPS / TOGGLE 60 FPS
 1.6-rebuild has Vector's refresh rate for the screen set to 60fps instead of the normal 30fps and with some of the workarounds I've done it works amazingly. But some people don't like 60fps or their bot is old enough that 60fps strains the battery too much causing shutdowns. This is a nice little toggle for those who want to go back to the classic Vector 30fps. When in 30fps mode the option switches to `TOGGLE 60 FPS` so that you know which mode Vector is currently running in.
 
-### DISABLE UPDATING / ENABLE UPDATING
-Disables all auto updates. If you're doing dev work for instance and your bot updates it would be pretty annoying, or if you'd rather delay the updates for some other time it'd be worth enabling this option. If auto updates are off this option will become `ENABLE UPDATING`.
+## UPDATE SETTTINGS
+Contains a few options related to updating Vector
+
+- DISABLE UPDATING / ENABLE UPDATING
+    - Disables all auto updates. If you're doing dev work for instance and your bot updates it would be pretty annoying, or if you'd rather delay the updates for some other time it'd be worth enabling this option. If auto updates are off this option will become `ENABLE UPDATING`.
+- CHECK FOR UPDATES
+    - It be what it's called
 
 ## CONFIGURATION PAGE 4
 ### SLEEP SETTINGS
