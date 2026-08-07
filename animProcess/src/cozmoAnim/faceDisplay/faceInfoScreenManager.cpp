@@ -119,6 +119,7 @@ bool checkAutoUpdatesOn() {
 }
 
 bool needsUpdate() {
+  (void)system("/usr/sbin/update-engine-rebuild -c");
   if (Util::FileUtils::FileExists("/run/rebuild/needs-update")) {
     return true;
   } else if (Util::FileUtils::FileExists("/run/rebuild/dont-need-update")) {
@@ -126,7 +127,6 @@ bool needsUpdate() {
   } else if (!Util::FileUtils::FileExists("/run/rebuild/needs-update") &&
              !Util::FileUtils::FileExists("/run/rebuild/dont-need-update"))
   {
-    (void)system("/usr/sbin/update-engine-rebuild -c");
     return needsUpdate();
   } else {
     return false;
@@ -213,9 +213,13 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   _context = context;
   _animationStreamer = animStreamer;
   
+  // osstate is useful
+  auto osstate = OSState::getInstance();
+
   // allow us to send debug info out to the web server
   _webService = context->GetWebService();
 
+  // screen/menu item definitons
   #define ADD_SCREEN(name, gotoScreen) \
     _screenMap.emplace(std::piecewise_construct, \
                        std::forward_as_tuple(ScreenName::name), \
@@ -582,7 +586,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   auto updateRebuild = [this]() {
     DrawUpdate();
   };
-  if (needsUpdate()) {
+  if (osstate->IsWallTimeSynced() && needsUpdate()) {
     ADD_MENU_ITEM(UpdateRebuild, "UPDATE", Updating);
   }
   SET_ENTER_ACTION(Updating, updateRebuild);
@@ -751,7 +755,8 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   };
   SET_ENTER_ACTION(ToggleMute, toggleMuteEnterAction);
   // TODO (VIC-11606): don't use timeout and instead wait for mute anim to end
-  SET_TIMEOUT(ToggleMute, 8, None);
+  const bool muted = _context->GetMicDataSystem()->IsMicMuted();
+  SET_TIMEOUT(ToggleMute, muted ? 8 : 6.5, None);
   
   // === AlexaNotification ===
   auto alexaNotification = [this]() {
@@ -2090,13 +2095,11 @@ void FaceInfoScreenManager::DrawUpdatePrompt()
 {
   auto osstate = OSState::getInstance();
 
-  if (osstate->IsValidIPAddress(osstate->GetIPAddress()) && !needsUpdate()) {
+  if (osstate->IsWallTimeSynced()) {
     (void)system("/usr/sbin/update-engine-rebuild -c");
   }
 
-  if (needsUpdate()) {
-    auto *osstate = OSState::getInstance();
-
+  if (osstate->IsWallTimeSynced() && needsUpdate()) {
     const std::string okToUpdate = "UPDATE REBUILD?";
 
     const std::string currOSVer = IsXray() ? "CURR: " + osstate->GetOSBuildVersion() : "CURRENT: " + osstate->GetOSBuildVersion();
@@ -2422,6 +2425,7 @@ void FaceInfoScreenManager::DrawScratch()
 {
 
   if (_currScreen == GetScreen(ScreenName::AutoUpdates) ||
+      _currScreen == GetScreen(ScreenName::Camera) ||
       _currScreen == GetScreen(ScreenName::ConfigurationSubmenu) ||
       _currScreen == GetScreen(ScreenName::ConfigurationSubmenu2) ||
       _currScreen == GetScreen(ScreenName::ConfigurationSubmenu3) ||

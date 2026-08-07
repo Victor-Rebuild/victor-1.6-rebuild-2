@@ -231,16 +231,11 @@ void BehaviorRockPaperScissors::RockPaperOrScissorsVector()
 {
 
   srand(BaseStationTimer::getInstance()->GetCurrentTimeInSeconds());
-  int whatdidvectorchoose = rand() % 3;
+  const int whatdidvectorchoose = rand() % 3;
   const auto & localeComponent = GetBEI().GetRobotInfo().GetLocaleComponent();
 
   std::string chosenOne = "";
-  std::string finalString = "";
   std::string winLoosePush = "";
-
-  const std::string vectorWins = localeComponent.GetString("RockPaperScissors.VectorWins");
-  const std::string vectorLost = localeComponent.GetString("RockPaperScissors.VectorLoss");
-  const std::string vectorTied = localeComponent.GetString("RockPaperScissors.VectorTied");
 
   const std::string choiceStringLocalized[] = {
     localeComponent.GetString(kRockPaperScissorsRock),
@@ -248,32 +243,33 @@ void BehaviorRockPaperScissors::RockPaperOrScissorsVector()
     localeComponent.GetString(kRockPaperScissorsScissors)
   };
 
+  const std::string winLoseTieString[] = {
+    localeComponent.GetString("RockPaperScissors.VectorWins"),
+    localeComponent.GetString("RockPaperScissors.VectorLoss"),
+    localeComponent.GetString("RockPaperScissors.VectorTied")
+  };
+
   chosenOne = choiceStringLocalized[whatdidvectorchoose];
 
   if (whatdidvectorchoose == _dVars.whatdidplayerchoose)
   {
-    winLoosePush = vectorTied;
+    winLoosePush = winLoseTieString[2];
+    _dVars.winLoseTie = 2;
   } else if ((whatdidvectorchoose == 0 && _dVars.whatdidplayerchoose == 1) ||
              (whatdidvectorchoose == 1 && _dVars.whatdidplayerchoose == 2) ||
              (whatdidvectorchoose == 2 && _dVars.whatdidplayerchoose == 0))
   {
-    winLoosePush = vectorLost;
+    winLoosePush = winLoseTieString[1];
+    _dVars.winLoseTie = 1;
   } else if ((whatdidvectorchoose == 0 && _dVars.whatdidplayerchoose == 2) ||
              (whatdidvectorchoose == 1 && _dVars.whatdidplayerchoose == 0) ||
              (whatdidvectorchoose == 2 && _dVars.whatdidplayerchoose == 1))
   {
-    winLoosePush = vectorWins;
-  }
-
-  if (winLoosePush == vectorLost) {
+    winLoosePush = winLoseTieString[0];
     _dVars.winLoseTie = 0;
-  } else if (winLoosePush == vectorTied) {
-    _dVars.winLoseTie = 1;
-  } else if (winLoosePush == vectorWins) {
-    _dVars.winLoseTie = 2;
   }
 
-  finalString = localeComponent.GetString("RockPaperScissors.VectorChose") + " " + chosenOne + "." + winLoosePush;
+  const std::string finalString = localeComponent.GetString("RockPaperScissors.VectorChose") + " " + chosenOne + "." + winLoosePush;
 
   _iConfig.rockPaperScissorsVectorResponseBehavior->SetTextToSay( finalString );
   DelegateIfInControl(_iConfig.rockPaperScissorsVectorResponseBehavior.get(), &BehaviorRockPaperScissors::PlayWinLoseTieAnim);
@@ -284,11 +280,11 @@ void BehaviorRockPaperScissors::PlayWinLoseTieAnim()
 {
   CompoundActionSequential *messageAnimation = new CompoundActionSequential();
   if (_dVars.winLoseTie == 0) {
-    messageAnimation->AddAction(new TriggerLiftSafeAnimationAction(AnimationTrigger::BlackJack_VictorLose), true);
-  } else if (_dVars.winLoseTie == 1) {
-    messageAnimation->AddAction(new TriggerLiftSafeAnimationAction(AnimationTrigger::BlackJack_VictorPush), true);
-  } else if (_dVars.winLoseTie == 2) {
     messageAnimation->AddAction(new TriggerLiftSafeAnimationAction(AnimationTrigger::BlackJack_VictorWin), true);
+  } else if (_dVars.winLoseTie == 1) {
+    messageAnimation->AddAction(new TriggerLiftSafeAnimationAction(AnimationTrigger::BlackJack_VictorLose), true);
+  } else if (_dVars.winLoseTie == 2) {
+    messageAnimation->AddAction(new TriggerLiftSafeAnimationAction(AnimationTrigger::BlackJack_VictorPush), true);
   }
   DelegateIfInControl(messageAnimation, &BehaviorRockPaperScissors::TransitionToPlayAgainPrompt);
 }
@@ -296,7 +292,7 @@ void BehaviorRockPaperScissors::PlayWinLoseTieAnim()
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BehaviorRockPaperScissors::TransitionToPlayAgainPrompt()
 {
-  if(_iConfig.playAgainPromptBehavior->WantsToBeActivated()){
+  if (_iConfig.playAgainPromptBehavior->WantsToBeActivated()) {
     DelegateIfInControl(_iConfig.playAgainPromptBehavior.get(), &BehaviorRockPaperScissors::TransitionToPlayAgain);
   }
 }
@@ -306,14 +302,14 @@ void BehaviorRockPaperScissors::TransitionToPlayAgain()
 {
   UserIntentComponent& uic = GetBehaviorComp<UserIntentComponent>();
 
-  if(uic.IsUserIntentPending(playAgainIntent)){
+  if (uic.IsUserIntentPending(playAgainIntent)) {
     uic.DropUserIntent(playAgainIntent);
     OnBehaviorActivated();
-  } else if(uic.IsUserIntentPending(affirmativeIntent)){
+  } else if (uic.IsUserIntentPending(affirmativeIntent)) {
     uic.DropUserIntent(affirmativeIntent);
     OnBehaviorActivated();
   } else {
-    if (uic.IsUserIntentPending(negativeIntent)){
+    if (uic.IsUserIntentPending(negativeIntent)) {
       uic.DropUserIntent(negativeIntent);
     } else if(uic.IsUserIntentPending(silenceIntent)) {
       uic.DropUserIntent(silenceIntent);
