@@ -2744,57 +2744,6 @@ bool Robot::UpdateGyroCalibChecks(Result& res)
   const float currentTime_sec = BaseStationTimer::getInstance()->GetCurrentTimeInSeconds();
 
   static bool displayedImage = false;
-  static bool displayedDisclaimerImage = false;
-  static bool officialBuild = true;
-  static bool checkedBuildType = false;
-  static double disclaimerStartTime_sec = -1.0;
-
-  if (!checkedBuildType) {
-      if (Util::FileUtils::FileExists("/etc/rebuild-dev-or-indev")) {
-          LOG_WARNING("Robot.CheckOffical", "Official Build");
-          officialBuild = true;
-      } else {
-          LOG_WARNING("Robot.CheckOffical", "Unofficial Build");
-          officialBuild = false;
-      }
-      checkedBuildType = true;
-  }
-
-  if (!officialBuild && !displayedDisclaimerImage && _syncRobotAcked) {
-      if (disclaimerStartTime_sec < 0) {
-          LOG_WARNING("Robot.Disclaimer", "Starting disclaimer display at time: %.2f", currentTime_sec);
-          disclaimerStartTime_sec = currentTime_sec;
-      }
-      
-      float elapsed = currentTime_sec - disclaimerStartTime_sec;
-      LOG_WARNING("Robot.Disclaimer", "Time elapsed: %.2f / 10.0 seconds", elapsed);
-      
-      if (elapsed < 3.0) {
-          // Keep re-displaying the image every frame to prevent it from being overridden
-          GetAnimationComponent().Init();
-          static const std::string kDisclamerImg = "config/devOnlySprites/independentSprites/disclamer.png";
-          const std::string imgPath = GetContextDataPlatform()->pathToResource(Anki::Util::Data::Scope::Resources,
-                                                                              kDisclamerImg);
-          Vision::ImageRGB img;
-          img.Load(imgPath);
-          if (img.GetNumCols() != FACE_DISPLAY_WIDTH || img.GetNumRows() != FACE_DISPLAY_HEIGHT) {
-              img.Resize(FACE_DISPLAY_HEIGHT, FACE_DISPLAY_WIDTH);
-          }
-          GetAnimationComponent().DisplayFaceImage(img, 0, true);
-          GetMoveComponent().MoveHeadToAngle(MAX_HEAD_ANGLE,
-                                            MAX_HEAD_SPEED_RAD_PER_S,
-                                            MAX_HEAD_ACCEL_RAD_PER_S2,
-                                            1.0f);
-          
-      } else {
-          displayedDisclaimerImage = true;
-          LOG_WARNING("Robot.Disclaimer", "Disclaimer display complete");  
-          res = RESULT_OK;
-          return true;
-      }
-  }
-
-
 
   if(!displayedImage &&
      _syncRobotSentTime_sec > 0 &&
