@@ -19,7 +19,7 @@ Check here for info [ABOUT.md](/ABOUT.md)
 
 ## Building
 
-`wire-os-victor` can be built standalone on most Linux distros (arm64 or amd64) and on macOS (arm64/M-series).
+`1.6-rebuild` can be built standalone on most Linux distros (arm64 or amd64) and on macOS (arm64/M-series).
 
 For Linux, the Docker method is recommended for now (especially if you have a weird or old Linux distro installed), though bare metal works nicely too.
 
