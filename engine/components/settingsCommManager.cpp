@@ -104,14 +104,18 @@ namespace
   }
   CONSOLE_FUNC(DebugSetButtonWakeWord, kConsoleGroup);
 
+  constexpr const char* kLocales = "English,French,German,Japanese";
+  CONSOLE_VAR_ENUM(u8, kLocaleIndex, kConsoleGroup, 0, kLocales);
   void DebugSetLocale(ConsoleFunctionContextRef context)
   {
-    const std::string& localeValue = ConsoleArg_Get_String(context, "localeValue");
+    static const std::vector<std::string> kLocaleValues =
+        {"en-US", "fr-FR", "de-DE", "ja-jp"};
+    const std::string& localeValue = kLocaleValues[kLocaleIndex];
     s_SettingsCommManager->HandleRobotSettingChangeRequest(external_interface::RobotSetting::locale,
-                                                           Json::Value(localeValue),
-                                                           kUpdateSettingsJdoc);
+                                                          Json::Value(localeValue),
+                                                          kUpdateSettingsJdoc);
   }
-  CONSOLE_FUNC(DebugSetLocale, kConsoleGroup, const char* localeValue);
+  CONSOLE_FUNC(DebugSetLocale, kConsoleGroup);
 
   void DebugSetTimeZone(ConsoleFunctionContextRef context)
   {
@@ -392,6 +396,15 @@ void SettingsCommManager::RefreshConsoleVars()
 
   const auto& buttonWakeWordValue = _settingsManager->GetRobotSettingAsUInt(external_interface::RobotSetting::button_wakeword);
   kButtonWakeWord = static_cast<u8>(buttonWakeWordValue);
+
+  static const std::vector<std::string> kLocaleValues =
+      {"en-US", "fr-FR", "de-DE", "ja-jp"};
+  const auto& localeValue = _settingsManager->GetRobotSettingAsString(external_interface::RobotSetting::locale);
+  const auto it = std::find(kLocaleValues.begin(), kLocaleValues.end(), localeValue);
+  if (it != kLocaleValues.end())
+  {
+    kLocaleIndex = static_cast<u8>(std::distance(kLocaleValues.begin(), it));
+  }
 #endif
 }
 
