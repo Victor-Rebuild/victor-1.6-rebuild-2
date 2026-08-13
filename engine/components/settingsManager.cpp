@@ -756,7 +756,7 @@ namespace Anki
           {
             _rebuildEyeThread = std::thread([this]()
             {
-              int nextFifthHour = 0;
+              int nextFifthHour = -1;
               bool gotTime = false;
               while (!_stopRebuildEyeThread.load(std::memory_order_acquire))
               {
@@ -802,8 +802,8 @@ namespace Anki
                     adjustedSaturation = adjustedSaturation + 0.15;
                   }
 
-                  if (nextFifthHour == 0 && hour != 0) {
-                    nextFifthHour = hour + 5;
+                  if (nextFifthHour < 0) {
+                    nextFifthHour = (hour + 5) % 24;
                   }
 
                   if (nextFifthHour == hour &&
@@ -811,7 +811,7 @@ namespace Anki
                     (std::stof(Util::FileUtils::ReadFile("/data/data/rebuild/rebuildEyesSaturation")) != adjustedSaturation))
                   {
                     LOG_WARNING("SettingsManager.RebuildEyes.HourlySave", "Saving values");
-                    nextFifthHour = hour + 5;
+                    nextFifthHour = (hour + 5) % 24;
                     std::vector<std::string> command;
                     command.push_back("/usr/bin/sudo");
                     command.push_back("/usr/sbin/save-eye-color");
