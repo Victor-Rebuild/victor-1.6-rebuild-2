@@ -1,6 +1,14 @@
-# victor-1.6-rebuild-private
+# victor-1.6-rebuild-2
 
 Welcome to `victor-1.6-rebuild-2`. This is where my modifed 1.6 source for Vector lives
+
+## Correcting the name of my CFW
+Do note, this custom firmware is NOT called names such as:
+- rebuild 1.6
+- 1.6-rebuild-2
+- etc...
+
+The name of this custom firmware is `1.6-rebuild`.
 
 ## Changes from regular 1.6
 
@@ -9,52 +17,27 @@ You can see all the changes made compared to normal 1.6 in [CHANGES.md](/CHANGES
 ## Installation
 Check here for info [ABOUT.md](/ABOUT.md)
 
-## Building (Linux, amd64 only, bare metal)
+## Building
 
-- Prerequisites:
-  - glibc 2.35 or above - this means anything Debian Bookworm-era and newer will work.
-  - The following packages need to be installed: `git wget curl openssl ninja g++ gcc pkg-config ccache`
-```
-# Arch Linux:
-sudo pacman -S git wget curl openssl ninja gcc pkgconf ccache
-# Ubuntu/Debian:
-sudo apt-get update && sudo apt-get install -y git wget curl openssl ninja-build gcc g++ pkg-config ccache
-# Fedora
-sudo dnf install -y git wget curl openssl ninja-build gcc gcc-c++ pkgconf-pkg-config ccache
-```
+`1.6-rebuild` can be built standalone on most Linux distros (arm64 or amd64) and on macOS (arm64/M-series).
 
-1. Clone the repo and cd into it:
+For Linux, the Docker method is recommended for now (especially if you have a weird or old Linux distro installed), though bare metal works nicely too.
 
-```
-cd ~
-git clone --recursive https://github.com/Victor-Rebuild/victor-1.6-rebuild-2 -b master
-cd victor-1.6-rebuild-2
-```
+Note that if you have built in Docker before and want to build on bare metal now (or vice-versa), you should do a [clean](#cleaning) build.
 
-2. Source `setenv.sh`:
-```
-source setenv.sh
-```
+Click an option below for instructions.
 
-3. (OPTIONAL) Run this so you don't have to perform step 2 every time:
-```
-echo "source \"$(pwd)/setenv.sh\"" >> $HOME/.bashrc
-```
+<details>
+<summary><strong>Docker: x86_64 or arm64 Linux</strong></summary>
+<br />
 
-4. Build:
-```
-vbuild
-```
+- Prerequisites: Make sure you have `docker` and `git` installed.
 
-## Building (Linux, amd64 only, docker)
-
- - Prereqs: Make sure you have `docker` and `git` installed.
-
-1. Clone the repo and cd into it:
+1. Clone the repo and `cd` into it:
 
 ```
 cd ~
-git clone --recursive https://github.com/Victor-Rebuild/victor-1.6-rebuild-2 -b master
+git clone --recurse-submodules https://github.com/Victor-Rebuild/victor-1.6-rebuild-2
 cd victor-1.6-rebuild-2
 ```
 
@@ -74,26 +57,133 @@ cd ~/victor-1.6-rebuild-2
 ./build/build-v.sh
 ```
 
-3. It should just work! The output will be in `./_build/vicos/Release/`
+</details>
+
+<details>
+<summary><strong>Bare Metal: x86_64 or arm64 Linux</strong></summary>
+<br \>
+
+- Prerequisites:
+  - glibc 2.35 or above - this means anything Debian Bookworm-era and newer will work.
+  - The following packages need to be installed: `git wget curl openssl ninja g++ gcc pkg-config ccache`
+```
+# Arch Linux:
+sudo pacman -S git wget curl openssl ninja gcc pkgconf ccache
+# Ubuntu/Debian:
+sudo apt-get update && sudo apt-get install -y git wget curl openssl ninja-build gcc g++ pkg-config ccache
+# Fedora
+sudo dnf install -y git wget curl openssl ninja-build gcc gcc-c++ pkgconf-pkg-config ccache
+```
+
+1. Clone the repo and `cd` into it:
+
+```
+cd ~
+git clone --recurse-submodules https://github.com/Victor-Rebuild/victor-1.6-rebuild-2
+cd victor-1.6-rebuild-2
+```
+
+2. Source `setenv.sh`:
+```
+source setenv.sh
+```
+
+3. (OPTIONAL) Run this so you don't have to perform step 2 every time:
+```
+echo "source \"$(pwd)/setenv.sh\"" >> $HOME/.bashrc
+```
+
+4. Build:
+```
+vbuild
+```
+
+</details>
+
+<details>
+
+<summary><strong>macOS (M-series only)</strong></summary>
+<br />
+
+- Prereqs: Make sure you have [brew](https://brew.sh/) installed.
+  -  Then: `brew install ccache gcc ninja pkg-config upx wget`
+
+1. Clone the repo and cd into it:
+
+```
+cd ~
+git clone --recurse-submodules https://github.com/Victor-Rebuild/victor-1.6-rebuild-2
+cd victor-1.6-rebuild-2
+```
+
+2. Run the build script:
+```
+cd ~/victor-1.6-rebuild-2
+./build/build-v.sh
+```
+
+</details>
+
 
 ## Deploying
 
-1. Echo your robot's IP address to robot_ip.txt (in the root of the victor repo):
+1. Install WireOS on your robot.
+2. Get your robot's IP through CCIS:
+  - 1. Place your robot on the charger
+  - 2. Double click the button
+  - 3. Lift the lift up then down
+  - 4. Write down the IP address somewhere
+  - 5. Lift the lift up then down again to exit CCIS
+3. One of the following:
+
+<details>
+<summary><strong>(Docker: x86_64 or arm64 Linux) or (macOS M-series)</strong></summary>
+<br \>
+
+- Run:
 
 ```
-echo 192.168.1.150 > robot_ip.txt
-```
-
-2. Copy your bot's SSH key to a file called `robot_sshkey` in the root of this repo.
-
-3. Run:
-
-```
-# Linux, docker
 ./build/deploy-v.sh
+```
+</details>
 
-# Linux, bare metal
+<details>
+<summary><strong>Bare Metal: x86_64 or arm64 Linux</strong></summary>
+<br \>
+
+- Run:
+
+```
 vdeploy
 ```
+</details>
+
+## Cleaning
+
+99% of the time, if you're working on a behavior or something, you don't need to clean any build directories. The CMakeLists are correctly setup to properly rebuild the code which needs to be rebuilt upon a file change.
+
+If you do want to clean anyway:
+
+<details>
+<summary><strong>(Docker: x86_64 or arm64 Linux) or (macOS M-series)</strong></summary>
+<br \>
+
+- Run:
+
+```
+./build/clean.sh
+```
+</details>
+
+<details>
+<summary><strong>Bare Metal: x86_64 or arm64 Linux</strong></summary>
+<br \>
+
+- Run:
+
+```
+vclean
+```
+</details>
 
 <small><sub><sup>DDL, if you're reading this, sosumi.</sup></sub></small>
