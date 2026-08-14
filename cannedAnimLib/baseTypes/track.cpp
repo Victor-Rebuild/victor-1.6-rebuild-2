@@ -28,7 +28,7 @@ namespace Animations {
       // a stop message for the previous keyframe because the body motion
       // command for this new keyframe will handle it. This avoids delays
       // introduced by "extra" stop messages being inserted unnecessarily.
-      if(prevKeyFrame->GetTimestampActionComplete_ms() > addedKeyFrame.GetTriggerTime_ms() - CozmoAnim::AnimTimeStepMS) {
+      if(prevKeyFrame->GetTimestampActionComplete_ms() > addedKeyFrame.GetTriggerTime_ms() - _getAnimTimeStepMS()) {
         //PRINT_NAMED_DEBUG("Animations.EnableStopMessageHelper",
         //                  "Disabling stop message for body motion keyframe at t=%d "
         //                  "with duration=%d because of next keyframe at t=%d",

@@ -928,10 +928,10 @@ void UpdateFaceImageRGBExample(Robot& robot)
   // ss << "files/images/img_" << GetLastMsgTimestamp() << ".jpg";
   // img.Save(ss.str().c_str());
 
-  // The duration of the image should ideally be some multiple of AnimTimeStepMS,
+  // The duration of the image should ideally be some multiple of _getAnimTimeStepMS(),
   // especially if you're playing a bunch of images in sequence, otherwise the
   // speed of the animation may not be as expected.
-  u32 duration_ms = 2 * AnimTimeStepMS;
+  u32 duration_ms = 2 * _getAnimTimeStepMS();
   robot.GetAnimationComponent().DisplayFaceImage(img, duration_ms);
 }
 

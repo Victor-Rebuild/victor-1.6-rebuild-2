@@ -13,6 +13,7 @@
 
 #include "engine/aiComponent/behaviorComponent/behaviors/blackjack/blackJackVisualizer.h"
 
+#include "anki/cozmo/shared/cozmoConfig.h"
 #include "cannedAnimLib/cannedAnims/cannedAnimationContainer.h"
 #include "cannedAnimLib/proceduralFace/proceduralFace.h"
 #include "clad/types/compositeImageTypes.h"
@@ -206,7 +207,7 @@ void BlackJackVisualizer::Init(BehaviorExternalInterface& bei)
   auto& dataAccessorComp = bei.GetComponentWrapper(BEIComponentID::DataAccessor).GetComponent<DataAccessorComponent>();
 
   const float kAnimAuthoredTimeStep_ms = 33.0f; // Original framerate
-  const float timingScaleFactor = (float)AnimTimeStepMS / kAnimAuthoredTimeStep_ms;
+  const float timingScaleFactor = (float)_getAnimTimeStepMS() / kAnimAuthoredTimeStep_ms;
 
   // Find the time stamps for animation driven events
   const auto* animContainer = dataAccessorComp.GetCannedAnimationContainer();
@@ -427,7 +428,7 @@ void BlackJackVisualizer::PlayCompositeCardAnimationAndLock(const BehaviorExtern
   bool emptySpriteBoxesAreValid = true;
   bei.GetAnimationComponent().PlayCompositeAnimation(compAnimName,
                                                      *(_compImg.get()),
-                                                     AnimTimeStepMS,
+                                                     _getAnimTimeStepMS(),
                                                      outAnimationDuration_ms,
                                                      shouldInterrupt,
                                                      emptySpriteBoxesAreValid,
@@ -483,7 +484,7 @@ void BlackJackVisualizer::SwipeToClearFace(BehaviorExternalInterface& bei, std::
   bool emptySpriteBoxesAreValid = true;
   bei.GetAnimationComponent().PlayCompositeAnimation(kSwipeAnimationName,
                                                      *(_compImg.get()),
-                                                     AnimTimeStepMS,
+                                                     _getAnimTimeStepMS(),
                                                      outAnimationDuration_ms,
                                                      shouldInterrupt,
                                                      emptySpriteBoxesAreValid,

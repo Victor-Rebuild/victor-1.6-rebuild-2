@@ -27,7 +27,6 @@ namespace Anim {
 
 namespace{
 const uint8_t kOffsetForEndOfFrame = 1;
-u32 AnimTimeStepMS = _getAnimTimeStepMS();
 }
 
 StreamingAnimationModifier::StreamingAnimationModifier(AnimationStreamer* streamer, Audio::EngineRobotAudioInput* audioInput, TextToSpeechComponent* ttsComponent)
@@ -74,12 +73,12 @@ void StreamingAnimationModifier::ApplyAlterationsAfterUpdate(AnimationStreamer* 
 void StreamingAnimationModifier::HandleMessage(const RobotInterface::AlterStreamingAnimationAtTime& msg)
 {
   auto relativeStreamTime_ms = msg.relativeStreamTime_ms;
-  if((relativeStreamTime_ms % AnimTimeStepMS) != 0){
-    relativeStreamTime_ms -= (relativeStreamTime_ms % AnimTimeStepMS);
+  if((relativeStreamTime_ms % _getAnimTimeStepMS()) != 0){
+    relativeStreamTime_ms -= (relativeStreamTime_ms % _getAnimTimeStepMS());
     PRINT_NAMED_WARNING("StreamingAnimationModifier.DelayPending.InvalidDelay",
                         "Delay %d is not a multiple of animation time step %d - \
                         it will be updated to %d to align with preceeding frame",
-                        msg.relativeStreamTime_ms, AnimTimeStepMS, relativeStreamTime_ms);
+                        msg.relativeStreamTime_ms, _getAnimTimeStepMS(), relativeStreamTime_ms);
   }
 
   // If this message should be applied at the end of the tick increase its time by 1

@@ -167,8 +167,6 @@ namespace Anim {
 
   namespace{
 
-  u32 AnimTimeStepMS = _getAnimTimeStepMS();
-
   static const std::string kWebVizModuleName = "animations";
 
   // Specifies how often to send AnimState message
@@ -176,7 +174,7 @@ namespace Anim {
 
   // Minimum amount of time that must expire after the last non-procedural face
   // is drawn and the next procedural face can be drawn
-  static const u32 kMinTimeBetweenLastNonProcFaceAndNextProcFace_ms = 2 * AnimTimeStepMS;
+  static const u32 kMinTimeBetweenLastNonProcFaceAndNextProcFace_ms = 2 * _getAnimTimeStepMS();
 
   // Default time to wait before forcing KeepFaceAlive() after the latest stream has stopped
   const f32 kDefaultLongEnoughSinceLastStreamTimeout_s = 0.5f;
@@ -227,7 +225,7 @@ namespace Anim {
   {
     kIsInManualUpdateMode = !kIsInManualUpdateMode;
     if (kIsInManualUpdateMode && (sDevRelativeTimePtr != nullptr)){
-      kCurrentManualFrameNumber = *sDevRelativeTimePtr/AnimTimeStepMS;
+      kCurrentManualFrameNumber = *sDevRelativeTimePtr/_getAnimTimeStepMS();
     }
   }
 
@@ -581,9 +579,9 @@ namespace Anim {
     Result result = _proceduralAnimation->AddKeyFrameToBack(keyframe);
 
     // Add a second one later to interpolate to, if duration is longer than one keyframe
-    if (RESULT_OK == result && duration_ms > AnimTimeStepMS)
+    if (RESULT_OK == result && duration_ms > _getAnimTimeStepMS())
     {
-      keyframe.SetTriggerTime_ms(duration_ms-AnimTimeStepMS);
+      keyframe.SetTriggerTime_ms(duration_ms-_getAnimTimeStepMS());
       result = _proceduralAnimation->AddKeyFrameToBack(keyframe);
     }
 
@@ -1080,7 +1078,7 @@ namespace Anim {
       // If we are initializing ANY animation at all, we don't want keepalive's mucking with the eye 
       // display state. If we eventually decide we want to have an animation screen run with keepalive eyes,
       // this will need to be addressed across the entire keepalive system
-      _proceduralTrackComponent->RemoveKeepFaceAlive(_relativeStreamTime_ms, (3 * AnimTimeStepMS));
+      _proceduralTrackComponent->RemoveKeepFaceAlive(_relativeStreamTime_ms, (3 * _getAnimTimeStepMS()));
 
       // auto& bodyTrack = _streamingAnimation->GetTrack<BodyMotionKeyFrame>();
       // if (bodyTrack.IsEmpty())
@@ -1523,7 +1521,7 @@ namespace Anim {
       const auto timeDrift = estimatedRealTime - _relativeStreamTime_ms;
 
       ColorRGBA color = NamedColors::GREEN;
-      if (timeDrift > (2 * AnimTimeStepMS))
+      if (timeDrift > (2 * _getAnimTimeStepMS()))
       {
         color = NamedColors::RED;
 
@@ -1986,7 +1984,7 @@ namespace Anim {
 
     if (kIsInManualUpdateMode)
     {
-      _relativeStreamTime_ms = kCurrentManualFrameNumber * AnimTimeStepMS;
+      _relativeStreamTime_ms = kCurrentManualFrameNumber * _getAnimTimeStepMS();
     }
 
     Result lastResult = RESULT_OK;
@@ -2017,7 +2015,7 @@ namespace Anim {
 
       if (_incrementTimeThisTick)
       {
-        _relativeStreamTime_ms += AnimTimeStepMS;
+        _relativeStreamTime_ms += _getAnimTimeStepMS();
       }
       _incrementTimeThisTick = true;
 

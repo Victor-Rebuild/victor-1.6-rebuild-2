@@ -52,8 +52,6 @@ class EngineToRobot;
 template <typename T>
 class AnkiEvent;
   
-static u32 AnimTimeStepMS = _getAnimTimeStepMS();
-
 class AnimationComponent : public IDependencyManagedComponent<RobotComponentID>, 
                            private Anki::Util::noncopyable, 
                            private Util::SignalHolder
@@ -147,14 +145,14 @@ public:
                                      MovementComponent* devSafetyCheck = nullptr);
 
 
-  // If you want to play multiple frames in sequence, duration_ms should be a multiple of AnimTimeStepMS.
+  // If you want to play multiple frames in sequence, duration_ms should be a multiple of _getAnimTimeStepMS().
   //
   // Note: If you're streaming a real-time sequence, the rate at which you stream should also approximately
   // match the duration. e.g. If you're streaming one image every engine tick, then the duration should be
-  // 2 x AnimTimeStepMS which is roughly equal to BS_TIME_STEP_MS. For convenience you can use this.
-  u32 DEFAULT_STREAMING_FACE_DURATION_MS = AnimTimeStepMS * ( (BS_TIME_STEP_MS % AnimTimeStepMS == 0) ?
-                                                                                  (BS_TIME_STEP_MS / AnimTimeStepMS)      :
-                                                                                  (BS_TIME_STEP_MS / AnimTimeStepMS) + 1 );
+  // 2 x _getAnimTimeStepMS() which is roughly equal to BS_TIME_STEP_MS. For convenience you can use this.
+  u32 DEFAULT_STREAMING_FACE_DURATION_MS = _getAnimTimeStepMS() * ( (BS_TIME_STEP_MS % _getAnimTimeStepMS() == 0) ?
+                                                                                  (BS_TIME_STEP_MS / _getAnimTimeStepMS())      :
+                                                                                  (BS_TIME_STEP_MS / _getAnimTimeStepMS()) + 1 );
   // (Didn't use the obvious 'ceil' function here because it's non-const and can't
   //  be used to init a static constexpr.)
   //

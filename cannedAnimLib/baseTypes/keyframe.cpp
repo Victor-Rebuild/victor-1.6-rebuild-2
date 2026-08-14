@@ -258,7 +258,7 @@ void SafeNumericCast(const FromType& fromVal, ToType& toVal, const char* debugNa
       }
       Vision::HSImageHandle faceHueAndSaturation = ProceduralFace::GetHueSatWrapper();
       _compositeImage.reset(new Vision::CompositeImage(faceHueAndSaturation, spriteHandle, !shouldRenderInEyeHue));
-      _keyframeActiveDuration_ms = CozmoAnim::AnimTimeStepMS;
+      _keyframeActiveDuration_ms = _getAnimTimeStepMS();
       _triggerTime_ms = triggerTime_ms;
     }
 
@@ -273,10 +273,10 @@ void SafeNumericCast(const FromType& fromVal, ToType& toVal, const char* debugNa
       _internalUpdateInterval_ms = std::max(frameInterval_ms, SPRITE_FRAME_INTERVAL_MS);
       _keyframeActiveDuration_ms = spriteSeq->GetNumFrames() * _internalUpdateInterval_ms;
       // ANKI_VERIFY((_internalUpdateInterval_ms != 0) &&
-      //             ((_internalUpdateInterval_ms % AnimTimeStepMS) == 0),
+      //             ((_internalUpdateInterval_ms % _getAnimTimeStepMS()) == 0),
       //             "SpriteSequenceKeyFrame.SetCompositeImage.InvalidTimeStep",
       //             "Update interval %d is not a multiple of anim time step %d",
-      //             _internalUpdateInterval_ms, AnimTimeStepMS);
+      //             _internalUpdateInterval_ms, _getAnimTimeStepMS());
     }
 
     SpriteSequenceKeyFrame::SpriteSequenceKeyFrame(Vision::SpriteCache* spriteCache, 
@@ -289,10 +289,10 @@ void SafeNumericCast(const FromType& fromVal, ToType& toVal, const char* debugNa
       _compositeImage.reset(compImg);
       _internalUpdateInterval_ms = std::max(frameInterval_ms, SPRITE_FRAME_INTERVAL_MS);
       // ANKI_VERIFY((_internalUpdateInterval_ms != 0) &&
-      //             ((_internalUpdateInterval_ms % AnimTimeStepMS) == 0),
+      //             ((_internalUpdateInterval_ms % _getAnimTimeStepMS()) == 0),
       //             "SpriteSequenceKeyFrame.SetCompositeImage.InvalidTimeStep",
       //             "Update interval %d is not a multiple of anim time step %d",
-      //             _internalUpdateInterval_ms, AnimTimeStepMS);
+      //             _internalUpdateInterval_ms, _getAnimTimeStepMS());
     }
 
     SpriteSequenceKeyFrame::SpriteSequenceKeyFrame(const SpriteSequenceKeyFrame& other)
@@ -482,7 +482,7 @@ void SafeNumericCast(const FromType& fromVal, ToType& toVal, const char* debugNa
 
       // Check if we should advance to a new frame
       const TimeStamp_t timeSinceTrigger = timeSinceAnimStart_ms - GetTriggerTime_ms();
-      const bool shouldAdvanceFrame = ((timeSinceTrigger % _internalUpdateInterval_ms) <= CozmoAnim::AnimTimeStepMS);
+      const bool shouldAdvanceFrame = ((timeSinceTrigger % _internalUpdateInterval_ms) <= _getAnimTimeStepMS());
 
       // Only update _lastDisplayedFrame when we should advance
       if (shouldAdvanceFrame && curFrame != _lastDisplayedFrame) {
@@ -1302,7 +1302,7 @@ _streamMsg.lights[__LED_NAME__].offset_ms = 0; } while(0)
       // If enable stop message is false there's another body motion keyframe that wants to run at the exact 
       // timestamp of the internal active duration
       // Therefore, if there's no stop message we want to finish body motion while there's still "motion duration" left
-      return _enableStopMessage ? _keyframeActiveDuration_ms + CozmoAnim::AnimTimeStepMS : _keyframeActiveDuration_ms;
+      return _enableStopMessage ? _keyframeActiveDuration_ms + _getAnimTimeStepMS() : _keyframeActiveDuration_ms;
     }
 
     

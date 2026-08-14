@@ -207,11 +207,11 @@ bool ScanlineDistorter::GetNextDistortionFrame(const f32 degree, ProceduralFace&
     if(Util::IsFltGTZero(distortionIter->probNoDistortionAfter) &&
        (GetRNG().RandDbl() < distortionIter->probNoDistortionAfter))
     {
-      timeInc = 2*CozmoAnim::AnimTimeStepMS;
+      timeInc = 2*_getAnimTimeStepMS();
     }
     else
     {
-      timeInc = CozmoAnim::AnimTimeStepMS;
+      timeInc = _getAnimTimeStepMS();
     }
     
     ++distortionIter;

@@ -298,7 +298,7 @@ Result Animation::DefineFromJson(const std::string& name, const Json::Value &jso
     } else if(frameName == SpriteSequenceKeyFrame::GetClassName()) {
       const Vision::SpriteSequence* spriteSeq = nullptr;
       TimeStamp_t triggerTime_ms = 0;
-      TimeStamp_t frameUpdateInterval = CozmoAnim::AnimTimeStepMS;
+      TimeStamp_t frameUpdateInterval = _getAnimTimeStepMS();
       const bool success = SpriteSequenceKeyFrame::ExtractDataFromJson(jsonFrame, seqContainer,
                                                                        spriteSeq, triggerTime_ms,
                                                                        frameUpdateInterval);
@@ -484,7 +484,7 @@ void Animation::AdvanceTracks(const TimeStamp_t toTime_ms)
 void Animation::AppendAnimation(const Animation& appendAnim)
 {
   // Append animation starting at the next keyframe
-  const uint32_t animOffest_ms = GetLastKeyFrameTime_ms() + CozmoAnim::AnimTimeStepMS;
+  const uint32_t animOffest_ms = GetLastKeyFrameTime_ms() + _getAnimTimeStepMS();
 
   // Append animation tracks
   _headTrack.AppendTrack(appendAnim.GetTrack<HeadAngleKeyFrame>(), animOffest_ms);
