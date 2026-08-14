@@ -249,16 +249,14 @@ private:
   bool _engineLoaded = false;
 
   bool _invalidServConfig = false;
+  bool _isRestartRequired = false;
   bool _usesCustServConfig = true;
   bool _usesEscapePod = true;
 
-  bool _classicAlexa = Util::FileUtils::FileExists("/data/data/rebuild/old-alexa");
-
-  bool _isRestartRequired = false;
-
-  bool _snoringDisabled = Util::FileUtils::FileExists("/data/data/rebuild/dont-snore-at-night");
-  bool _disablePersonCheck = Util::FileUtils::FileExists("/data/data/rebuild/dont-look-for-people-at-night");
-  bool _disableReactToSound = Util::FileUtils::FileExists("/data/data/rebuild/dont-react-to-sound-at-night");
+  const bool _classicAlexa = Util::FileUtils::FileExists("/data/data/rebuild/old-alexa");
+  const bool _snoringDisabled = Util::FileUtils::FileExists("/data/data/rebuild/dont-snore-at-night");
+  const bool _disablePersonCheck = Util::FileUtils::FileExists("/data/data/rebuild/dont-look-for-people-at-night");
+  const bool _disableReactToSound = Util::FileUtils::FileExists("/data/data/rebuild/dont-react-to-sound-at-night");
 
   std::string _sysconVersion = "";
   
