@@ -56,3 +56,11 @@ On every beat Vector will randomly change his eye color to one of the eye color 
 
 ### USE BETA ALEXA / USE MODERN ALEXA
 Old beta Alexa actually had it's voice run through the stock Vector voice filter instead of having it's own unfiltered channel. This restores that behavior.
+
+## CONFIGURATION PAGE 5
+
+### USE BETA ALEXA / USE MODERN ALEXA
+Old beta Alexa actually had it's voice run through the stock Vector voice filter instead of having it's own unfiltered channel. This restores that behavior.
+
+### USE VIC-CLOUDLESS / USE NORMAL CLOUD
+vic-cloudless is a modified version of vic-cloud developed by [Wire](https://github.com/kercre123/vic-cloudless). It allows Vector to process voice commands locally on himself without needing a seperate Voice Command server. The version in rebuild uses my [fork](https://github.com/Victor-Rebuild/vic-cloudswitch/tree/1.6-rebuild) which allows it to work in cloud and cloudless mode.
