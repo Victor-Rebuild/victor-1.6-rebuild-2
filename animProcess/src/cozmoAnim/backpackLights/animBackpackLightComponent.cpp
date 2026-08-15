@@ -521,7 +521,8 @@ void BackpackLightComponent::UpdateSystemLightState(bool isCloudStreamOpen)
     // to the system light as the off color (normally green)
     if(!OSState::getInstance()->IsUserSpaceSecure())
     {
-      light.offColor = 0xFFFFFF00;
+      light.onColor = 0x00FF0000;
+      light.offColor = 0x00FFFF00;
       light.onPeriod_ms = 960;
       light.offPeriod_ms = 960;
       light.transitionOnPeriod_ms = 0;
