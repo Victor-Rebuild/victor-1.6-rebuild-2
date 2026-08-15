@@ -40,8 +40,6 @@ protected:
   virtual void InitBehavior() override;
   virtual bool WantsToBeActivatedBehavior() const override;
   virtual void OnBehaviorActivated() override;
-  virtual void BehaviorUpdate() override;
-  virtual void OnBehaviorLeftActivatableScope() override;
 
   virtual void AlwaysHandleInScope(const RobotToEngineEvent& event) override;
 

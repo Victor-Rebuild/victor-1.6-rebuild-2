@@ -21,9 +21,7 @@
 #include "engine/aiComponent/behaviorComponent/behaviorExternalInterface/beiRobotInfo.h"
 #include "engine/aiComponent/behaviorComponent/userIntentComponent.h"
 #include "engine/aiComponent/behaviorComponent/userIntents.h"
-#include "engine/aiComponent/beiConditions/conditions/conditionTimePowerButtonPressed.h"
 #include "engine/components/dataAccessorComponent.h"
-#include "engine/externalInterface/externalInterface.h"
 #include "robot.h"
 
 namespace Anki {
@@ -133,19 +131,6 @@ void BehaviorPowerRobotOff::OnBehaviorActivated()
     TransitionToPoweringOff();
   }
 }
-
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void BehaviorPowerRobotOff::BehaviorUpdate()
-{
-}
-
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void BehaviorPowerRobotOff::OnBehaviorLeftActivatableScope()
-{
-}
-
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BehaviorPowerRobotOff::AlwaysHandleInScope(const RobotToEngineEvent& event)  {
