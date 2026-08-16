@@ -519,7 +519,7 @@ void BackpackLightComponent::UpdateSystemLightState(bool isCloudStreamOpen)
 
     // If user space is unsecure then mix white in
     // to the system light as the off color (normally green)
-    if(!OSState::getInstance()->IsUserSpaceSecure())
+    if(!OSState::getInstance()->IsUserSpaceSecure() && !Util::FileUtils::FileExists("/data/data/rebuild/do-not-blink-circle-light"))
     {
       light.onColor = 0x00FF0000;
       light.offColor = 0x00FFFF00;
