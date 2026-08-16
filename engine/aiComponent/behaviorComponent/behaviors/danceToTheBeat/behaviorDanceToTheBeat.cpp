@@ -170,7 +170,7 @@ void BehaviorDanceToTheBeat::OnBehaviorActivated()
   DASMSG_SET(i3, (int) _dVars.danceAnims.size(), "Number of dance animations that have been queued to play");
   DASMSG_SEND();
 
-  if (_dVars.eyeColorRandomizer) {
+  if (eyeColorRandomizer) {
     // Backup the current hue and saturation
     auto readVar = [](const char* key) -> float {
         std::string cmd = std::string("curl -s 'localhost:8889/consolevarget?key=") + key + "' | cut -d'<' -f1";
@@ -340,7 +340,7 @@ void BehaviorDanceToTheBeat::PlayNextDanceAnim()
   std::string hueVal;
   std::string satVal;
 
-  if (_dVars.eyeColorRandomizer) {
+  if (eyeColorRandomizer) {
     srand(time(0));
     int nextEyeColor = rand() % 7;
 
@@ -361,7 +361,7 @@ void BehaviorDanceToTheBeat::PlayNextDanceAnim()
     DelegateNow(animAction, [this](){
       DelegateIfInControl(new ReselectingLoopAnimationAction(_iConfig.eyeHoldAnim));
     });
-    if (_dVars.eyeColorRandomizer) {
+    if (eyeColorRandomizer) {
       (void)(system((hueVal.c_str())));
       (void)(system((satVal.c_str())));
     }
@@ -440,7 +440,7 @@ void BehaviorDanceToTheBeat::StopBackpackLights()
 {
   auto& blc = GetBEI().GetBackpackLightComponent();
   blc.ClearAllBackpackLightConfigs();
-  if (_dVars.eyeColorRandomizer) {
+  if (eyeColorRandomizer) {
     std::string hueVal = "curl 'localhost:8889/consolevarset?key=ProcFace_Hue&value=" + std::to_string(origHue) + "'";
     std::string satVal = "curl 'localhost:8889/consolevarset?key=ProcFace_Saturation&value=" + std::to_string(origSat) + "'";
     (void)(system((hueVal.c_str())));

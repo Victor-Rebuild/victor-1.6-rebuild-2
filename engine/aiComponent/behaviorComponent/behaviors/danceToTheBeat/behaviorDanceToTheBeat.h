@@ -17,9 +17,9 @@
 #include "engine/aiComponent/behaviorComponent/behaviors/danceToTheBeat/danceToTheBeatConfig.h"
 
 #include "engine/components/backpackLights/engineBackpackLightComponent.h"
+#include "engine/components/rebuildConfig.h"
 
 #include "clad/types/backpackAnimationTriggers.h"
-#include "util/fileUtils/fileUtils.h"
 
 namespace Anki {
 namespace Vector {
@@ -86,9 +86,6 @@ private:
     // ID for registering OnBeat callback with BeatDetectorComponent. A
     // value of less than 0 indicates that no callback is registered.
     int onBeatCallbackId = -1;
-
-    // Should we use the eye color randomizer?
-    bool eyeColorRandomizer = Util::FileUtils::FileExists("/data/data/rebuild/dttb-eye-randomizer");
     
     // The queue of animations to play while dancing
     std::deque<DanceAnimMetadata> danceAnims;
@@ -113,6 +110,8 @@ private:
   
   void UnregisterOnBeatCallback();
   
+  // Should we use the eye color randomizer?
+  const bool eyeColorRandomizer = RebuildToggles::GetBool("dttbRandomEyes");
 };
 
 

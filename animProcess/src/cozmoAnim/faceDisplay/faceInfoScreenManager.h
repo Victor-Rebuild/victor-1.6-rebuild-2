@@ -17,13 +17,16 @@
 #ifndef __AnimProcess_CozmoAnim_FaceDisplay_FaceInfoScreenManager_H_
 #define __AnimProcess_CozmoAnim_FaceDisplay_FaceInfoScreenManager_H_
 
+#include "coretech/common/engine/utils/data/dataPlatform.h"
 #include "coretech/common/shared/types.h"
 #include "coretech/common/engine/colorRGBA.h"
 #include "coretech/common/shared/math/point_fwd.h"
+#include "cozmoAnim/animContext.h"
 #include "cozmoAnim/faceDisplay/faceInfoScreenTypes.h"
 #include "clad/robotInterface/messageEngineToRobot.h"
 #include "clad/cloud/mic.h"
 #include "clad/types/tofDisplayTypes.h"
+#include "engine/components/rebuildConfig.h"
 
 #include "util/fileUtils/fileUtils.h"
 #include "util/singleton/dynamicSingleton.h"
@@ -254,13 +257,15 @@ private:
   bool _usesCustServConfig = true;
   bool _usesEscapePod = true;
 
-  const bool _classicAlexa = Util::FileUtils::FileExists("/data/data/rebuild/old-alexa");
   const bool _cloudlessEnabled = Util::FileUtils::FileExists("/data/data/forceCloudless");
 
-  // Sleeping settings
-  const bool _snoringDisabled = Util::FileUtils::FileExists("/data/data/rebuild/dont-snore-at-night");
-  const bool _disablePersonCheck = Util::FileUtils::FileExists("/data/data/rebuild/dont-look-for-people-at-night");
-  const bool _disableReactToSound = Util::FileUtils::FileExists("/data/data/rebuild/dont-react-to-sound-at-night");
+  Json::Value _toggles;
+  static constexpr const char* kTogglesPath = "/data/data/rebuild/toggles.json";
+
+  const bool _classicAlexa = RebuildToggles::GetBool("classicAlexa");
+  const bool _snoringDisabled = RebuildToggles::GetBool("snoringDisabled");
+  const bool _disablePersonCheck = RebuildToggles::GetBool("disablePersonCheck");
+  const bool _disableReactToSound = RebuildToggles::GetBool("disableReactToSound");
 
   std::string _sysconVersion = "";
   

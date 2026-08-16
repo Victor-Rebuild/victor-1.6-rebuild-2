@@ -14,14 +14,13 @@
 #define __Engine_AiComponent_BehaviorComponent_Behaviors_BehaviorSleeping_H__
 
 #include "engine/aiComponent/behaviorComponent/behaviors/iCozmoBehavior.h"
+#include "engine/components/rebuildConfig.h"
 
 namespace Anki {
 namespace Vector {
 
 class BehaviorSleeping : public ICozmoBehavior
 {
-public:
-  bool _disableSnoring = Util::FileUtils::FileExists("/data/data/rebuild/dont-snore-at-night");
 protected:
   // Enforce creation through BehaviorFactory
   friend class BehaviorFactory;  
@@ -66,7 +65,7 @@ private:
   InstanceConfig   _iConfig;
   DynamicVariables _dVars;
 
-
+  const bool _disableSnoring = RebuildToggles::GetBool("snoringDisabled");
 };
 
 }

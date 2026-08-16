@@ -252,6 +252,21 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   #define SET_EXIT_ACTION(screen, lambda) \
     GetScreen(ScreenName::screen)->SetExitScreenAction(lambda);
 
+  if (!Util::Data::DataPlatform::readAsJson(kTogglesPath, _toggles)) {
+    _toggles["classicAlexa"]        = Util::FileUtils::FileExists("/data/data/rebuild/old-alexa");
+    _toggles["snoringDisabled"]     = Util::FileUtils::FileExists("/data/data/rebuild/dont-snore-at-night");
+    _toggles["disablePersonCheck"]  = Util::FileUtils::FileExists("/data/data/rebuild/dont-look-for-people-at-night");
+    _toggles["disableReactToSound"] = Util::FileUtils::FileExists("/data/data/rebuild/dont-react-to-sound-at-night");
+    _toggles["dttbRandomEyes"]      = Util::FileUtils::FileExists("/data/data/rebuild/dttb-eye-randomizer");
+    _context->GetDataPlatform()->writeAsJson(kTogglesPath, _toggles);
+
+    Util::FileUtils::DeleteFile("/data/data/rebuild/old-alexa");
+    Util::FileUtils::DeleteFile("/data/data/rebuild/dont-snore-at-night");
+    Util::FileUtils::DeleteFile("/data/data/rebuild/dont-look-for-people-at-night");
+    Util::FileUtils::DeleteFile("/data/data/rebuild/dont-react-to-sound-at-night");
+    Util::FileUtils::DeleteFile("/data/data/rebuild/dttb-eye-randomizer");
+  }
+
   // =============== Screens ==================
   // Screens we don't want users to have access to
   // * Microphone visualization
@@ -643,12 +658,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   // === Toggle Snoring ===
   FaceInfoScreen::MenuItemAction confirmToggleSnoring = [this] {
     LOG_INFO("FaceInfoScreenManager.Snoring.Confirmed", "");
-    if (!_snoringDisabled) {
-      Util::FileUtils::WriteFile("/data/data/rebuild/dont-snore-at-night", "");
-    } else {
-      Util::FileUtils::DeleteFile("/data/data/rebuild/dont-snore-at-night");
-    }
-
+    RebuildToggles::SetBool(_context->GetDataPlatform(), "snoringDisabled", !_snoringDisabled);
     _isRestartRequired = true;
 
     return ScreenName::SleepSettings;
@@ -659,11 +669,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   // === Toggle React to Person ===
   FaceInfoScreen::MenuItemAction confirmToggleRTP = [this] {
     LOG_INFO("FaceInfoScreenManager.ReacttoPerson.Confirmed", "");
-    if (!_disablePersonCheck) {
-      Util::FileUtils::WriteFile("/data/data/rebuild/dont-look-for-people-at-night", "");
-    } else {
-      Util::FileUtils::DeleteFile("/data/data/rebuild/dont-look-for-people-at-night");
-    }
+    RebuildToggles::SetBool(_context->GetDataPlatform(), "disablePersonCheck", !_disablePersonCheck);
 
     _isRestartRequired = true;
 
@@ -675,11 +681,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   // === Toggle React to Sound ===
   FaceInfoScreen::MenuItemAction confirmToggleRTS = [this] {
     LOG_INFO("FaceInfoScreenManager.ReacttoSound.Confirmed", "");
-    if (!_disableReactToSound) {
-      Util::FileUtils::WriteFile("/data/data/rebuild/dont-react-to-sound-at-night", "");
-    } else {
-      Util::FileUtils::DeleteFile("/data/data/rebuild/dont-react-to-sound-at-night");
-    }
+    RebuildToggles::SetBool(_context->GetDataPlatform(), "disableReactToSound", !_disableReactToSound);
 
     _isRestartRequired = true;
 
@@ -691,11 +693,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   // === DTTB random eye colors screen ===
   FaceInfoScreen::MenuItemAction confirmToggleDTTBEyes = [this] {
     LOG_INFO("FaceInfoScreenManager.SwapDTTBEyes.Confirmed", "");
-    if (Util::FileUtils::FileDoesNotExist("/data/data/rebuild/dttb-eye-randomizer")) {
-      Util::FileUtils::WriteFile("/data/data/rebuild/dttb-eye-randomizer", "");
-    } else {
-      Util::FileUtils::DeleteFile("/data/data/rebuild/dttb-eye-randomizer");
-    }
+    RebuildToggles::SetBool(_context->GetDataPlatform(), "dttbRandomEyes", !RebuildToggles::GetBool("dttbRandomEyes"));
 
     _isRestartRequired = true;
 
@@ -707,12 +705,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   // === Old/New alexa screen ===
   FaceInfoScreen::MenuItemAction confirmOldNewAlexa = [this] {
     LOG_INFO("FaceInfoScreenManager.OldNewAlexa.Confirmed", "");
-    if (!_classicAlexa) {
-      Util::FileUtils::WriteFile("/data/data/rebuild/old-alexa", "");
-    } else {
-      Util::FileUtils::DeleteFile("/data/data/rebuild/old-alexa");
-    }
-
+    RebuildToggles::SetBool(_context->GetDataPlatform(), "classicAlexa", !_classicAlexa);
     _isRestartRequired = true;
 
     return ScreenName::ConfigurationSubmenu5;

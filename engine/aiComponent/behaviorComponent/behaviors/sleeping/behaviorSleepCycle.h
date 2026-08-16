@@ -15,6 +15,7 @@
 #pragma once
 
 #include "engine/aiComponent/behaviorComponent/behaviors/iCozmoBehavior.h"
+#include "engine/components/rebuildConfig.h"
 
 #include "coretech/common/engine/robotTimeStamp.h"
 
@@ -108,8 +109,8 @@ private:
 
   int denyGoHome = 0;
 
-  bool _disablePersonCheck = Util::FileUtils::FileExists("/data/data/rebuild/dont-look-for-people-at-night");
-  bool _disableReactToSound = Util::FileUtils::FileExists("/data/data/rebuild/dont-react-to-sound-at-night");
+  const bool _disablePersonCheck = RebuildToggles::GetBool("disablePersonCheck");
+  const bool _disableReactToSound = RebuildToggles::GetBool("disableReactToSound");
 
   struct InstanceConfig {
     std::string awakeDelegateName;
