@@ -58,7 +58,6 @@ enum class ScreenName : uint8_t {
   BackpackLights,
   BackpackLightsDot,
   BackpackLightsDotBlink,
-  BackpackLightsDotColor,
   BackpackLightsMenu,
   BootRecovery,
   CheckForUpdates,

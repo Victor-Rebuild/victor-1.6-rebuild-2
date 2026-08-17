@@ -581,7 +581,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
 
     return ScreenName::ConfigurationSubmenu;
   };
-  ADD_MENU_ITEM(BackpackLightsDotBlink, "BACK", BackpackLightsMenu);
+  ADD_MENU_ITEM(BackpackLightsDotBlink, "BACK", BackpackLightsDot);
   ADD_MENU_ITEM_WITH_ACTION(BackpackLightsDotBlink, "CONFIRM", confirmToggleDotLightBlink);
 
   // === Recovery screen ===
