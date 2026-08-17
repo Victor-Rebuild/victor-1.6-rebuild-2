@@ -46,7 +46,7 @@
 #include "util/fileUtils/fileUtils.h"
 
 #define DEBUG_TEST_ALL_ANIM_TRIGGERS 0
-#define DEBUG_LIGHTS 0
+#define DEBUG_LIGHTS 1
 
 // Scales colors by this factor when applying white balancing
 static constexpr f32 kWhiteBalanceScale = 0.6f;

@@ -14,6 +14,7 @@
 #ifndef ANKI_VECTOR_LIGHTS_CONFIG_H
 #define ANKI_VECTOR_LIGHTS_CONFIG_H
 
+#include "engine/components/rebuildConfig.h"
 #include <sys/stat.h>
 
 namespace Anki {
@@ -24,8 +25,7 @@ namespace Vector {
     static bool value = false;
 
     if (!initialized) {
-      struct stat buffer;
-      value = (stat("/data/data/wirelights", &buffer) == 0) || (stat("/data/data/rebuild/wirelights", &buffer) == 0);
+      value = RebuildToggles::GetBool("wireOSLights");
       initialized = true;
     }
 
@@ -40,6 +40,18 @@ namespace Vector {
     if (!initialized) {
       struct stat buffer;
       value = (stat("/data/data/customBackpackLights/off.json", &buffer) == 0) && (stat("/data/data/customBackpackLights/cubeSpinner/purple/spinner_purple_celebration.json", &buffer) == 0);
+      initialized = true;
+    }
+
+    return value;
+  }
+
+  inline bool& _blinkDotLight() {
+    static bool initialized = false;
+    static bool value = false;
+
+    if (!initialized) {
+      value = RebuildToggles::GetBool("blinkDotLight");
       initialized = true;
     }
 

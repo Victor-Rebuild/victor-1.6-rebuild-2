@@ -31,7 +31,6 @@
 
 #include "osState/osState.h"
 
-#define DEBUG_LIGHTS 0
 
 namespace Anki {
 namespace Vector {

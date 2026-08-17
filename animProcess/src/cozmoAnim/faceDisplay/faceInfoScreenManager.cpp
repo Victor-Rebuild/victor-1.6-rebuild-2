@@ -254,10 +254,11 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
 
   if (!Util::Data::DataPlatform::readAsJson(kTogglesPath, _toggles)) {
     _toggles["classicAlexa"]        = Util::FileUtils::FileExists("/data/data/rebuild/old-alexa");
-    _toggles["snoringDisabled"]     = Util::FileUtils::FileExists("/data/data/rebuild/dont-snore-at-night");
     _toggles["disablePersonCheck"]  = Util::FileUtils::FileExists("/data/data/rebuild/dont-look-for-people-at-night");
     _toggles["disableReactToSound"] = Util::FileUtils::FileExists("/data/data/rebuild/dont-react-to-sound-at-night");
     _toggles["dttbRandomEyes"]      = Util::FileUtils::FileExists("/data/data/rebuild/dttb-eye-randomizer");
+    _toggles["snoringDisabled"]     = Util::FileUtils::FileExists("/data/data/rebuild/dont-snore-at-night");
+    _toggles["wireOSLights"]        = Util::FileUtils::FileExists("/data/data/wirelights");
     _context->GetDataPlatform()->writeAsJson(kTogglesPath, _toggles);
 
     Util::FileUtils::DeleteFile("/data/data/rebuild/old-alexa");
@@ -265,6 +266,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
     Util::FileUtils::DeleteFile("/data/data/rebuild/dont-look-for-people-at-night");
     Util::FileUtils::DeleteFile("/data/data/rebuild/dont-react-to-sound-at-night");
     Util::FileUtils::DeleteFile("/data/data/rebuild/dttb-eye-randomizer");
+    Util::FileUtils::DeleteFile("/data/data/wirelights");
   }
 
   // =============== Screens ==================
@@ -283,6 +285,9 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   // Start rebuild custom screens
   ADD_SCREEN_WITH_TEXT(AutoUpdates, AutoUpdates, {"UPDATE SETTINGS"});
   ADD_SCREEN_WITH_TEXT(BackpackLights, BackpackLights, {_wireoslights() ? "USE ANKI LIGHTS?" : "USE WIREOS LIGHTS?"});
+  ADD_SCREEN_WITH_TEXT(BackpackLightsMenu, BackpackLightsMenu, {"BACKPACK SETTINGS"});
+  ADD_SCREEN_WITH_TEXT(BackpackLightsDot, BackpackLightsDot, {"DOT LIGHT SETTINGS"});
+  ADD_SCREEN_WITH_TEXT(BackpackLightsDotBlink, BackpackLightsDotBlink, {"BLINK DOT LIGHT?"});
   ADD_SCREEN_WITH_TEXT(BootRecovery, BootRecovery, {"RECOVERY MODE?"});
   ADD_SCREEN_WITH_TEXT(Cloudless, Cloudless, {_cloudlessEnabled ? "USE NORMAL CLOUD?" : "USE VIC-CLOUDLESS?"});
   ADD_SCREEN_WITH_TEXT(ConfigurationSubmenu, ConfigurationSubmenu, {"CONFIGURATION PAGE 1"});
@@ -497,16 +502,8 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   ADD_MENU_ITEM(ConfigurationSubmenu, "EXIT", Main);
   ADD_MENU_ITEM_WITH_ACTION(ConfigurationSubmenu, "NEXT PAGE", incSlotUp);
   ADD_MENU_ITEM(ConfigurationSubmenu, "SELF TEST", SelfTest);
-  if (_userlights()) {
-    ADD_MENU_ITEM(ConfigurationSubmenu, "CHANGE SLOT", SwitchSlot);
-    ADD_MENU_ITEM(ConfigurationSubmenu, "CUSTOM LIGHTS ON", ConfigurationSubmenu);
-  } else if (_wireoslights()) {
-    ADD_MENU_ITEM(ConfigurationSubmenu, "ANKI LIGHTS", BackpackLights);
-    ADD_MENU_ITEM(ConfigurationSubmenu, "CHANGE SLOT", SwitchSlot);
-  } else {
-    ADD_MENU_ITEM(ConfigurationSubmenu, "CHANGE SLOT", SwitchSlot);
-    ADD_MENU_ITEM(ConfigurationSubmenu, "WIREOS LIGHTS", BackpackLights);
-  }
+  ADD_MENU_ITEM(ConfigurationSubmenu, "CHANGE SLOT", SwitchSlot);
+  ADD_MENU_ITEM(ConfigurationSubmenu, "BACKPACK SETTINGS", BackpackLightsMenu);
   DISABLE_TIMEOUT(ConfigurationSubmenu)
 
   // === Screen 2 ===
@@ -550,21 +547,42 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   ADD_MENU_ITEM(SwitchSlot, "BACK", ConfigurationSubmenu);
   ADD_MENU_ITEM_WITH_ACTION(SwitchSlot, "CONFIRM", confirmSlotSwitch);
 
+  ADD_MENU_ITEM(BackpackLightsMenu, "BACK", ConfigurationSubmenu);
+  if (_userlights()) {
+    ADD_MENU_ITEM(BackpackLightsMenu, "CUSTOM LIGHTS ON", ConfigurationSubmenu);
+  } else if (_wireoslights()) {
+    ADD_MENU_ITEM(BackpackLightsMenu, "ANKI LIGHTS", BackpackLights);
+  } else {
+    ADD_MENU_ITEM(BackpackLightsMenu, "WIREOS LIGHTS", BackpackLights);
+  }
+  ADD_MENU_ITEM(BackpackLightsMenu, "DOT LIGHT SETTINGS", BackpackLightsDot);
+
   // === Swap backpack lights screen ===
-  FaceInfoScreen::MenuItemAction confirmToggleLights = [this] {
+  FaceInfoScreen::MenuItemAction confirmToggleWireOSAnkiLights = [this] {
     LOG_INFO("FaceInfoScreenManager.Swaplights.Confirmed", "");
-    if (!_wireoslights()) {
-      Util::FileUtils::WriteFile("/data/data/rebuild/wirelights", "");
-    } else {
-      Util::FileUtils::DeleteFile("/data/data/rebuild/wirelights");
-    }
+    RebuildToggles::SetBool(_context->GetDataPlatform(), "wireOSLights", !RebuildToggles::GetBool("wireOSLights"));
 
     _isRestartRequired = true;
 
     return ScreenName::ConfigurationSubmenu;
   };
-  ADD_MENU_ITEM(BackpackLights, "BACK", ConfigurationSubmenu);
-  ADD_MENU_ITEM_WITH_ACTION(BackpackLights, "CONFIRM", confirmToggleLights);
+  ADD_MENU_ITEM(BackpackLights, "BACK", BackpackLightsMenu);
+  ADD_MENU_ITEM_WITH_ACTION(BackpackLights, "CONFIRM", confirmToggleWireOSAnkiLights);
+
+  ADD_MENU_ITEM(BackpackLightsDot, "BACK", BackpackLightsMenu);
+  ADD_MENU_ITEM(BackpackLightsDot, "TOGGLE BLINKING", BackpackLightsDotBlink);
+
+  // === Blink dot light screen ===
+  FaceInfoScreen::MenuItemAction confirmToggleDotLightBlink = [this] {
+    LOG_INFO("FaceInfoScreenManager.BlinkDotLight.Confirmed", "");
+    RebuildToggles::SetBool(_context->GetDataPlatform(), "blinkDotLight", !RebuildToggles::GetBool("blinkDotLight"));
+
+    _isRestartRequired = true;
+
+    return ScreenName::ConfigurationSubmenu;
+  };
+  ADD_MENU_ITEM(BackpackLightsDotBlink, "BACK", BackpackLightsMenu);
+  ADD_MENU_ITEM_WITH_ACTION(BackpackLightsDotBlink, "CONFIRM", confirmToggleDotLightBlink);
 
   // === Recovery screen ===
   FaceInfoScreen::MenuItemAction confirmBootRecovery = [] {
@@ -2447,6 +2465,8 @@ void FaceInfoScreenManager::DrawScratch()
 {
 
   if (_currScreen == GetScreen(ScreenName::AutoUpdates) ||
+      _currScreen == GetScreen(ScreenName::BackpackLightsMenu) ||
+      _currScreen == GetScreen(ScreenName::BackpackLightsDot) ||
       _currScreen == GetScreen(ScreenName::Camera) ||
       _currScreen == GetScreen(ScreenName::ConfigurationSubmenu) ||
       _currScreen == GetScreen(ScreenName::ConfigurationSubmenu2) ||

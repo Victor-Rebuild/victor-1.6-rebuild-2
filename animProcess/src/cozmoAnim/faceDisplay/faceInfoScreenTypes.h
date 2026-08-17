@@ -56,6 +56,10 @@ enum class ScreenName : uint8_t {
  // Start rebuild custom screens
   AutoUpdates,
   BackpackLights,
+  BackpackLightsDot,
+  BackpackLightsDotBlink,
+  BackpackLightsDotColor,
+  BackpackLightsMenu,
   BootRecovery,
   CheckForUpdates,
   Cloudless,

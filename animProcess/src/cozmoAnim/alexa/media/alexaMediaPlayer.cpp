@@ -49,6 +49,7 @@ TODO (VIC-9853): re-implement this properly. I think it should more closely rese
 #include "clad/audio/audioSwitchTypes.h"
 #include "cozmoAnim/animContext.h"
 #include "cozmoAnim/audio/cozmoAudioController.h"
+#include "engine/components/rebuildConfig.h"
 #include "json/json.h"
 #include "util/console/consoleInterface.h"
 #include "util/container/ringBuffContiguousRead.h"
@@ -109,7 +110,7 @@ namespace {
   constexpr int kMaxPlayTries = 20;
 
   // Check if we want to use the old alexa voice or the modern voice
-  bool classicAlexa = Util::FileUtils::FileExists("/data/data/rebuild/old-alexa");
+  bool classicAlexa = RebuildToggles::GetBool("classicAlexa");
 
   // define wwise objects depending on player type
   constexpr PluginId_t kPluginIdTTS = 10;

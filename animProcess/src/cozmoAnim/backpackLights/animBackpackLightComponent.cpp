@@ -20,13 +20,12 @@
 #include "cozmoAnim/micData/micDataSystem.h"
 #include "cozmoAnim/robotDataLoader.h"
 #include "clad/robotInterface/messageEngineToRobot.h"
+#include "engine/components/lightsConfig.h"
 #include "util/console/consoleInterface.h"
 #include "util/fileUtils/fileUtils.h"
 #include "util/internetUtils/internetUtils.h"
 
 #include "osState/osState.h"
-
-#define DEBUG_LIGHTS 0
 
 namespace Anki {
 namespace Vector {
@@ -519,12 +518,16 @@ void BackpackLightComponent::UpdateSystemLightState(bool isCloudStreamOpen)
 
     // If user space is unsecure then mix white in
     // to the system light as the off color (normally green)
-    if(!OSState::getInstance()->IsUserSpaceSecure() && !Util::FileUtils::FileExists("/data/data/rebuild/do-not-blink-circle-light"))
+    if(!OSState::getInstance()->IsUserSpaceSecure() && _systemLightState == SystemLightState::Off)
     {
       light.onColor = 0x00FF0000;
       light.offColor = 0x00FFFF00;
       light.onPeriod_ms = 960;
-      light.offPeriod_ms = 960;
+      if (_blinkDotLight()) {
+        light.offPeriod_ms = 960;
+      } else {
+        light.offPeriod_ms = 0;
+      }
       light.transitionOnPeriod_ms = 0;
       light.transitionOffPeriod_ms = 0;
       light.offset_ms = 0;

@@ -260,7 +260,7 @@ private:
   const bool _cloudlessEnabled = Util::FileUtils::FileExists("/data/data/forceCloudless");
 
   Json::Value _toggles;
-  static constexpr const char* kTogglesPath = "/data/data/rebuild/toggles.json";
+  static constexpr const char* kTogglesPath = "/data/data/rebuild/settings.json";
 
   const bool _classicAlexa = RebuildToggles::GetBool("classicAlexa");
   const bool _snoringDisabled = RebuildToggles::GetBool("snoringDisabled");
