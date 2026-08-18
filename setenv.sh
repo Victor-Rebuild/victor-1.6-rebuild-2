@@ -13,9 +13,9 @@ alias victor_stage_debug="cd ${GIT_PROJ_ROOT} && ${GIT_PROJ_ROOT}/project/victor
 alias watch_backtraces="cd ${GIT_PROJ_ROOT} && echo Waiting for backtraces... && python3 project/victor/scripts/backtracewatcher.py"
 alias watch_backtraces_debug="cd ${GIT_PROJ_ROOT} && echo Waiting for backtraces... && python3 project/victor/scripts/backtracewatcherdebug.py"
 
-alias victor_build_release="cd ${GIT_PROJ_ROOT} && ${GIT_PROJ_ROOT}/project/victor/scripts/victor_build_release.sh"
+alias victor_build_release="cd ${GIT_PROJ_ROOT} && ${GIT_PROJ_ROOT}/build/build-v.sh"
 alias victor_build_debug="cd ${GIT_PROJ_ROOT} && ${GIT_PROJ_ROOT}/project/victor/scripts/victor_build_debug.sh"
-alias victor_deploy_run="cd ${GIT_PROJ_ROOT} && ${GIT_PROJ_ROOT}/project/victor/scripts/victor_deploy.sh -c Release -b && ${GIT_PROJ_ROOT}/project/victor/scripts/victor_start.sh"
+alias victor_deploy_run="cd ${GIT_PROJ_ROOT} && ${GIT_PROJ_ROOT}/build/deploy-v.sh"
 alias victor_deploy_run_debug="cd ${GIT_PROJ_ROOT} && ${GIT_PROJ_ROOT}/project/victor/scripts/victor_deploy.sh -c Debug -b && ${GIT_PROJ_ROOT}/project/victor/scripts/victor_start.sh"
 
 function IS_ROBOT_IP_THERE() {
@@ -27,12 +27,14 @@ function IS_ROBOT_IP_THERE() {
     fi
 }
 
+alias no_docker='export NO_DOCKER=1'
+alias use_docker='export NO_DOCKER=0'
 alias vclean='rm -rf ${GIT_PROJ_ROOT}/_build ${GIT_PROJ_ROOT}/generated'
 alias vbuild=victor_build_release
 alias vbuilddebug=victor_build_debug
-alias vdeploy='IS_ROBOT_IP_THERE; victor_stage && victor_deploy_run'
+alias vdeploy='IS_ROBOT_IP_THERE; victor_deploy_run'
 alias vdeploydebug='IS_ROBOT_IP_THERE; victor_stage_debug && victor_deploy_run_debug'
-alias vbd='victor_build_release && victor_stage && victor_deploy_run'
+alias vbd='victor_build_release && victor_deploy_run'
 alias vbdd='victor_build_debug && victor_stage_debug && victor_deploy_run_debug'
 alias stage='victor_stage'
 alias see_size_of_silly_victor_build='victor_stage && du -sh _build/staging'

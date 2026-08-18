@@ -58,6 +58,18 @@ namespace Vector {
     return value;
   }
 
+  inline bool& _fadeDotLight() {
+    static bool initialized = false;
+    static bool value = false;
+
+    if (!initialized) {
+      value = RebuildToggles::GetBool("fadeDotLight");
+      initialized = true;
+    }
+
+    return value;
+  }
+
 }
 }
 

@@ -523,13 +523,9 @@ void BackpackLightComponent::UpdateSystemLightState(bool isCloudStreamOpen)
       light.onColor = 0x00FF0000;
       light.offColor = 0x00FFFF00;
       light.onPeriod_ms = 960;
-      if (_blinkDotLight()) {
-        light.offPeriod_ms = 960;
-      } else {
-        light.offPeriod_ms = 0;
-      }
-      light.transitionOnPeriod_ms = 0;
-      light.transitionOffPeriod_ms = 0;
+      light.offPeriod_ms = _blinkDotLight() ? 960 : 0;
+      light.transitionOnPeriod_ms = _fadeDotLight() ? 3000 : 0;
+      light.transitionOffPeriod_ms = _fadeDotLight() ? 3000 : 0;
       light.offset_ms = 0;
     }
 

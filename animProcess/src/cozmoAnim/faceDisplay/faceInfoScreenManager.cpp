@@ -288,6 +288,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   ADD_SCREEN_WITH_TEXT(BackpackLightsMenu, BackpackLightsMenu, {"BACKPACK SETTINGS"});
   ADD_SCREEN_WITH_TEXT(BackpackLightsDot, BackpackLightsDot, {"DOT LIGHT SETTINGS"});
   ADD_SCREEN_WITH_TEXT(BackpackLightsDotBlink, BackpackLightsDotBlink, {"BLINK DOT LIGHT?"});
+  ADD_SCREEN_WITH_TEXT(BackpackLightsDotFade, BackpackLightsDotFade, {"FADE DOT LIGHT?"});
   ADD_SCREEN_WITH_TEXT(BootRecovery, BootRecovery, {"RECOVERY MODE?"});
   ADD_SCREEN_WITH_TEXT(Cloudless, Cloudless, {_cloudlessEnabled ? "USE NORMAL CLOUD?" : "USE VIC-CLOUDLESS?"});
   ADD_SCREEN_WITH_TEXT(ConfigurationSubmenu, ConfigurationSubmenu, {"CONFIGURATION PAGE 1"});
@@ -570,7 +571,20 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   ADD_MENU_ITEM_WITH_ACTION(BackpackLights, "CONFIRM", confirmToggleWireOSAnkiLights);
 
   ADD_MENU_ITEM(BackpackLightsDot, "BACK", BackpackLightsMenu);
+  ADD_MENU_ITEM(BackpackLightsDot, "TOGGLE FADING", BackpackLightsDotFade);
   ADD_MENU_ITEM(BackpackLightsDot, "TOGGLE BLINKING", BackpackLightsDotBlink);
+
+  // === Fade dot light screen ===
+  FaceInfoScreen::MenuItemAction confirmToggleDotLightFade = [this] {
+    LOG_INFO("FaceInfoScreenManager.BlinkDotLight.Confirmed", "");
+    RebuildToggles::SetBool(_context->GetDataPlatform(), "fadeDotLight", !RebuildToggles::GetBool("fadeDotLight"));
+
+    _isRestartRequired = true;
+
+    return ScreenName::ConfigurationSubmenu;
+  };
+  ADD_MENU_ITEM(BackpackLightsDotFade, "BACK", BackpackLightsDot);
+  ADD_MENU_ITEM_WITH_ACTION(BackpackLightsDotFade, "CONFIRM", confirmToggleDotLightFade);
 
   // === Blink dot light screen ===
   FaceInfoScreen::MenuItemAction confirmToggleDotLightBlink = [this] {
