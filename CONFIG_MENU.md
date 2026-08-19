@@ -18,8 +18,15 @@ Anki's built in semi-auto self-test option. The self-test is very prone to error
 ### CHANGE SLOT
 Vector has 2 system slots, slot a and slot b. This option runs the `sysswitch` command which switches whatever the inactive slot is to the active one, and reboot the robot into the other system slot.
 
-### WIREOS LIGHTS / ANKI LIGHTS
-Toggles the WireOS backpack lights instead of the stock Anki or vice-versa ones if those are preferred. If custom backpack lights are in use this option will display `CUSTOM LIGHTS ON` instead and won't do anything.
+### BACKPACK SETTINGS
+- WIREOS LIGHTS / ANKI LIGHTS
+    - Toggles the WireOS backpack lights instead of the stock Anki or vice-versa ones if those are preferred. If custom backpack lights are in use this option will display `CUSTOM LIGHTS ON` instead and won't do anything.
+- DOT LIGHT SETTINGS
+    - Settings related to the dot light.
+    - TOGGLE FADING
+        - If the dot light is set to blink this will make it so that it fades green/blue instead of abruptly shifting.
+    - TOGGLE BLNKING
+        - Allow the dot light to blink green/blue.
 
 ## CONFIGURATION PAGE 2
 ### ENTER RECOVERY

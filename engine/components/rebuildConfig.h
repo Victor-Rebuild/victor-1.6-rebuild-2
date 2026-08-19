@@ -1,12 +1,12 @@
 /**
- * File: lightsConfig.h
+ * File: rebuildConfig.h
  *
  * Author: Emily
  *
- * Created: 08/16/2025
+ * Created: 08/16/2026
  *
  * Description:
- *   Choose backpack lights thing
+ *   Thing that manages settings for 1.6-rebuild.
  *
  * Copyright: Emily, 2026
  **/
