@@ -23,6 +23,7 @@
 #include "cozmoAnim/faceDisplay/faceDisplay.h"
 #include "cozmoAnim/faceDisplay/faceInfoScreen.h"
 #include "cozmoAnim/faceDisplay/faceInfoScreenManager.h"
+#include "cozmoAnim/faceDisplay/faceInfoScreenTypes.h"
 #include "cozmoAnim/micData/micDataSystem.h"
 #include "cozmoAnim/robotDataLoader.h"
 
@@ -294,8 +295,6 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   ADD_SCREEN_WITH_TEXT(ConfigurationSubmenu, ConfigurationSubmenu, {"CONFIGURATION PAGE 1"});
   ADD_SCREEN_WITH_TEXT(ConfigurationSubmenu2, ConfigurationSubmenu2, {"CONFIGURATION PAGE 2"});
   ADD_SCREEN_WITH_TEXT(ConfigurationSubmenu3, ConfigurationSubmenu3, {"CONFIGURATION PAGE 3"});
-  ADD_SCREEN_WITH_TEXT(ConfigurationSubmenu4, ConfigurationSubmenu4, {"CONFIGURATION PAGE 4"});
-  ADD_SCREEN_WITH_TEXT(ConfigurationSubmenu5, ConfigurationSubmenu5, {"CONFIGURATION PAGE 5"});
   ADD_SCREEN_WITH_TEXT(DisableAutoUpdates, DisableAutoUpdates, {checkAutoUpdatesOn() ? "DISABLE UPDATES?" : "ENABLE UPDATES?"});
   ADD_SCREEN_WITH_TEXT(SleepSettings, SleepSettings, {"SLEEP SETTINGS"});
   ADD_SCREEN_WITH_TEXT(DTTBRandomEyes, DTTBRandomEyes, {"TOGGLE DTTB EYES?"});
@@ -477,66 +476,37 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   DISABLE_TIMEOUT(Reonboard);
 
   // === Configuration Submenu ===
-  FaceInfoScreen::MenuItemAction incSlotUp = [] {
-      confPageNumber += 1;
-      switch(confPageNumber) {
-          case 5:  return ScreenName::ConfigurationSubmenu5;
-          case 4:  return ScreenName::ConfigurationSubmenu4;
-          case 3:  return ScreenName::ConfigurationSubmenu3;
-          case 2:  return ScreenName::ConfigurationSubmenu2;
-          default: confPageNumber = 1; return ScreenName::ConfigurationSubmenu;
-      }
-  };
-
-  FaceInfoScreen::MenuItemAction incSlotDown = [] {
-      confPageNumber -= 1;
-      switch(confPageNumber) {
-          case 1:  return ScreenName::ConfigurationSubmenu;
-          case 2:  return ScreenName::ConfigurationSubmenu2;
-          case 3:  return ScreenName::ConfigurationSubmenu3;
-          case 4:  return ScreenName::ConfigurationSubmenu4;
-          default: confPageNumber = 5; return ScreenName::ConfigurationSubmenu5;
-      }
-  };
+  // FaceInfoScreen::MenuItemAction incSlotDown = [] {
+  //     confPageNumber -= 1;
+  //     switch(confPageNumber) {
+  //         case 1:  return ScreenName::ConfigurationSubmenu;
+  //         case 2:  return ScreenName::ConfigurationSubmenu2;
+  //         default: confPageNumber = 3; return ScreenName::ConfigurationSubmenu3;
+  //     }
+  // };
 
   // === Screen 1 ===
   ADD_MENU_ITEM(ConfigurationSubmenu, "EXIT", Main);
-  ADD_MENU_ITEM_WITH_ACTION(ConfigurationSubmenu, "NEXT PAGE", incSlotUp);
   ADD_MENU_ITEM(ConfigurationSubmenu, "SELF TEST", SelfTest);
   ADD_MENU_ITEM(ConfigurationSubmenu, "CHANGE SLOT", SwitchSlot);
+  ADD_MENU_ITEM(ConfigurationSubmenu, "ENTER RECOVERY", BootRecovery);
   ADD_MENU_ITEM(ConfigurationSubmenu, "BACKPACK SETTINGS", BackpackLightsMenu);
   DISABLE_TIMEOUT(ConfigurationSubmenu)
 
   // === Screen 2 ===
   ADD_MENU_ITEM(ConfigurationSubmenu2, "EXIT", Main);
-  ADD_MENU_ITEM_WITH_ACTION(ConfigurationSubmenu2, "NEXT PAGE", incSlotUp);
-  ADD_MENU_ITEM_WITH_ACTION(ConfigurationSubmenu2, "PREV PAGE", incSlotDown);
-  ADD_MENU_ITEM(ConfigurationSubmenu2, "ENTER RECOVERY", BootRecovery);
+  ADD_MENU_ITEM(ConfigurationSubmenu2, _using30fps() ? "TOGGLE 60 FPS" : "TOGGLE 30 FPS", Toggle30fps);
+  ADD_MENU_ITEM(ConfigurationSubmenu2, "SLEEP SETTINGS", SleepSettings);
+  ADD_MENU_ITEM(ConfigurationSubmenu2, "UPDATE SETTINGS", AutoUpdates);
   ADD_MENU_ITEM(ConfigurationSubmenu2, "CHANGE PERF PROFILE", SetFrequency);
   DISABLE_TIMEOUT(ConfigurationSubmenu2)
 
   // === Screen 3 ===
   ADD_MENU_ITEM(ConfigurationSubmenu3, "EXIT", Main);
-  ADD_MENU_ITEM_WITH_ACTION(ConfigurationSubmenu3, "NEXT PAGE", incSlotUp);
-  ADD_MENU_ITEM_WITH_ACTION(ConfigurationSubmenu3, "PREV PAGE", incSlotDown);
-  ADD_MENU_ITEM(ConfigurationSubmenu3, _using30fps() ? "TOGGLE 60 FPS" : "TOGGLE 30 FPS", Toggle30fps);
-  ADD_MENU_ITEM(ConfigurationSubmenu3, "UPDATE SETTINGS", AutoUpdates);
+  ADD_MENU_ITEM(ConfigurationSubmenu3, _classicAlexa ? "USE MODERN ALEXA" : "USE BETA ALEXA", OldNewAlexa);
+  ADD_MENU_ITEM(ConfigurationSubmenu3, "DTTB RANDOM EYES", DTTBRandomEyes);
+  ADD_MENU_ITEM(ConfigurationSubmenu3, _cloudlessEnabled ? "USE NORMAL CLOUD" : "USE VIC-CLOUDLESS", Cloudless);
   DISABLE_TIMEOUT(ConfigurationSubmenu3)
-
-  // === Screen 4 ===
-  ADD_MENU_ITEM(ConfigurationSubmenu4, "EXIT", Main);
-  ADD_MENU_ITEM_WITH_ACTION(ConfigurationSubmenu4, "NEXT PAGE", incSlotUp);
-  ADD_MENU_ITEM_WITH_ACTION(ConfigurationSubmenu4, "PREV PAGE", incSlotDown);
-  ADD_MENU_ITEM(ConfigurationSubmenu4, "SLEEP SETTINGS", SleepSettings);
-  ADD_MENU_ITEM(ConfigurationSubmenu4, "DTTB RANDOM EYES", DTTBRandomEyes);
-  DISABLE_TIMEOUT(ConfigurationSubmenu4)
-
-  // === Screen 5 ===
-  ADD_MENU_ITEM(ConfigurationSubmenu5, "EXIT", Main);
-  ADD_MENU_ITEM_WITH_ACTION(ConfigurationSubmenu5, "PREV PAGE", incSlotDown);
-  ADD_MENU_ITEM(ConfigurationSubmenu5, _classicAlexa ? "USE MODERN ALEXA" : "USE BETA ALEXA", OldNewAlexa);
-  ADD_MENU_ITEM(ConfigurationSubmenu5, _cloudlessEnabled ? "USE NORMAL CLOUD" : "USE VIC-CLOUDLESS", Cloudless);
-  DISABLE_TIMEOUT(ConfigurationSubmenu5)
 
   // === SwitchSlot screen ===
   FaceInfoScreen::MenuItemAction confirmSlotSwitch = [this] {
@@ -604,7 +574,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
     (void)system("/usr/sbin/reboot recovery");
     return ScreenName::Rebooting;
   };
-  ADD_MENU_ITEM(BootRecovery, "BACK", ConfigurationSubmenu2);
+  ADD_MENU_ITEM(BootRecovery, "BACK", ConfigurationSubmenu);
   ADD_MENU_ITEM_WITH_ACTION(BootRecovery, "CONFIRM", confirmBootRecovery);
 
   // === Change CPU/RAM speed ===
@@ -641,9 +611,9 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
 
     _isRestartRequired = true;
 
-    return ScreenName::ConfigurationSubmenu3;
+    return ScreenName::ConfigurationSubmenu2;
   };
-  ADD_MENU_ITEM(Toggle30fps, "BACK", ConfigurationSubmenu3);
+  ADD_MENU_ITEM(Toggle30fps, "BACK", ConfigurationSubmenu2);
   ADD_MENU_ITEM_WITH_ACTION(Toggle30fps, "CONFIRM", confirmToggle30fps);
 
   // === Update Settings ===
@@ -657,9 +627,9 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
 
     _isRestartRequired = true;
 
-    return ScreenName::ConfigurationSubmenu3;
+    return ScreenName::ConfigurationSubmenu2;
   };
-  ADD_MENU_ITEM(AutoUpdates, "BACK", ConfigurationSubmenu3);
+  ADD_MENU_ITEM(AutoUpdates, "BACK", ConfigurationSubmenu2);
   ADD_MENU_ITEM(AutoUpdates, checkAutoUpdatesOn() ? "DISABLE UPDATING" : "ENABLE UPDATING", DisableAutoUpdates);
   ADD_MENU_ITEM(AutoUpdates, "CHECK FOR UPDATES", UpdateRebuild);
   ADD_MENU_ITEM(DisableAutoUpdates, "BACK", AutoUpdates);
@@ -682,7 +652,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   DISABLE_TIMEOUT(Updating);
 
   // Sleep settings
-  ADD_MENU_ITEM(SleepSettings, "BACK", ConfigurationSubmenu4);
+  ADD_MENU_ITEM(SleepSettings, "BACK", ConfigurationSubmenu2);
   ADD_MENU_ITEM(SleepSettings, _disablePersonCheck ? "ENABLE RTP" : "DISABLE RTP", RTP);
   ADD_MENU_ITEM(SleepSettings, _disableReactToSound ? "ENABLE RTS" : "DISABLE RTS", RTS);
   ADD_MENU_ITEM(SleepSettings, _snoringDisabled ? "ENABLE SNORING" : "DISABLE SNORING", Snoring);
@@ -729,9 +699,9 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
 
     _isRestartRequired = true;
 
-    return ScreenName::ConfigurationSubmenu4;
+    return ScreenName::ConfigurationSubmenu3;
   };
-  ADD_MENU_ITEM(DTTBRandomEyes, "BACK", ConfigurationSubmenu4);
+  ADD_MENU_ITEM(DTTBRandomEyes, "BACK", ConfigurationSubmenu3);
   ADD_MENU_ITEM_WITH_ACTION(DTTBRandomEyes, "CONFIRM", confirmToggleDTTBEyes);
 
   // === Old/New alexa screen ===
@@ -740,9 +710,9 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
     RebuildToggles::SetBool(_context->GetDataPlatform(), "classicAlexa", !_classicAlexa);
     _isRestartRequired = true;
 
-    return ScreenName::ConfigurationSubmenu5;
+    return ScreenName::ConfigurationSubmenu3;
   };
-  ADD_MENU_ITEM(OldNewAlexa, "BACK", ConfigurationSubmenu5);
+  ADD_MENU_ITEM(OldNewAlexa, "BACK", ConfigurationSubmenu3);
   ADD_MENU_ITEM_WITH_ACTION(OldNewAlexa, "CONFIRM", confirmOldNewAlexa);
 
   // === Cloudless screen ===
@@ -756,9 +726,9 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
 
     _isRestartRequired = true;
 
-    return ScreenName::ConfigurationSubmenu5;
+    return ScreenName::ConfigurationSubmenu3;
   };
-  ADD_MENU_ITEM(Cloudless, "BACK", ConfigurationSubmenu5);
+  ADD_MENU_ITEM(Cloudless, "BACK", ConfigurationSubmenu3);
   ADD_MENU_ITEM_WITH_ACTION(Cloudless, "CONFIRM", confirmToggleCloudless);
 
   // === Camera screen ===
@@ -1467,12 +1437,16 @@ void FaceInfoScreenManager::ProcessMenuNavigation(const RobotState& state)
 
   // Check for button press to go to next debug screen
   if (buttonReleasedEvent) {
-    if (_debugInfoScreensUnlocked &&
+    if (currScreenName == ScreenName::ConfigurationSubmenu) {
+      SetScreen(ScreenName::ConfigurationSubmenu2);
+    } else if (currScreenName == ScreenName::ConfigurationSubmenu2) {
+      SetScreen(ScreenName::ConfigurationSubmenu3);
+    } else if (currScreenName == ScreenName::ConfigurationSubmenu3) {
+      SetScreen(ScreenName::ConfigurationSubmenu);
+    } else if (_debugInfoScreensUnlocked &&
         (currScreenName != ScreenName::None &&
           currScreenName != ScreenName::FAC &&
-          currScreenName != ScreenName::Pairing &&
-          currScreenName != ScreenName::Reonboard &&
-          currScreenName != ScreenName::SwitchSlot) ) {
+          currScreenName != ScreenName::Pairing)) {
       SetScreen(_currScreen->GetButtonGotoScreen());
     }
   }
@@ -2485,8 +2459,6 @@ void FaceInfoScreenManager::DrawScratch()
       _currScreen == GetScreen(ScreenName::ConfigurationSubmenu) ||
       _currScreen == GetScreen(ScreenName::ConfigurationSubmenu2) ||
       _currScreen == GetScreen(ScreenName::ConfigurationSubmenu3) ||
-      _currScreen == GetScreen(ScreenName::ConfigurationSubmenu4) ||
-      _currScreen == GetScreen(ScreenName::ConfigurationSubmenu5) ||
       _currScreen == GetScreen(ScreenName::DisableAutoUpdates) ||
       _currScreen == GetScreen(ScreenName::SleepSettings) ||
       _currScreen == GetScreen(ScreenName::SetFrequency) ||

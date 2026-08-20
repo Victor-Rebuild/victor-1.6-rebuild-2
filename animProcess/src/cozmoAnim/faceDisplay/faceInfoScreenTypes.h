@@ -66,8 +66,6 @@ enum class ScreenName : uint8_t {
   ConfigurationSubmenu, // Let's you change configurations and has some other useful options
   ConfigurationSubmenu2, // ^
   ConfigurationSubmenu3, // ^^
-  ConfigurationSubmenu4, // ^^^
-  ConfigurationSubmenu5, // ^^^^
   DisableAutoUpdates,
   DTTBRandomEyes,
   OldNewAlexa,
