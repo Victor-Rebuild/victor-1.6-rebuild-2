@@ -2,6 +2,8 @@
 
 Welcome to `victor-1.6-rebuild-2`. This is where my modifed 1.6 source for Vector lives
 
+![rebuild-image-toast](toast-rebuild-ios6.png)
+
 ## Correcting the name of my CFW
 Do note, this custom firmware is NOT called names such as:
 - rebuild 1.6
