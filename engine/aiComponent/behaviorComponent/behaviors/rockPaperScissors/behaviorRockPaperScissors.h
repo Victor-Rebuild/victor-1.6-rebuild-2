@@ -55,7 +55,9 @@ private:
     std::shared_ptr<IBEICondition> activateBehaviorCondition;
 
     std::shared_ptr<BehaviorTextToSpeechLoop>          ttsBehavior;
-    std::shared_ptr<BehaviorTextToSpeechLoop>          rockPaperScissorsVectorResponseBehavior;
+    std::shared_ptr<BehaviorTextToSpeechLoop>          rockPaperScissorsVectorResponseBehaviorRock;
+    std::shared_ptr<BehaviorTextToSpeechLoop>          rockPaperScissorsVectorResponseBehaviorPaper;
+    std::shared_ptr<BehaviorTextToSpeechLoop>          rockPaperScissorsVectorResponseBehaviorScissors;
     std::shared_ptr<BehaviorPromptUserForVoiceCommand> playAgainPromptBehavior;
     std::shared_ptr<BehaviorPromptUserForVoiceCommand> rockPaperScissorsPromptBehavior;
   };

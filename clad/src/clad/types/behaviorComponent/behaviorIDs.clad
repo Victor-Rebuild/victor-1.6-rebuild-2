@@ -222,6 +222,9 @@ enum uint_16 BehaviorID {
   // victorBehaviorTree/highLevelDelegates/rockPaperScissors
   RockPaperScissors,
   RockPaperScissorsChooseMovePrompt,
+  RockPaperScissorsTTSRock,
+  RockPaperScissorsTTSPaper,
+  RockPaperScissorsTTSScissors,
 
   // victorBehaviorTree/highLevelDelegates/investigateCube
   InteractWithStaticCube,

@@ -446,6 +446,11 @@ enum int_32 AnimationTrigger
   ReactToShakeSnowGlobe_Lvl1InHand,
   ReactToShakeSnowGlobe_Lvl1OnGround,
 
+  // RockPaperScissors
+  RPSRock,
+  RPSPaper,
+  RPSScissors,
+
   RTS_OffCharger_Sleep_Ambient,
   RTS_OffCharger_Sleep_Front,
   RTS_OffCharger_Sleep_30Left,

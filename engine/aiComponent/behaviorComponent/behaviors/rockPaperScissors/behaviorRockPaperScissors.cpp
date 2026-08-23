@@ -82,9 +82,17 @@ void BehaviorRockPaperScissors::InitBehavior()
                                   BEHAVIOR_CLASS(PromptUserForVoiceCommand),
                                   _iConfig.playAgainPromptBehavior );
 
-  BC.FindBehaviorByIDAndDowncast( BEHAVIOR_ID(KnowledgeGraphTTS),
-                                  BEHAVIOR_CLASS(TextToSpeechLoop),
-                                  _iConfig.rockPaperScissorsVectorResponseBehavior );
+  BC.FindBehaviorByIDAndDowncast( BEHAVIOR_ID(RockPaperScissorsTTSRock),
+                                BEHAVIOR_CLASS(TextToSpeechLoop),
+                                _iConfig.rockPaperScissorsVectorResponseBehaviorRock );
+
+  BC.FindBehaviorByIDAndDowncast( BEHAVIOR_ID(RockPaperScissorsTTSPaper),
+                                BEHAVIOR_CLASS(TextToSpeechLoop),
+                                _iConfig.rockPaperScissorsVectorResponseBehaviorPaper );
+
+  BC.FindBehaviorByIDAndDowncast( BEHAVIOR_ID(RockPaperScissorsTTSScissors),
+                                BEHAVIOR_CLASS(TextToSpeechLoop),
+                                _iConfig.rockPaperScissorsVectorResponseBehaviorScissors );
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -106,10 +114,12 @@ void BehaviorRockPaperScissors::GetBehaviorOperationModifiers(BehaviorOperationM
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BehaviorRockPaperScissors::GetAllDelegates(std::set<IBehavior*>& delegates) const
 {
-  delegates.insert( _iConfig.ttsBehavior.get() );
-  delegates.insert( _iConfig.rockPaperScissorsPromptBehavior.get() );
+  delegates.insert(_iConfig.ttsBehavior.get());
+  delegates.insert(_iConfig.rockPaperScissorsPromptBehavior.get());
   delegates.insert(_iConfig.playAgainPromptBehavior.get());
-  delegates.insert( _iConfig.rockPaperScissorsVectorResponseBehavior.get() );
+  delegates.insert(_iConfig.rockPaperScissorsVectorResponseBehaviorRock.get());
+  delegates.insert(_iConfig.rockPaperScissorsVectorResponseBehaviorPaper.get());
+  delegates.insert(_iConfig.rockPaperScissorsVectorResponseBehaviorScissors.get());
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -271,8 +281,16 @@ void BehaviorRockPaperScissors::RockPaperOrScissorsVector()
 
   const std::string finalString = localeComponent.GetString("RockPaperScissors.VectorChose") + " " + chosenOne + "." + winLoosePush;
 
-  _iConfig.rockPaperScissorsVectorResponseBehavior->SetTextToSay( finalString );
-  DelegateIfInControl(_iConfig.rockPaperScissorsVectorResponseBehavior.get(), &BehaviorRockPaperScissors::PlayWinLoseTieAnim);
+  if (whatdidvectorchoose == 0) {
+    _iConfig.rockPaperScissorsVectorResponseBehaviorRock->SetTextToSay( finalString );
+    DelegateIfInControl(_iConfig.rockPaperScissorsVectorResponseBehaviorRock.get(), &BehaviorRockPaperScissors::PlayWinLoseTieAnim);
+  } else if (whatdidvectorchoose == 1) {
+    _iConfig.rockPaperScissorsVectorResponseBehaviorPaper->SetTextToSay( finalString );
+    DelegateIfInControl(_iConfig.rockPaperScissorsVectorResponseBehaviorPaper.get(), &BehaviorRockPaperScissors::PlayWinLoseTieAnim);
+  } else if (whatdidvectorchoose == 2) {
+    _iConfig.rockPaperScissorsVectorResponseBehaviorScissors->SetTextToSay( finalString );
+    DelegateIfInControl(_iConfig.rockPaperScissorsVectorResponseBehaviorScissors.get(), &BehaviorRockPaperScissors::PlayWinLoseTieAnim);
+  }
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

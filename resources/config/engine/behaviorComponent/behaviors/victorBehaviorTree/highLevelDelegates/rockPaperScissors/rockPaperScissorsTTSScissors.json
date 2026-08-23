@@ -1,0 +1,10 @@
+{
+  "behaviorClass" : "TextToSpeechLoop",
+  "behaviorID"    : "RockPaperScissorsTTSScissors",
+
+  "associatedActiveFeature": "KnowledgeGraph",
+
+  "loopAnimation"            : "RPSScissors",
+  "getOutAnimation"          : "KnowledgeGraphGetOut",
+  "emergencyGetOutAnimation" : "KnowledgeGraphGetOut"
+}

@@ -2114,5 +2114,17 @@
   {
     "CladEvent": "IntentionalPerformance",
     "AnimName": "ag_iperformance"
+  },
+  {
+    "CladEvent": "RPSRock",
+    "AnimName": "ag_rockpaperscissors_rock"
+  },
+  {
+    "CladEvent": "RPSPaper",
+    "AnimName": "ag_rockpaperscissors_paper"
+  },
+  {
+    "CladEvent": "RPSScissors",
+    "AnimName": "ag_rockpaperscissors_scissors"
   }
 ]
