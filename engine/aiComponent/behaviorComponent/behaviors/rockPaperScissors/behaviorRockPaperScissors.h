@@ -65,6 +65,7 @@ private:
   struct DynamicVariables {
     DynamicVariables();
     int whatdidplayerchoose;
+    int whatdidvectorchoose;
     int howManyBadRequests;
     int winLoseTie;
   };
@@ -76,6 +77,7 @@ private:
   void RockPaperOrScissors();
   void RockPaperOrScissorsVectorSearch();
   void RockPaperOrScissorsVector();
+  void RockPaperOrScissorsVectorStartTTS();
   void PlayWinLoseTieAnim();
   void TransitionToPlayAgainPrompt();
   void TransitionToPlayAgain();

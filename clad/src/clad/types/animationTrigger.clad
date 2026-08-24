@@ -447,6 +447,11 @@ enum int_32 AnimationTrigger
   ReactToShakeSnowGlobe_Lvl1OnGround,
 
   // RockPaperScissors
+  RPSDecideGetin,
+  RPSDecideLoop,
+  RPSDecideGetOutRock,
+  RPSDecideGetOutPaper,
+  RPSDecideGetOutScissors,
   RPSRock,
   RPSPaper,
   RPSScissors,

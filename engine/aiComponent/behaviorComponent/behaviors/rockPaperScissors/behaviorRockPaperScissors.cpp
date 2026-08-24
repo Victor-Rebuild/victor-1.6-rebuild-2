@@ -229,10 +229,7 @@ void BehaviorRockPaperScissors::RockPaperOrScissors()
 void BehaviorRockPaperScissors::RockPaperOrScissorsVectorSearch()
 {
   CompoundActionSequential *messageAnimation = new CompoundActionSequential();
-  messageAnimation->AddAction(new TriggerLiftSafeAnimationAction(AnimationTrigger::KnowledgeGraphGetIn), true);
-  messageAnimation->AddAction(new TriggerLiftSafeAnimationAction(AnimationTrigger::KnowledgeGraphSearchingGetIn), true);
-  messageAnimation->AddAction(new TriggerLiftSafeAnimationAction(AnimationTrigger::KnowledgeGraphSearching), true);
-  messageAnimation->AddAction(new TriggerLiftSafeAnimationAction(AnimationTrigger::KnowledgeGraphSearchingGetOutSuccess), true);
+  messageAnimation->AddAction(new TriggerLiftSafeAnimationAction(AnimationTrigger::RPSDecideGetin), true);
   DelegateIfInControl(messageAnimation, &BehaviorRockPaperScissors::RockPaperOrScissorsVector);
 }
 
@@ -241,7 +238,7 @@ void BehaviorRockPaperScissors::RockPaperOrScissorsVector()
 {
 
   srand(BaseStationTimer::getInstance()->GetCurrentTimeInSeconds());
-  const int whatdidvectorchoose = rand() % 3;
+  _dVars.whatdidvectorchoose = rand() % 3;
   const auto & localeComponent = GetBEI().GetRobotInfo().GetLocaleComponent();
 
   std::string chosenOne = "";
@@ -259,21 +256,21 @@ void BehaviorRockPaperScissors::RockPaperOrScissorsVector()
     localeComponent.GetString("RockPaperScissors.VectorTied")
   };
 
-  chosenOne = choiceStringLocalized[whatdidvectorchoose];
+  chosenOne = choiceStringLocalized[_dVars.whatdidvectorchoose];
 
-  if (whatdidvectorchoose == _dVars.whatdidplayerchoose)
+  if (_dVars.whatdidvectorchoose == _dVars.whatdidplayerchoose)
   {
     winLoosePush = winLoseTieString[2];
     _dVars.winLoseTie = 2;
-  } else if ((whatdidvectorchoose == 0 && _dVars.whatdidplayerchoose == 1) ||
-             (whatdidvectorchoose == 1 && _dVars.whatdidplayerchoose == 2) ||
-             (whatdidvectorchoose == 2 && _dVars.whatdidplayerchoose == 0))
+  } else if ((_dVars.whatdidvectorchoose == 0 && _dVars.whatdidplayerchoose == 1) ||
+             (_dVars.whatdidvectorchoose == 1 && _dVars.whatdidplayerchoose == 2) ||
+             (_dVars.whatdidvectorchoose == 2 && _dVars.whatdidplayerchoose == 0))
   {
     winLoosePush = winLoseTieString[1];
     _dVars.winLoseTie = 1;
-  } else if ((whatdidvectorchoose == 0 && _dVars.whatdidplayerchoose == 2) ||
-             (whatdidvectorchoose == 1 && _dVars.whatdidplayerchoose == 0) ||
-             (whatdidvectorchoose == 2 && _dVars.whatdidplayerchoose == 1))
+  } else if ((_dVars.whatdidvectorchoose == 0 && _dVars.whatdidplayerchoose == 2) ||
+             (_dVars.whatdidvectorchoose == 1 && _dVars.whatdidplayerchoose == 0) ||
+             (_dVars.whatdidvectorchoose == 2 && _dVars.whatdidplayerchoose == 1))
   {
     winLoosePush = winLoseTieString[0];
     _dVars.winLoseTie = 0;
@@ -281,14 +278,30 @@ void BehaviorRockPaperScissors::RockPaperOrScissorsVector()
 
   const std::string finalString = localeComponent.GetString("RockPaperScissors.VectorChose") + " " + chosenOne + "." + winLoosePush;
 
-  if (whatdidvectorchoose == 0) {
+  CompoundActionSequential *messageAnimation = new CompoundActionSequential();
+  if (_dVars.whatdidvectorchoose == 0) {
+    messageAnimation->AddAction(new TriggerLiftSafeAnimationAction(AnimationTrigger::RPSDecideGetOutRock), true);
     _iConfig.rockPaperScissorsVectorResponseBehaviorRock->SetTextToSay( finalString );
-    DelegateIfInControl(_iConfig.rockPaperScissorsVectorResponseBehaviorRock.get(), &BehaviorRockPaperScissors::PlayWinLoseTieAnim);
-  } else if (whatdidvectorchoose == 1) {
+    DelegateIfInControl(messageAnimation, &BehaviorRockPaperScissors::RockPaperOrScissorsVectorStartTTS);
+  } else if (_dVars.whatdidvectorchoose == 1) {
+    messageAnimation->AddAction(new TriggerLiftSafeAnimationAction(AnimationTrigger::RPSDecideGetOutPaper), true);
     _iConfig.rockPaperScissorsVectorResponseBehaviorPaper->SetTextToSay( finalString );
-    DelegateIfInControl(_iConfig.rockPaperScissorsVectorResponseBehaviorPaper.get(), &BehaviorRockPaperScissors::PlayWinLoseTieAnim);
-  } else if (whatdidvectorchoose == 2) {
+    DelegateIfInControl(messageAnimation, &BehaviorRockPaperScissors::RockPaperOrScissorsVectorStartTTS);
+  } else if (_dVars.whatdidvectorchoose == 2) {
+    messageAnimation->AddAction(new TriggerLiftSafeAnimationAction(AnimationTrigger::RPSDecideGetOutScissors), true);
     _iConfig.rockPaperScissorsVectorResponseBehaviorScissors->SetTextToSay( finalString );
+    DelegateIfInControl(messageAnimation, &BehaviorRockPaperScissors::RockPaperOrScissorsVectorStartTTS);
+  }
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void BehaviorRockPaperScissors::RockPaperOrScissorsVectorStartTTS()
+{
+  if (_dVars.whatdidvectorchoose == 0) {
+    DelegateIfInControl(_iConfig.rockPaperScissorsVectorResponseBehaviorRock.get(), &BehaviorRockPaperScissors::PlayWinLoseTieAnim);
+  } else if (_dVars.whatdidvectorchoose == 1) {
+    DelegateIfInControl(_iConfig.rockPaperScissorsVectorResponseBehaviorPaper.get(), &BehaviorRockPaperScissors::PlayWinLoseTieAnim);
+  } else if (_dVars.whatdidvectorchoose == 2) {
     DelegateIfInControl(_iConfig.rockPaperScissorsVectorResponseBehaviorScissors.get(), &BehaviorRockPaperScissors::PlayWinLoseTieAnim);
   }
 }

@@ -2116,6 +2116,26 @@
     "AnimName": "ag_iperformance"
   },
   {
+    "CladEvent": "RPSDecideGetin",
+    "AnimName": "ag_rockpaperscissors_decide_getin"
+  },
+  {
+    "CladEvent": "RPSDecideLoop",
+    "AnimName": "ag_rockpaperscissors_decide_loop"
+  },
+  {
+    "CladEvent": "RPSDecideGetOutRock",
+    "AnimName": "ag_rockpaperscissors_decide_getout_rock"
+  },
+  {
+    "CladEvent": "RPSDecideGetOutPaper",
+    "AnimName": "ag_rockpaperscissors_decide_getout_paper"
+  },
+  {
+    "CladEvent": "RPSDecideGetOutScissors",
+    "AnimName": "ag_rockpaperscissors_decide_getout_scissors"
+  },
+  {
     "CladEvent": "RPSRock",
     "AnimName": "ag_rockpaperscissors_rock"
   },
