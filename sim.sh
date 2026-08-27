@@ -5,7 +5,7 @@ set -e
 SCRIPT_PATH=$(dirname $([ -L $0 ] && echo "$(dirname $0)/$(readlink -n $0)" || echo $0))
 SCRIPT_NAME=`basename ${0}`
 TOPLEVEL=$(cd "$SCRIPT_PATH" && pwd)
-OS_LATEST=$(curl http://ota.pvic.xyz/vic/latestVersion 2> /dev/null)
+OS_LATEST=$(curl http://anki2.ca:81/otas/1.6-rebuild/indev/latest 2> /dev/null)
 
 if [[ $? != "0" || $OS_LATEST == *"404 page"* || $OS_LATEST == "" ]]; then
 	echo "failed to get current WireOS version from server: $OS_LATEST"
@@ -58,7 +58,7 @@ cd dvcbs
 if [[ ! -d "$OS_LATEST" ]]; then
 	mkdir "$OS_LATEST"
 	cd "$OS_LATEST"
-	wget "http://ota.pvic.xyz/vic/latest/dev.ota"
+	curl -o latest.ota "http://anki2.ca:81/otas/1.6-rebuild/indev/dev/latest"
 	cd ..
 fi
 OSPATH="$(pwd)/${OS_LATEST}/edits"

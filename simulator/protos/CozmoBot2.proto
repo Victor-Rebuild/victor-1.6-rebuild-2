@@ -793,7 +793,7 @@ Robot {
             DEF SHOULDER HingeJoint {
               jointParameters HingeJointParameters {
                 axis 0 -1 0
-                dampingConstant 6
+                dampingConstant 1
                 position IS liftAngle
                 minStop IS liftAngle_lowLimit
                 maxStop IS liftAngle_highLimit

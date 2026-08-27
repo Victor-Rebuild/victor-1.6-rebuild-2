@@ -49,6 +49,7 @@ AkUInt32 AkAlsaSink::m_uLatencyReportThresholdMsec = AKALSASINK_DEFAULT_LATENCY_
 // Static function for post CreateAkAlsaSink() work
 std::function<void(AkAlsaSink*)> AkAlsaSink::PostCreateAlsaFunc = nullptr;
 
+#ifndef STANDALONE_SIM
 static int alsa_error_recovery(void *in_puserdata, snd_pcm_t *in_phandle, int in_err)
 {
 	AkAlsaSink *  pAlsaSinkDevice = (AkAlsaSink *)in_puserdata;
@@ -98,6 +99,7 @@ static int alsa_error_recovery(void *in_puserdata, snd_pcm_t *in_phandle, int in
 
 	return in_err;
 }
+#endif
 
 // ---------------------- Alsa Helper function -----------------------------------------------
 // Alsa audio Thread, handling writing of the alsa stream and pushing data to the audio buffer

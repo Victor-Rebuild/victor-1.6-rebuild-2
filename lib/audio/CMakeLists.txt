@@ -32,6 +32,17 @@ if (NOT TARGET clad)
   add_subdirectory(../../tools/message-buffers "${CMAKE_BINARY_DIR}/message-buffers")
 endif()
 
+if (STANDALONE_SIM)
+  message(STATUS "STANDALONE_SIM: ON. BUILDING BINARIES FOR WEBOTS, NOT VECTOR")
+  add_definitions(-DSTANDALONE_SIM)
+  set(STANDALONE_SIM_NOWARN
+    -Wno-unused-variable
+    -Wno-unused-const-variable
+    -Wno-unused-local-typedef
+    -Wno-unused-function
+  )
+endif()
+
 #
 # wwise
 #

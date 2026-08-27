@@ -48,7 +48,7 @@ namespace Factory {
     // Memory maps the EMR file and returns a pointer to it
     static Factory::EMR* OpenEMR(int openFlags, int protFlags)
     {
-      int fd = open(kEMRFile, openFlags);
+      int fd = open(kEMRFile, openFlags, 0600);
 
       if(fd == -1)
       {
