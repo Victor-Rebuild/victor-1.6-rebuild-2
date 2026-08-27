@@ -28,7 +28,7 @@ namespace Vector {
 
 namespace {
   unsigned int kTicksPerGameUpdate = 1;
-  unsigned int kScalingFactor = IsXray() ? 2 : 4; // must be power of 2
+  unsigned int kScalingFactor = 4; // must be power of 2
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -68,10 +68,13 @@ void BehaviorSnakeGame::OnBehaviorActivated()
   // reset dynamic variables
   _dVars = DynamicVariables();
 
-  // move head up
-  auto* action = new MoveHeadToAngleAction( M_PI/4 );
+  // Play getin
+  auto* action = new TriggerLiftSafeAnimationAction( AnimationTrigger::BlackJack_GetIn );
   DelegateIfInControl(action, [&](ActionResult result) {
     auto& rng = GetBEI().GetRNG();
+
+    // move head up
+    DelegateIfInControl(new MoveHeadToAngleAction( M_PI/4 ));
 
     unsigned int initLength = 10;
 
@@ -113,7 +116,8 @@ void BehaviorSnakeGame::BehaviorUpdate()
       _dVars.lost = true;
       CancelDelegates(false);
       // lost. play an animation and end
-      auto* newAction = new TriggerLiftSafeAnimationAction( AnimationTrigger::AudioOnlyHuh );
+      CompoundActionSequential *newAction = new CompoundActionSequential();
+      newAction->AddAction(new TriggerLiftSafeAnimationAction(AnimationTrigger::BlackJack_Swipe), true);
       DelegateIfInControl(newAction, [this](ActionResult result) {
         CancelSelf();
       });
@@ -133,9 +137,9 @@ void BehaviorSnakeGame::BehaviorUpdate()
 
     // draw face
     DrawGame( image );
-  }
 
-  GetBEI().GetAnimationComponent().DisplayFaceImage( image, 1.0f, true );
+    GetBEI().GetAnimationComponent().DisplayFaceImage( image, 0.0f, true );
+  }
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -199,14 +203,14 @@ void BehaviorSnakeGame::AnimateDirection( uint8_t directionInt )
       degrees = 10.f;
     }
     auto turnAction = new TurnInPlaceAction( DEG_TO_RAD(degrees), false );
-    turnAction->SetAccel(MAX_BODY_ROTATION_ACCEL_RAD_PER_SEC2);
+    turnAction->SetAccel(MAX_BODY_ROTATION_ACCEL_RAD_PER_SEC2 / 2);
     turnAction->SetMaxSpeed(MAX_BODY_ROTATION_SPEED_RAD_PER_SEC);
     CancelDelegates();
     DelegateIfInControl(turnAction);
   } else {
     IAction* liftAction;
-    if( direction == SnakeGame::Direction::UP ) {
-      liftAction = new MoveLiftToHeightAction(10.0f); // not working
+    if( direction == SnakeGame::Direction::DOWN ) {
+      liftAction = new MoveLiftToHeightAction(MoveLiftToHeightAction::Preset::JUST_ABOVE_PROX); // not working
     } else {
       liftAction = new MoveLiftToHeightAction(MoveLiftToHeightAction::Preset::LOW_DOCK);
     }
