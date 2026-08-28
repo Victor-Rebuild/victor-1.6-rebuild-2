@@ -1647,6 +1647,10 @@ void FaceInfoScreenManager::DrawMain()
   std::transform(esn.begin(), esn.end(), esn.begin(),
     [](unsigned char c){ return std::tolower(c); });
 
+  #ifdef STANDALONE_SIM
+    esn = "NO ESN!";
+  #endif
+
   std::string botname;
   if (namedRobot()) {
     if (Util::FileUtils::FileExists("/data/data/customBotName")) {
