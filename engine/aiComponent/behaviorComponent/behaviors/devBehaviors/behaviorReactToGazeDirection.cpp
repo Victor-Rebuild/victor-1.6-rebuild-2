@@ -103,6 +103,11 @@ void BehaviorReactToGazeDirection::OnBehaviorActivated()
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BehaviorReactToGazeDirection::TransitionToCheckForFace(const Radians& turnAngle)
 {
+  if (!_dVars.didReact) {
+    _dVars.didReact = true;
+  } else {
+    CancelSelf();
+  }
 
   // Turn to the angle, pick the correct (left or right) animation, and then search for a face.
   CompoundActionSequential* turnAction = new CompoundActionSequential();
@@ -134,6 +139,11 @@ void BehaviorReactToGazeDirection::TransitionToCheckForFace(const Radians& turnA
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BehaviorReactToGazeDirection::TransitionToLookAtFace(const SmartFaceID& faceToTurnTowards, const Radians& turnAngle)
 {
+  if (!_dVars.didReact) {
+    _dVars.didReact = true;
+  } else {
+    CancelSelf();
+  }
 
   // Using a turn towards face action and the face to turn towards, look for the
   // face we think is in the FOV if we were to turn to turn angle. The turn
@@ -164,6 +174,12 @@ void BehaviorReactToGazeDirection::TransitionToLookAtFace(const SmartFaceID& fac
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BehaviorReactToGazeDirection::TransitionToCheckForPointOnSurface(const Pose3d& gazePose)
 {
+  if (!_dVars.didReact) {
+    _dVars.didReact = true;
+  } else {
+    CancelSelf();
+  }
+
   const auto& translation = gazePose.GetTranslation();
   auto makingEyeContact = GetBEI().GetFaceWorld().IsMakingEyeContact(kMaxTimeSinceTrackedFaceUpdated_ms);
 

@@ -51,6 +51,7 @@ private:
 
     Pose3d                gazeDirectionPose;
     SmartFaceID           faceIDToTurnBackTo;
+    bool didReact   =     false;
   };
 
   InstanceConfig _iConfig;
