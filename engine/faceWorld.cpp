@@ -1212,16 +1212,16 @@ namespace Vector {
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   bool FaceWorld::ClearGazeDirectionHistory(const SmartFaceID& faceID)
   {
-    // Loop over all the faces and see if any of them are making eye contact
-    for (const auto& entry: _faceEntries)
+    for (auto& entry: _faceEntries)
     {
       if (faceID.MatchesFaceID(entry.second.face.GetID()))
       {
-        const auto& gazeDirectionEntry = _gazeDirection.find(entry.second.face.GetID());
+        auto gazeDirectionEntry = _gazeDirection.find(entry.second.face.GetID());
         if (gazeDirectionEntry != _gazeDirection.end()) {
           gazeDirectionEntry->second.ClearHistory();
-          return true;
         }
+        entry.second.face.SetGazeDirectionStable(false);
+        return true;
       }
     }
     return false;

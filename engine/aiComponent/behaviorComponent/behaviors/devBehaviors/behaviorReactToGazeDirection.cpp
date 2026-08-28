@@ -45,6 +45,8 @@ namespace {
 
   // Configuration file keys
   const char* const kSearchForFaces = "searchForFaces";
+  const char* const kCooldownKey    = "cooldown_s";
+  const float kDefaultCooldown_s    = 15.f;
 }
 
 #define LOG_CHANNEL "Behaviors"
@@ -68,8 +70,9 @@ void BehaviorReactToGazeDirection::BehaviorUpdate()
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 BehaviorReactToGazeDirection::InstanceConfig::InstanceConfig(const Json::Value& config)
+: cooldown(config.get(kCooldownKey, kDefaultCooldown_s).asFloat())
 {
-  const std::string& debugName = "BehaviorReactToBody.InstanceConfig.LoadConfig";
+  const std::string& debugName = "BehaviorReactToGazeDirection.InstanceConfig.LoadConfig";
   searchForFaces = JsonTools::ParseBool(config, kSearchForFaces, debugName);
 }
 
@@ -84,6 +87,7 @@ void BehaviorReactToGazeDirection::GetBehaviorJsonKeys(std::set<const char*>& ex
 {
   const char* list[] = {
       kSearchForFaces,
+      kCooldownKey,
   };
   expectedKeys.insert( std::begin(list), std::end(list) );
 }
@@ -91,24 +95,22 @@ void BehaviorReactToGazeDirection::GetBehaviorJsonKeys(std::set<const char*>& ex
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool BehaviorReactToGazeDirection::WantsToBeActivatedBehavior() const
 {
+  if (_iConfig.cooldown.OnCooldown()) {
+    return false;
+  }
   return GetBEI().GetFaceWorld().AnyStableGazeDirection(kMaxTimeSinceTrackedFaceUpdated_ms);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BehaviorReactToGazeDirection::OnBehaviorActivated()
 {
+  _dVars = DynamicVariables();
   TransitionToCheckGazeDirection();
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BehaviorReactToGazeDirection::TransitionToCheckForFace(const Radians& turnAngle)
 {
-  if (!_dVars.didReact) {
-    _dVars.didReact = true;
-  } else {
-    CancelSelf();
-  }
-
   // Turn to the angle, pick the correct (left or right) animation, and then search for a face.
   CompoundActionSequential* turnAction = new CompoundActionSequential();
   if (turnAngle > 0) {
@@ -139,12 +141,6 @@ void BehaviorReactToGazeDirection::TransitionToCheckForFace(const Radians& turnA
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BehaviorReactToGazeDirection::TransitionToLookAtFace(const SmartFaceID& faceToTurnTowards, const Radians& turnAngle)
 {
-  if (!_dVars.didReact) {
-    _dVars.didReact = true;
-  } else {
-    CancelSelf();
-  }
-
   // Using a turn towards face action and the face to turn towards, look for the
   // face we think is in the FOV if we were to turn to turn angle. The turn
   // angle is used to choose to play the left or right animation.
@@ -174,12 +170,6 @@ void BehaviorReactToGazeDirection::TransitionToLookAtFace(const SmartFaceID& fac
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BehaviorReactToGazeDirection::TransitionToCheckForPointOnSurface(const Pose3d& gazePose)
 {
-  if (!_dVars.didReact) {
-    _dVars.didReact = true;
-  } else {
-    CancelSelf();
-  }
-
   const auto& translation = gazePose.GetTranslation();
   auto makingEyeContact = GetBEI().GetFaceWorld().IsMakingEyeContact(kMaxTimeSinceTrackedFaceUpdated_ms);
 
@@ -279,6 +269,7 @@ void BehaviorReactToGazeDirection::TransitionToCheckGazeDirection()
 
       // Now that we know we are going to turn clear the history
       GetBEI().GetFaceWorldMutable().ClearGazeDirectionHistory(_dVars.faceIDToTurnBackTo);
+      _iConfig.cooldown.StartCooldown(GetRNG());
 
       if (_iConfig.searchForFaces) {
 

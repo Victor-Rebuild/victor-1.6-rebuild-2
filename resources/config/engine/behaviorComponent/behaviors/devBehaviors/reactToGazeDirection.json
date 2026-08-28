@@ -2,6 +2,7 @@
   "behaviorID" :   "ReactToGazeDirection",
   "behaviorClass": "ReactToGazeDirection",
   "searchForFaces": true,
+  "cooldown_s": 15.0,
 
   "wantsToBeActivatedCondition":  {
     "conditionType": "FeatureGate",

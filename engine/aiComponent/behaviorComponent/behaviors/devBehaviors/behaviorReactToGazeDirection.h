@@ -13,6 +13,7 @@
 #define __Engine_AiComponent_BehaviorComponent_Behaviors_BehaviorReactToGazeDirection__
 
 #include "coretech/common/engine/robotTimeStamp.h"
+#include "engine/aiComponent/behaviorComponent/behaviors/dispatch/helpers/behaviorCooldownInfo.h"
 #include "engine/aiComponent/behaviorComponent/behaviors/iCozmoBehavior.h"
 #include "engine/smartFaceId.h"
 
@@ -44,6 +45,7 @@ private:
     InstanceConfig(const Json::Value& config);
 
     bool searchForFaces;
+    BehaviorCooldownInfo cooldown;
   };
 
   struct DynamicVariables {
@@ -51,7 +53,6 @@ private:
 
     Pose3d                gazeDirectionPose;
     SmartFaceID           faceIDToTurnBackTo;
-    bool didReact   =     false;
   };
 
   InstanceConfig _iConfig;
