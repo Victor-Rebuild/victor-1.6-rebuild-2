@@ -43,6 +43,7 @@ protected:
 
   virtual bool WantsToBeActivatedBehavior() const override;
   virtual void OnBehaviorActivated() override;
+  virtual void OnBehaviorDeactivated() override;
   virtual void BehaviorUpdate() override;
 
 private:
@@ -62,6 +63,8 @@ private:
     std::unique_ptr<SnakeGameSolver> solver;
     unsigned int gameTicks;
     bool lost = false;
+    int points = 0;
+    // int prevPoints = 0;
   };
 
   InstanceConfig _iConfig;

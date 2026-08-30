@@ -12,19 +12,28 @@
 
 
 #include "engine/aiComponent/behaviorComponent/behaviors/victor/behaviorSnakeGame.h"
-
-#include "anki/cozmo/shared/cozmoConfig.h"
-#include "coretech/common/engine/colorRGBA.h"
-#include "coretech/vision/engine/image.h"
-#include "engine/actions/animActions.h"
-#include "engine/actions/basicActions.h"
-#include "engine/components/animationComponent.h"
 #include "engine/aiComponent/behaviorComponent/behaviors/victor/snakeGame.h"
 #include "engine/aiComponent/behaviorComponent/behaviors/victor/snakeGameSolver.h"
 
+#include "coretech/common/engine/colorRGBA.h"
+#include "coretech/common/engine/utils/timer.h"
+#include "coretech/vision/engine/image.h"
+
+#include "engine/actions/animActions.h"
+#include "engine/actions/basicActions.h"
+
+#include "engine/audio/engineRobotAudioClient.h"
+
+#include "engine/components/animationComponent.h"
+#include "engine/components/rebuildConfig.h"
+
+#include "clad/audio/audioEventTypes.h"
 
 namespace Anki {
 namespace Vector {
+
+using AMD_GE_GE = AudioMetaData::GameEvent::GenericEvent;
+using AMD_GOT = AudioMetaData::GameObjectType;
 
 namespace {
   unsigned int kTicksPerGameUpdate = 1;
@@ -46,13 +55,15 @@ BehaviorSnakeGame::~BehaviorSnakeGame()
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool BehaviorSnakeGame::WantsToBeActivatedBehavior() const
 {
-  return true;
+  srand(BaseStationTimer::getInstance()->GetCurrentTimeInSeconds());
+  return (rand() % 10 <= 2);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BehaviorSnakeGame::GetBehaviorOperationModifiers(BehaviorOperationModifiers& modifiers) const
 {
   modifiers.wantsToBeActivatedWhenOnCharger = true;
+  modifiers.wantsToBeActivatedWhenOffTreads = false;
   modifiers.behaviorAlwaysDelegates = false;
 }
 
@@ -88,6 +99,13 @@ void BehaviorSnakeGame::OnBehaviorActivated()
   });
 }
 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void BehaviorSnakeGame::OnBehaviorDeactivated()
+{
+  if (_dVars.points > RebuildToggles::GetInt("snakeHighScoreVector")) {
+    RebuildToggles::SetInt(nullptr, "snakeHighScoreVector", _dVars.points);
+  }
+}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BehaviorSnakeGame::BehaviorUpdate()
@@ -118,6 +136,7 @@ void BehaviorSnakeGame::BehaviorUpdate()
       // lost. play an animation and end
       CompoundActionSequential *newAction = new CompoundActionSequential();
       newAction->AddAction(new TriggerLiftSafeAnimationAction(AnimationTrigger::BlackJack_Swipe), true);
+      newAction->AddAction(new TriggerLiftSafeAnimationAction(AnimationTrigger::Feedback_ShutUp), true);
       DelegateIfInControl(newAction, [this](ActionResult result) {
         CancelSelf();
       });
@@ -137,6 +156,11 @@ void BehaviorSnakeGame::BehaviorUpdate()
 
     // draw face
     DrawGame( image );
+
+    // if (_dVars.prevPoints != _dVars.points) {
+    //   _dVars.prevPoints = _dVars.points;
+    //   LOG_WARNING("BehaviorSnakeGame", "Current points %i", _dVars.points);
+    // }
 
     GetBEI().GetAnimationComponent().DisplayFaceImage( image, 0.0f, true );
   }
@@ -184,6 +208,11 @@ void BehaviorSnakeGame::DrawGame( Vision::Image& image ) const
         setImg(i,j, 255);
       } else if( game.GetFood().x == snakeI && game.GetFood().y == snakeJ ) {
         setImg(i,j, 255);
+      }
+      if (game.GetScore() != _dVars.points) {
+        auto& dVars = const_cast<DynamicVariables&>(_dVars);
+        dVars.points = game.GetScore();
+        GetBEI().GetRobotAudioClient().PostEvent(AMD_GE_GE::Play__Robot_Vic_Sfx__Blackjack_Deal, AMD_GOT::Behavior);
       }
     }
   }
