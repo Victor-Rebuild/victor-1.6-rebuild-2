@@ -29,6 +29,7 @@
 #include "anki/cozmo/robot/logging.h"
 #include "anki/cozmo/robot/hal.h"
 #include "anki/cozmo/robot/DAS.h"
+#include "anki/cozmo/shared/cozmoConfig.h"
 
 #include "clad/robotInterface/messageRobotToEngine_send_helper.h"
 #include "clad/types/motorTypes.h"
@@ -688,7 +689,8 @@ namespace Anki {
             ++numCliffSensorsDetectingChange;
           }
         }
-        bool cliffBasedPickupDetect = numCliffSensorsDetectingChange >= NUM_CLIFF_SENSORS_FOR_CHANGE_DETECT_PICKUP;
+        bool cliffBasedPickupDetect = !IsCozmoBody() &&
+                                      numCliffSensorsDetectingChange >= NUM_CLIFF_SENSORS_FOR_CHANGE_DETECT_PICKUP;
 
 
         if (IsPickedUp()) {
