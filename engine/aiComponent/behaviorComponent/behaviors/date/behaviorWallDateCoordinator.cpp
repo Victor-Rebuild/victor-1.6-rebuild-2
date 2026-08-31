@@ -249,12 +249,13 @@ std::string BehaviorWallDateCoordinator::GetTTSStringForDate()
   std::string dayStringEnd;
   struct tm localDate;
 
-  int currentMonth = localDate.tm_mon;
-  int currentDay = localDate.tm_mday;
   int dayWeek = 0;
 
   WallTime::getInstance()->GetLocalTime(localDate);
   WallTime::getInstance()->GetDayOfWeek(dayWeek);
+
+  int currentMonth = localDate.tm_mon;
+  int currentDay = localDate.tm_mday;
 
   const auto & localeComponent = GetBEI().GetRobotInfo().GetLocaleComponent();
 
@@ -309,8 +310,8 @@ std::string BehaviorWallDateCoordinator::GetTTSStringForDate()
     dayStringEnd = "";
   }
     
-  ss << dayString + "" + monthString + "" + std::to_string(currentDay) + dayStringEnd;
-  LOG_WARNING("Date", "DateString: %s", ss.str().c_str());
+  ss << dayString + " " + monthString + " " + std::to_string(currentDay) + dayStringEnd;
+  LOG_WARNING("Date", "Final full date string: %s Month: %i Day: %i", ss.str().c_str(), currentMonth, currentDay);
 
   return ss.str();
 }
