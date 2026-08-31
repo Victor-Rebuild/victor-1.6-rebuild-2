@@ -63,7 +63,7 @@ bool BehaviorSnakeGame::WantsToBeActivatedBehavior() const
 {
   UserIntentComponent& uic = GetBehaviorComp<UserIntentComponent>();
   srand(BaseStationTimer::getInstance()->GetCurrentTimeInSeconds());
-  return (rand() % 10 <= 2) || uic.IsUserIntentPending(USER_INTENT(snake_victor_score));
+  return (rand() % 10 <= 4) || uic.IsUserIntentPending(USER_INTENT(snake_victor_score));
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
