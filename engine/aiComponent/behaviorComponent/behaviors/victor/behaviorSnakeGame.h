@@ -14,6 +14,7 @@
 #define __Engine_AiComponent_BehaviorComponent_Behaviors_BehaviorSnakeGame__
 
 #include "engine/aiComponent/behaviorComponent/behaviors/iCozmoBehavior.h"
+#include "engine/aiComponent/behaviorComponent/behaviors/animationWrappers/behaviorTextToSpeechLoop.h"
 
 namespace Anki {
 
@@ -41,6 +42,7 @@ protected:
   virtual void GetAllDelegates(std::set<IBehavior*>& delegates) const override ;
   virtual void GetBehaviorJsonKeys(std::set<const char*>& expectedKeys) const override {}
 
+  virtual void InitBehavior() override;
   virtual bool WantsToBeActivatedBehavior() const override;
   virtual void OnBehaviorActivated() override;
   virtual void OnBehaviorDeactivated() override;
@@ -48,13 +50,14 @@ protected:
 
 private:
 
-  void UpdateGame();
+  void SayScore();
 
   void DrawGame( Vision::Image& image ) const;
 
   void AnimateDirection( uint8_t direction );
 
   struct InstanceConfig {
+    std::shared_ptr<BehaviorTextToSpeechLoop>          ttsBehavior;
   };
 
   struct DynamicVariables {

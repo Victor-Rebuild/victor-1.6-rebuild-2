@@ -7,8 +7,5 @@
 
   "respondToUserIntents": [
     { "type": "play_rockPaperScissors" }
-  ],
-
-  "goToChargerBehavior": "FindHomeForSleeping",
-  "powerOffAnimName" : "anim_gotosleep_getin_01"
+  ]
 }

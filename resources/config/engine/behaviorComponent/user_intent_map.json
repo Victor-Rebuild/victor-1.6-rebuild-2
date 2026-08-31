@@ -383,6 +383,10 @@
     {
       "cloud_intent": "intent_play_rockPaperScissorsScissors",
       "user_intent": "play_rockPaperScissorsScissors"
+    },
+    {
+      "cloud_intent": "intent_snake_victor_score",
+      "user_intent": "snake_victor_score"
     }
   ],
 

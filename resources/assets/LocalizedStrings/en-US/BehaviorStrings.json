@@ -122,5 +122,8 @@
   },
   "BehaviorRespondToName.ImX": {
     "translation": "I'm {0}"
+  },
+  "BehaviorSnakeGame.VictorScore": {
+    "translation": "My high score is {0}"
   }
 }

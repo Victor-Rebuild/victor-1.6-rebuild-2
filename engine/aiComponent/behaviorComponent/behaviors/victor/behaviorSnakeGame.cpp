@@ -11,9 +11,13 @@
  **/
 
 
+#include "engine/aiComponent/behaviorComponent/behaviorContainer.h"
 #include "engine/aiComponent/behaviorComponent/behaviors/victor/behaviorSnakeGame.h"
 #include "engine/aiComponent/behaviorComponent/behaviors/victor/snakeGame.h"
 #include "engine/aiComponent/behaviorComponent/behaviors/victor/snakeGameSolver.h"
+#include "engine/aiComponent/behaviorComponent/behaviorExternalInterface/beiRobotInfo.h"
+#include "engine/aiComponent/behaviorComponent/userIntentComponent.h"
+#include "engine/aiComponent/behaviorComponent/userIntents.h"
 
 #include "coretech/common/engine/colorRGBA.h"
 #include "coretech/common/engine/utils/timer.h"
@@ -25,6 +29,7 @@
 #include "engine/audio/engineRobotAudioClient.h"
 
 #include "engine/components/animationComponent.h"
+#include "engine/components/localeComponent.h"
 #include "engine/components/rebuildConfig.h"
 
 #include "clad/audio/audioEventTypes.h"
@@ -38,6 +43,7 @@ using AMD_GOT = AudioMetaData::GameObjectType;
 namespace {
   unsigned int kTicksPerGameUpdate = 1;
   unsigned int kScalingFactor = 4; // must be power of 2
+  const char * kVictorScore = "BehaviorSnakeGame.VictorScore";
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -55,8 +61,9 @@ BehaviorSnakeGame::~BehaviorSnakeGame()
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool BehaviorSnakeGame::WantsToBeActivatedBehavior() const
 {
+  UserIntentComponent& uic = GetBehaviorComp<UserIntentComponent>();
   srand(BaseStationTimer::getInstance()->GetCurrentTimeInSeconds());
-  return (rand() % 10 <= 2);
+  return (rand() % 10 <= 2) || uic.IsUserIntentPending(USER_INTENT(snake_victor_score));
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -68,9 +75,18 @@ void BehaviorSnakeGame::GetBehaviorOperationModifiers(BehaviorOperationModifiers
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void BehaviorSnakeGame::InitBehavior()
+{
+  auto& BC = GetBEI().GetBehaviorContainer();
+  BC.FindBehaviorByIDAndDowncast( BEHAVIOR_ID(DefaultTextToSpeechLoop),
+                                BEHAVIOR_CLASS(TextToSpeechLoop),
+                                _iConfig.ttsBehavior );
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BehaviorSnakeGame::GetAllDelegates(std::set<IBehavior*>& delegates) const
 {
-
+  delegates.insert(_iConfig.ttsBehavior.get());
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -78,6 +94,14 @@ void BehaviorSnakeGame::OnBehaviorActivated()
 {
   // reset dynamic variables
   _dVars = DynamicVariables();
+
+  UserIntentComponent& uic = GetBehaviorComp<UserIntentComponent>();
+  UserIntentPtr intentDataVictorScore = uic.GetUserIntentIfActive(USER_INTENT(snake_victor_score));
+
+  if (intentDataVictorScore) {
+    SayScore();
+    return;
+  }
 
   // Play getin
   auto* action = new TriggerLiftSafeAnimationAction( AnimationTrigger::BlackJack_GetIn );
@@ -164,6 +188,17 @@ void BehaviorSnakeGame::BehaviorUpdate()
 
     GetBEI().GetAnimationComponent().DisplayFaceImage( image, 0.0f, true );
   }
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void BehaviorSnakeGame::SayScore()
+{
+  UserIntentComponent& uic = GetBehaviorComp<UserIntentComponent>();
+  const auto & localeComponent = GetBEI().GetRobotInfo().GetLocaleComponent();
+  static const UserIntentTag victorScoreIntent = USER_INTENT(snake_victor_score);
+  uic.DropUserIntent(victorScoreIntent);
+  _iConfig.ttsBehavior->SetTextToSay(localeComponent.GetString(kVictorScore, std::to_string(RebuildToggles::GetInt("snakeHighScoreVector"))));
+  DelegateIfInControl(_iConfig.ttsBehavior.get(), [this](){CancelSelf();});
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

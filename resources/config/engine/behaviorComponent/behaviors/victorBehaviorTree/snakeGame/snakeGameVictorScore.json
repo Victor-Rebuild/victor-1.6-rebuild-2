@@ -1,0 +1,8 @@
+{
+  "behaviorID" : "SnakeGameVictorScore",
+  "behaviorClass": "SnakeGame",
+
+  "respondToUserIntents": [
+    { "type": "snake_victor_score" }
+  ]
+}
