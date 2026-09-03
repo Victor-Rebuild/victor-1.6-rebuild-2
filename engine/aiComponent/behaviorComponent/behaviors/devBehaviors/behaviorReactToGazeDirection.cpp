@@ -97,6 +97,9 @@ bool BehaviorReactToGazeDirection::WantsToBeActivatedBehavior() const
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BehaviorReactToGazeDirection::OnBehaviorActivated()
 {
+  // reset dynamic variables
+  _dVars = DynamicVariables();
+
   TransitionToCheckGazeDirection();
 }
 
@@ -106,7 +109,10 @@ void BehaviorReactToGazeDirection::TransitionToCheckForFace(const Radians& turnA
   if (!_dVars.didReact) {
     _dVars.didReact = true;
   } else {
+    // If we're doing this again assume we're looping
+    GetBEI().GetFaceWorldMutable().ClearGazeDirectionHistory(_dVars.faceIDToTurnBackTo);
     CancelSelf();
+    return;
   }
 
   // Turn to the angle, pick the correct (left or right) animation, and then search for a face.
@@ -142,7 +148,10 @@ void BehaviorReactToGazeDirection::TransitionToLookAtFace(const SmartFaceID& fac
   if (!_dVars.didReact) {
     _dVars.didReact = true;
   } else {
+    // If we're doing this again assume we're looping
+    GetBEI().GetFaceWorldMutable().ClearGazeDirectionHistory(_dVars.faceIDToTurnBackTo);
     CancelSelf();
+    return;
   }
 
   // Using a turn towards face action and the face to turn towards, look for the
@@ -177,7 +186,10 @@ void BehaviorReactToGazeDirection::TransitionToCheckForPointOnSurface(const Pose
   if (!_dVars.didReact) {
     _dVars.didReact = true;
   } else {
+    // If we're doing this again assume we're looping
+    GetBEI().GetFaceWorldMutable().ClearGazeDirectionHistory(_dVars.faceIDToTurnBackTo);
     CancelSelf();
+    return;
   }
 
   const auto& translation = gazePose.GetTranslation();
