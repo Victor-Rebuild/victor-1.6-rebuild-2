@@ -499,9 +499,10 @@ namespace Anim {
       Abort();
       return RESULT_OK;
     }
-    auto* anim = _context->GetDataLoader()->GetCannedAnimation(name);
-    return SetStreamingAnimation(anim, tag, numLoops, startAt_ms, interruptRunning,
-                                 shouldOverrideEyeHue, shouldRenderInEyeHue, false);
+    return RESULT_OK;
+    // auto* anim = _context->GetDataLoader()->GetCannedAnimation(name);
+    // return SetStreamingAnimation(anim, tag, numLoops, startAt_ms, interruptRunning,
+    //                              shouldOverrideEyeHue, shouldRenderInEyeHue, false);
   }
 
   void AnimationStreamer::SetPendingStreamingAnimation(const std::string& name, u32 numLoops)
@@ -2141,8 +2142,12 @@ namespace Anim {
     if( auto ex = _doom->GetException() ) {
       try {
         std::rethrow_exception( ex );
+      } catch( const std::string& e ) {
+        PRINT_NAMED_ERROR("DOOM", "%s", e.c_str() );
       } catch( const std::exception& e ) {
         PRINT_NAMED_ERROR("DOOM", "%s", e.what() );
+      } catch( ... ) {
+        PRINT_NAMED_ERROR("DOOM", "unknown exception type");
       }
       // error. show all red face
       drawColor(Anki::Vision::PixelRGB565(255,0,0));

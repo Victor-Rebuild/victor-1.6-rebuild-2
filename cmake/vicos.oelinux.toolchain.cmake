@@ -115,7 +115,6 @@ list(APPEND VICOS_COMPILER_FLAGS
 	-no-canonical-prefixes)
 list(APPEND VICOS_COMPILER_FLAGS_CXX
     -Qunused-arguments
-	-fno-exceptions
 	-fno-rtti)
 list(APPEND VICOS_COMPILER_FLAGS_RELEASE
   -D_FORTIFY_SOURCE=2)

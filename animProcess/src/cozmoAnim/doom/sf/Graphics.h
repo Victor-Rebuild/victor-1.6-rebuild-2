@@ -1,12 +1,15 @@
 #pragma once
 
 #include "coretech/vision/engine/image.h"
+#include "coretech/vision/engine/colorPixelTypes.h"
 #include <memory>
 #include <mutex>
 
 namespace Anki {
   namespace Vision {
     class ImageRGB565;
+    class PixelRGBA;
+    class PixelRGB565;
   }
 }
 
@@ -43,7 +46,7 @@ public:
   void setScale(const Vector2<int>& size);
   void setScale(float scaleX, float scaleY);
 
-  Anki::Vision::ImageRGB GetImage() const;
+  Anki::Vision::ImageRGBA GetImage() const;
 private:
   const Texture* _texture = nullptr; // the fullsize image from the game
   Uint32 _height=0;
@@ -70,7 +73,7 @@ private:
   Uint32 _width;
   Uint32 _height;
   std::mutex _mutex;
-  Anki::Vision::ImageRGB _image; // this code is sloppier because I was avoiding including image in the .h but had to anyway :|
+  Anki::Vision::ImageRGBA _image; // this code is sloppier because I was avoiding including image in the .h but had to anyway :|
   int _frameCount=0;
   int _lastFrameCount=0;
 

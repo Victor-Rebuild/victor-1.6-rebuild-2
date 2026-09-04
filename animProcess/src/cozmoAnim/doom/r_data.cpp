@@ -394,7 +394,7 @@ void R_InitTextures (void)
 
     int*		patchlookup;
 
-    int			totalwidth;
+    // int			totalwidth;
     int			nummappatches;
     int			offset;
     int			maxoff;
@@ -452,7 +452,7 @@ void R_InitTextures (void)
     texturewidthmask = (int*)malloc (numtextures*sizeof(void*));
     textureheight = (int*)malloc (numtextures*sizeof(void*));
 
-    totalwidth = 0;
+    // totalwidth = 0;
 
     //	Really complex printing shit...
     temp1 = WadManager::getNumForName ("S_START");  // P_???????
@@ -520,7 +520,7 @@ void R_InitTextures (void)
 	texturewidthmask[i] = j-1;
 	textureheight[i] = texture->height<<FRACBITS;
 
-	totalwidth += texture->width;
+	// totalwidth += texture->width;
     }
 
     // Precalculate whatever possible.

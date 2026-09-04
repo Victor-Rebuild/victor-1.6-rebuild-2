@@ -13,7 +13,7 @@
 
 
 #include "coretech/vision/engine/image.h"
-#include "coretech/common/engine/math/matrix_impl.h"
+#include "coretech/common/shared/math/matrix.h"
 
 #include "anki/cozmo/shared/cozmoConfig.h"
 
@@ -42,7 +42,7 @@ DoomPort::DoomPort(const std::string& resourcePath, unsigned int width, unsigned
 
 }
 
-void DoomPort::SetAudioController( Anki::Cozmo::Audio::CozmoAudioController* ac )
+void DoomPort::SetAudioController( Anki::Vector::Audio::CozmoAudioController* ac )
 {
   _gMixer.SetAudioController( ac );
 }
@@ -59,7 +59,13 @@ void DoomPort::Stop() {
 void DoomPort::CallDoomMain() {
   try {
     D_DoomMain();
-  } catch (std::exception ex) {
+  } catch (const std::string& err) {
+    std::lock_guard<std::mutex> lock(_mutex);
+    _exception = std::current_exception();
+  } catch (const std::exception& ex) {
+    std::lock_guard<std::mutex> lock(_mutex);
+    _exception = std::current_exception();
+  } catch (...) {
     std::lock_guard<std::mutex> lock(_mutex);
     _exception = std::current_exception();
   }
@@ -87,14 +93,14 @@ void DoomPort::GetScreen(Anki::Vision::ImageRGB565& screen)
   } else {
     PRINT_NAMED_WARNING("DOOM","no window yet");
     // Display three color strips increasing in brightness from left to right
-    for(int i=0; i<Anki::Cozmo::FACE_DISPLAY_HEIGHT/3; ++i)
+    for(int i=0; i<Anki::Vector::FACE_DISPLAY_HEIGHT/3; ++i)
     {
       Anki::Vision::PixelRGB565* red_i   = screen.GetRow(i);
-      Anki::Vision::PixelRGB565* green_i = screen.GetRow(i + Anki::Cozmo::FACE_DISPLAY_HEIGHT/3);
-      Anki::Vision::PixelRGB565* blue_i  = screen.GetRow(i + 2*Anki::Cozmo::FACE_DISPLAY_HEIGHT/3);
-      for(int j=0; j<Anki::Cozmo::FACE_DISPLAY_WIDTH; ++j)
+      Anki::Vision::PixelRGB565* green_i = screen.GetRow(i + Anki::Vector::FACE_DISPLAY_HEIGHT/3);
+      Anki::Vision::PixelRGB565* blue_i  = screen.GetRow(i + 2*Anki::Vector::FACE_DISPLAY_HEIGHT/3);
+      for(int j=0; j<Anki::Vector::FACE_DISPLAY_WIDTH; ++j)
       {
-        const u8 value = Anki::Util::numeric_cast_clamped<u8>(std::round((f32)j/(f32)Anki::Cozmo::FACE_DISPLAY_WIDTH * 255.f));
+        const u8 value = Anki::Util::numeric_cast_clamped<u8>(std::round((f32)j/(f32)Anki::Vector::FACE_DISPLAY_WIDTH * 255.f));
         red_i[j]   = Anki::Vision::PixelRGB565(value, 0, 0);
         green_i[j] = Anki::Vision::PixelRGB565(0, value, 0);
         blue_i[j]  = Anki::Vision::PixelRGB565(0, 0, value);
@@ -105,6 +111,7 @@ void DoomPort::GetScreen(Anki::Vision::ImageRGB565& screen)
 
 void InputFire()
 {
+  if (!window) return;
   sf::Event ev;
   ev.type = sf::Event::KeyPressed;
   ev.key.code = sf::Event::Key::LControl; // attack
@@ -113,6 +120,7 @@ void InputFire()
 
 void InputFireRelease()
 {
+  if (!window) return;
   sf::Event ev;
   ev.type = sf::Event::KeyReleased;
   ev.key.code = sf::Event::Key::LControl;
@@ -121,6 +129,7 @@ void InputFireRelease()
 
 void InputUse()
 {
+  if (!window) return;
   sf::Event ev;
   ev.type = sf::Event::KeyPressed;
   ev.key.code = sf::Event::Key::Space; // use
@@ -128,6 +137,7 @@ void InputUse()
 }
 void InputUseRelease()
 {
+  if (!window) return;
   sf::Event ev;
   ev.type = sf::Event::KeyReleased;
   ev.key.code = sf::Event::Key::Space; // use
@@ -136,6 +146,7 @@ void InputUseRelease()
 
 void InputForward()
 {
+  if (!window) return;
   sf::Event ev;
   ev.type = sf::Event::KeyPressed;
   ev.key.code = sf::Event::Key::W;
@@ -143,6 +154,7 @@ void InputForward()
 }
 void InputForwardRelease()
 {
+  if (!window) return;
   sf::Event ev;
   ev.type = sf::Event::KeyReleased;
   ev.key.code = sf::Event::Key::W;
@@ -151,6 +163,7 @@ void InputForwardRelease()
 
 void InputBackward()
 {
+  if (!window) return;
   sf::Event ev;
   ev.type = sf::Event::KeyPressed;
   ev.key.code = sf::Event::Key::S;
@@ -158,6 +171,7 @@ void InputBackward()
 }
 void InputBackwardRelease()
 {
+  if (!window) return;
   sf::Event ev;
   ev.type = sf::Event::KeyReleased;
   ev.key.code = sf::Event::Key::S;
@@ -166,6 +180,7 @@ void InputBackwardRelease()
 
 void InputLeft()
 {
+  if (!window) return;
   sf::Event ev;
   ev.type = sf::Event::KeyPressed;
   ev.key.code = sf::Event::Key::Left;
@@ -173,6 +188,7 @@ void InputLeft()
 }
 void InputLeftRelease()
 {
+  if (!window) return;
   sf::Event ev;
   ev.type = sf::Event::KeyReleased;
   ev.key.code = sf::Event::Key::Left;
@@ -181,6 +197,7 @@ void InputLeftRelease()
 
 void InputRight()
 {
+  if (!window) return;
   sf::Event ev;
   ev.type = sf::Event::KeyPressed;
   ev.key.code = sf::Event::Key::Right;
@@ -188,6 +205,7 @@ void InputRight()
 }
 void InputRightRelease()
 {
+  if (!window) return;
   sf::Event ev;
   ev.type = sf::Event::KeyReleased;
   ev.key.code = sf::Event::Key::Right;
@@ -224,20 +242,20 @@ void ConsoleInputRightRelease( ConsoleFunctionContextRef context ) { InputRightR
 CONSOLE_FUNC(ConsoleInputRightRelease, "AAA DOOM");
 
 
-void DoomPort::HandleMessage(const Anki::Cozmo::RobotState& robotState)
+void DoomPort::HandleMessage(const Anki::Vector::RobotState& robotState)
 {
-  if( !_gMainLoopStarted ) {
+  if( !_gMainLoopStarted || window == nullptr ) {
     return;
   }
 
   // todo: helper for this shit
   static bool buttonWasPressed = false;
-  const auto buttonIsPressed = static_cast<bool>(robotState.status & (uint16_t)Anki::Cozmo::RobotStatusFlag::IS_BUTTON_PRESSED);
+  const auto buttonIsPressed = static_cast<bool>(robotState.status & (uint16_t)Anki::Vector::RobotStatusFlag::IS_BUTTON_PRESSED);
   const auto buttonPressedEvent = !buttonWasPressed && buttonIsPressed;
   const auto buttonReleasedEvent = buttonWasPressed && !buttonIsPressed;
   buttonWasPressed = buttonIsPressed;
 
-  const auto liftHeight_mm = ((sinf(robotState.liftAngle) * Anki::Cozmo::LIFT_ARM_LENGTH) + Anki::Cozmo::LIFT_BASE_POSITION[2] + Anki::Cozmo::LIFT_FORK_HEIGHT_REL_TO_ARM_END);
+  const auto liftHeight_mm = ((sinf(robotState.liftAngle) * Anki::Vector::LIFT_ARM_LENGTH) + Anki::Vector::LIFT_BASE_POSITION[2] + Anki::Vector::LIFT_FORK_HEIGHT_REL_TO_ARM_END);
   static bool wasLiftAbove = false;
   const bool isAbove = liftHeight_mm > 50.0;
   const bool useButtonEvent = !wasLiftAbove && isAbove;

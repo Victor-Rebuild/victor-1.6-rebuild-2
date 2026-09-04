@@ -246,7 +246,8 @@ void I_Sound::S_UpdateSounds(mobj_t * listener_p)
     if (listener_p)
     {
         sf::Listener::setPosition(static_cast<float>(listener_p->x), static_cast<float>(listener_p->y), static_cast<float>(listener_p->z));
-        auto angle(static_cast<float>(listener_p->angle) / std::numeric_limits<unsigned int>::max());
+        auto angle(static_cast<double>(listener_p->angle) /
+               (static_cast<double>(std::numeric_limits<unsigned int>::max()) + 1.0));
         auto degrees = angle*360.f;
 
         //flip 180 degrees because...

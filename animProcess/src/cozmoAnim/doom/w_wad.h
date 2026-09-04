@@ -29,7 +29,7 @@ typedef struct
 /// \date 26/02/2017
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-typedef struct
+typedef struct lumpinfo_t
 {
     std::string	name = std::string(8, '0');
     std::vector<char> data;

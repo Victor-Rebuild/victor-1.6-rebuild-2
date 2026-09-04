@@ -83,13 +83,13 @@ const Animation* CannedAnimationContainer::GetAnimation(const std::string& name)
   const Animation* animPtr = nullptr;
   
   auto retVal = _animations.find(name);
-  if(retVal == _animations.end()) {
-    PRINT_NAMED_ERROR("CannedAnimationContainer.GetAnimation_Const.InvalidName",
-                      "Animation requested for unknown animation '%s'.",
-                      name.c_str());
-  } else {
+  // if(retVal == _animations.end()) {
+  //   PRINT_NAMED_ERROR("CannedAnimationContainer.GetAnimation_Const.InvalidName",
+  //                     "Animation requested for unknown animation '%s'.",
+  //                     name.c_str());
+  // } else {
     animPtr = &retVal->second;
-  }
+  // }
   
   return animPtr;
 }

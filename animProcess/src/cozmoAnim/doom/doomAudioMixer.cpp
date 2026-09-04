@@ -5,13 +5,12 @@
 #include "audioEngine/plugins/ankiPluginInterface.h"
 #include "cozmoAnim/audio/cozmoAudioController.h"
 #include "audioEngine/audioTypeTranslator.h"
-#include "clad/types/sayTextStyles.h"
 
 namespace {
   constexpr Anki::AudioMetaData::GameObjectType kGameObject
-    = Anki::AudioMetaData::GameObjectType::Cozmo_OnDevice;
+    = Anki::AudioMetaData::GameObjectType::TextToSpeech;
   constexpr Anki::AudioMetaData::GameEvent::GenericEvent kEvent
-    = Anki::AudioMetaData::GameEvent::GenericEvent::Play__Robot_Vo__External_Unprocessed;
+    = Anki::AudioMetaData::GameEvent::GenericEvent::Play__Robot_Vic__External_Voice_Text;
 }
 
 void DoomAudioMixer::Play( const Anki::AudioEngine::StandardWaveDataContainer* container, bool looping)
@@ -81,8 +80,8 @@ void DoomAudioMixer::PlayInternal( const Anki::AudioEngine::StandardWaveDataCont
   const auto gameObject = static_cast<AudioGameObject>(kGameObject);
 
   PRINT_NAMED_WARNING("DOOM","setting switch in DoomAudioMixer::PlayInternal");
-  const auto switchGroup = Anki::AudioMetaData::SwitchState::SwitchGroupType::Cozmo_Voice_Processing;
-  const auto switchState = Anki::Cozmo::SayTextVoiceStyle::Unprocessed;
+  const auto switchGroup = Anki::AudioMetaData::SwitchState::SwitchGroupType::Robot_Vic_External_Processing;
+  const auto switchState = Anki::AudioMetaData::SwitchState::SwitchGroupType::Robot_Vic_External_Processing;
   _audioController->SetSwitchState(static_cast<AudioSwitchGroupId>(switchGroup),
                                    static_cast<AudioSwitchStateId>(switchState),
                                    gameObject);

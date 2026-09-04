@@ -1,6 +1,8 @@
 #pragma once
 
 #include "cozmoAnim/doom/d_event.h"
+#include <string>
+#include <vector>
 
 #define printf(...) PRINT_NAMED_WARNING("DOOM", __VA_ARGS__)
 

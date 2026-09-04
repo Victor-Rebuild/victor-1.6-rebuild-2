@@ -129,23 +129,7 @@ extern bool demorecording;
 
 void I_Error (const char *error, ...)
 {
-    va_list	argptr;
-
-    // Message first.
-    va_start (argptr,error);
-    fprintf (stderr, "Error: ");
-    vfprintf (stderr,error,argptr);
-    fprintf (stderr, "\n");
-    va_end (argptr);
-
-    fflush( stderr );
-
-    // Shutdown. Here might be other errors.
-    if (demorecording)
-	G_CheckDemoStatus();
-
-    D_QuitNetGame ();
-    I_ShutdownGraphics();
-
+  fprintf(stderr, "DOOM I_Error: %s\n", error);
+  fflush(stderr);   // make sure it's flushed before anything can crash
   throw std::string(error);
 }

@@ -1,8 +1,9 @@
 #include "cozmoAnim/doom/sf/Graphics.h"
+#include "coretech/vision/engine/colorPixelTypes.h"
 #include "cozmoAnim/doom/sf/Event.h"
 #include "cozmoAnim/doom/sf/Vector2.h"
 #include "coretech/vision/engine/image.h"
-#include "coretech/common/engine/math/matrix_impl.h"
+#include "coretech/common/shared/math/matrix.h"
 
 #include <queue>
 
@@ -64,34 +65,34 @@ void Sprite::setScale(float scaleX, float scaleY)
 
 }
 
-Anki::Vision::ImageRGB Sprite::GetImage() const
+Anki::Vision::ImageRGBA Sprite::GetImage() const
 {
   DEV_ASSERT( _texture != nullptr, "null texture" );
 
   // todo: three copies here, could be 1 if done manually.
 
   // src image. copy 1
-  Anki::Vision::ImageRGB src( _texture->GetHeight(), _texture->GetWidth() );
+  Anki::Vision::ImageRGBA src( _texture->GetHeight(), _texture->GetWidth() );
   for( int i=0; i<_texture->GetHeight(); ++i ) {
-    Anki::Vision::PixelRGB* row = src.GetRow(i);
+    Anki::Vision::PixelRGBA* row = src.GetRow(i);
     for( int j=0; j<_texture->GetWidth(); ++j ) {
       Uint32 offset = 3*i*_texture->GetWidth() + 3*j;
       Uint8 r = *(_texture->GetPixels() + offset + 0);
       Uint8 g = *(_texture->GetPixels() + offset + 1);
       Uint8 b = *(_texture->GetPixels() + offset + 2);
-      row[j] = Anki::Vision::PixelRGB(r,g,b);
+      row[j] = Anki::Vision::PixelRGBA(r,g,b,1);
     }
   }
 
   // dst image
-  Anki::Vision::ImageRGB dst(_height, _width);
+  Anki::Vision::ImageRGBA dst(_height, _width);
 
   // resize. copy 2
   src.ResizeKeepAspectRatio( dst );
 
   // add border. copy 3
   if( (dst.GetNumCols() < _width) || (dst.GetNumRows() < _height) ) {
-    Anki::Vision::ImageRGB ret(_height, _width);
+    Anki::Vision::ImageRGBA ret(_height, _width);
     int top = (_height - dst.GetNumRows()) / 2;
     int bottom = (_height - dst.GetNumRows()) - top;
     int left = (_width - dst.GetNumCols()) / 2;
