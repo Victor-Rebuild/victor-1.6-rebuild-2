@@ -5,6 +5,7 @@ project(cti_vision)
 set(CORETECH_VISION_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../..)
 
 include(okao)
+include(tflite)
 
 include(anki_build_cxx)
 
@@ -31,6 +32,7 @@ target_link_libraries(cti_vision
   jsoncpp
   util
   robot_interface
+  ${TFLITE_LIBS}
   ${OPENCV_LIBS}
   ${OKAO_LIBS}
   ${ASAN_LINKER_FLAGS}
@@ -41,12 +43,19 @@ PRIVATE
   $<$<CONFIG:Debug>:-O0>
   $<$<CONFIG:Release>:-O2>
   ${SYMBOL_VISIBILITY_FLAGS}
-  ${ASAN_CXX_FLAGS} 
+  ${ASAN_CXX_FLAGS}
+)
+
+set_source_files_properties(engine/tfliteModel.cpp
+  PROPERTIES
+  COMPILE_OPTIONS "-Wno-undef;-Wno-shorten-64-to-32"
 )
 
 target_include_directories(cti_vision
   PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../..>
+  PRIVATE
+  ${TFLITE_INCLUDE_PATHS}
 )
 
 target_compile_definitions(cti_vision
