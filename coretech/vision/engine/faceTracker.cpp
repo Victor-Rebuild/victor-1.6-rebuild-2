@@ -38,6 +38,8 @@ FACE_TRACKER_PROVIDER == FACE_TRACKER_OPENCV
 #  include "faceTrackerImpl_opencv.h"
 #elif FACE_TRACKER_PROVIDER == FACE_TRACKER_TEST
 #  include "faceTrackerImpl_test.h"
+#elif FACE_TRACKER_PROVIDER == FACE_TRACKER_YUNET
+#  include "faceTrackerImpl_yunet.h"
 #else 
 #  error Unknown FACE_TRACKER_PROVIDER set!
 #endif

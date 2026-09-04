@@ -13,7 +13,14 @@
 
   "ColorImages" : true,        // Whether color images are enabled on startup (can still be toggled later)
 
-  "FaceAlbum" : "default",     
+  "FaceAlbum" : "default",
+
+  "FaceDetection" :
+  {
+    "UseGpu"      : true,   // Run YuNet and MobileFaceNet on the Adreno via the OpenCL delegate
+    "GpuCacheDir" : "/data/data/com.anki.victor/cache/gpuCache", // Created if missing; empty disables kernel caching
+    "NumThreads"  : 2       // Only used for whatever falls back to CPU
+  },
 
   "FaceRecognition" :
   {
