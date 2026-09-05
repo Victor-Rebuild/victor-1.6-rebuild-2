@@ -14,6 +14,7 @@
 *
 */
 
+#include "coretech/common/engine/colorRGBA.h"
 #include "cozmoAnim/alexa/alexa.h"
 #include "cozmoAnim/animContext.h"
 #include "cozmoAnim/animProcessMessages.h"
@@ -103,6 +104,8 @@ const u32 FaceInfoScreenManager::kDefaultTextSpacing_pix = 11;
 const f32 FaceInfoScreenManager::kDefaultTextScale = 0.4f;
 int confPageNumber = 1;
 
+bool isCheckingUpdate = false;
+
 bool isDeployed() {
     struct stat info;
     if (stat("/anki-devtools", &info) != 0) {
@@ -120,14 +123,19 @@ bool checkAutoUpdatesOn() {
 }
 
 bool needsUpdate() {
-  (void)system("/usr/sbin/update-engine-rebuild -c");
   if (Util::FileUtils::FileExists("/run/rebuild/needs-update")) {
+    isCheckingUpdate = false;
     return true;
   } else if (Util::FileUtils::FileExists("/run/rebuild/dont-need-update")) {
+    isCheckingUpdate = false;
     return false;
   } else if (!Util::FileUtils::FileExists("/run/rebuild/needs-update") &&
              !Util::FileUtils::FileExists("/run/rebuild/dont-need-update"))
   {
+    if (!isCheckingUpdate) {
+      (void)system("systemctl start update-engine-rebuild-check.service &");
+      isCheckingUpdate = true;
+    }
     return needsUpdate();
   } else {
     return false;
@@ -593,19 +601,19 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   // === Change CPU/RAM speed ===
   FaceInfoScreen::MenuItemAction confirmSetSpeedReg = [] {
     LOG_INFO("FaceInfoScreenManager.ChangeFrequency.ConfirmedRegular", "");
-    (void)system("curl 'http://localhost:8080/api/mods/FreqChange/set?freq=0'");
+    (void)system("curl 'http://localhost:8080/api/mods/FreqChange/set?freq=0' &");
     return ScreenName::ConfigurationSubmenu2;
   };
 
   FaceInfoScreen::MenuItemAction confirmSetSpeedBal = [] {
     LOG_INFO("FaceInfoScreenManager.ChangeFrequency.ConfirmedBalanced", "");
-    (void)system("curl 'http://localhost:8080/api/mods/FreqChange/set?freq=1'");
+    (void)system("curl 'http://localhost:8080/api/mods/FreqChange/set?freq=1' &");
     return ScreenName::ConfigurationSubmenu2;
   };
 
   FaceInfoScreen::MenuItemAction confirmSetSpeedPerf= [] {
     LOG_INFO("FaceInfoScreenManager.ChangeFrequency.ConfirmedPerf", "");
-    (void)system("curl 'http://localhost:8080/api/mods/FreqChange/set?freq=2'");
+    (void)system("curl 'http://localhost:8080/api/mods/FreqChange/set?freq=2' &");
     return ScreenName::ConfigurationSubmenu2;
   };
   ADD_MENU_ITEM(SetFrequency, "BACK", ConfigurationSubmenu2);
@@ -2144,7 +2152,7 @@ void FaceInfoScreenManager::DrawUpdatePrompt()
   auto osstate = OSState::getInstance();
 
   if (osstate->IsWallTimeSynced()) {
-    (void)system("/usr/sbin/update-engine-rebuild -c");
+    (void)system("systemctl start update-engine-rebuild-check.service &");
   }
 
   if (osstate->IsWallTimeSynced() && needsUpdate()) {
@@ -2156,11 +2164,11 @@ void FaceInfoScreenManager::DrawUpdatePrompt()
 
     if (Util::FileUtils::FileExists("/run/rebuild/target-ver")) {
       targetOSVer = targetOSVer + Util::FileUtils::ReadFile("/run/rebuild/target-ver");
-    } else {
+    } else { // We shouldn't get here
       targetOSVer = targetOSVer + "UNDEFINED";
     }
 
-    ColoredTextLines lines = {{okToUpdate},
+    ColoredTextLines lines = {{{okToUpdate, NamedColors::GREEN}},
                               {},
                               {currOSVer},
                               {targetOSVer},
@@ -2170,9 +2178,9 @@ void FaceInfoScreenManager::DrawUpdatePrompt()
   } else {
     const std::string upToDate = "REBUILD UP TO DATE";
     const std::string niceDay = "HAVE A NICE DAY";
-    ColoredTextLines lines = {{upToDate},
+    ColoredTextLines lines = {{{upToDate, NamedColors::GREEN}},
                               {},
-                              {niceDay},
+                              {{niceDay, NamedColors::GREEN}},
                             };
     DrawTextOnScreen(lines);
   }
