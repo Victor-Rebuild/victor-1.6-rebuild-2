@@ -44,18 +44,19 @@ public:
 
   // Convenience ctor that allows you to specify simple non-menu text at the top of the screen
   FaceInfoScreen(ScreenName screenName, ScreenName buttonGotoScreen, const std::vector<std::string>& staticText);
+  FaceInfoScreen(ScreenName screenName, ScreenName buttonGotoScreen, const std::vector<ColoredTextLine>& staticText);
   
   // Returns name of current screen
   ScreenName GetName() { return _name; }
   
   // Add menu item that transitions to gotoScreen when selected
   // Ordering of the items is determined by the order in which you call this function
-  void AppendMenuItem(const std::string& text, ScreenName gotoScreen);
+  void AppendMenuItem(const std::string& text, ScreenName gotoScreen, const ColorRGBA& color = NamedColors::WHITE);
 
   // Add menu item that should execute a function and then goto the
   // screen that is returned by that function
   using MenuItemAction = std::function<ScreenName()>;
-  void AppendMenuItem(const std::string& text, MenuItemAction action);
+  void AppendMenuItem(const std::string& text, MenuItemAction action, const ColorRGBA& color = NamedColors::WHITE);
   
   // Specify functions to execute when entering or exiting the screen
   using ScreenAction = std::function<void()>;
@@ -118,19 +119,20 @@ private:
   ScreenAction _exitAction = {};
 
   struct MenuItem {
-    MenuItem(std::string text, MenuItemAction action)
+    MenuItem(std::string text, MenuItemAction action, ColorRGBA color = NamedColors::WHITE)
     : text(text)
     , action(action)
+    , color(color)
     {}
-    
     std::string text;
     MenuItemAction action;
+    ColorRGBA color;
   };
   
   std::vector<MenuItem> _menu;
   size_t _menuCursor;
   
-  std::vector<std::string> _staticText;
+  std::vector<ColoredTextLine> _staticText;
 };
   
 

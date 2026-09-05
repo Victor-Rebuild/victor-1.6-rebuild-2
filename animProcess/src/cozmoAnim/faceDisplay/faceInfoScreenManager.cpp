@@ -234,11 +234,25 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
                        std::forward_as_tuple(ScreenName::name, ScreenName::gotoScreen, temp)); \
   }
 
+  #define ADD_SCREEN_WITH_COLORED_TEXT(name, gotoScreen, ...) \
+  { \
+    std::vector<ColoredTextLine> temp = { __VA_ARGS__ }; \
+    _screenMap.emplace(std::piecewise_construct, \
+                      std::forward_as_tuple(ScreenName::name), \
+                      std::forward_as_tuple(ScreenName::name, ScreenName::gotoScreen, temp)); \
+  }
+
   #define ADD_MENU_ITEM(screen, itemText, gotoScreen) \
     GetScreen(ScreenName::screen)->AppendMenuItem(itemText, ScreenName::gotoScreen);
 
+  #define ADD_COLORED_MENU_ITEM(screen, itemText, gotoScreen, color) \
+    GetScreen(ScreenName::screen)->AppendMenuItem(itemText, ScreenName::gotoScreen, color);
+
   #define ADD_MENU_ITEM_WITH_ACTION(screen, itemText, action) \
     GetScreen(ScreenName::screen)->AppendMenuItem(itemText, action);
+
+  #define ADD_COLORED_MENU_ITEM_WITH_ACTION(screen, itemText, action) \
+    GetScreen(ScreenName::screen)->AppendMenuItem(itemText, action, color);
 
   #define SET_TIMEOUT(screen, timeout_sec, timeoutScreen) \
     GetScreen(ScreenName::screen)->SetTimeout(timeout_sec, ScreenName::timeoutScreen);
@@ -283,40 +297,40 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   ADD_SCREEN(Main, Network);
 
   // Start rebuild custom screens
-  ADD_SCREEN_WITH_TEXT(AutoUpdates, AutoUpdates, {"UPDATE SETTINGS"});
-  ADD_SCREEN_WITH_TEXT(BackpackLights, BackpackLights, {_wireoslights() ? "USE ANKI LIGHTS?" : "USE WIREOS LIGHTS?"});
-  ADD_SCREEN_WITH_TEXT(BackpackLightsMenu, BackpackLightsMenu, {"BACKPACK SETTINGS"});
-  ADD_SCREEN_WITH_TEXT(BackpackLightsDot, BackpackLightsDot, {"DOT LIGHT SETTINGS"});
-  ADD_SCREEN_WITH_TEXT(BackpackLightsDotBlink, BackpackLightsDotBlink, {"BLINK DOT LIGHT?"});
-  ADD_SCREEN_WITH_TEXT(BackpackLightsDotFade, BackpackLightsDotFade, {"FADE DOT LIGHT?"});
-  ADD_SCREEN_WITH_TEXT(BootRecovery, BootRecovery, {"RECOVERY MODE?"});
-  ADD_SCREEN_WITH_TEXT(Cloudless, Cloudless, {_cloudlessEnabled ? "USE NORMAL CLOUD?" : "USE VIC-CLOUDLESS?"});
-  ADD_SCREEN_WITH_TEXT(ConfigurationSubmenu, ConfigurationSubmenu, {"CONFIGURATION PAGE 1"});
-  ADD_SCREEN_WITH_TEXT(ConfigurationSubmenu2, ConfigurationSubmenu2, {"CONFIGURATION PAGE 2"});
-  ADD_SCREEN_WITH_TEXT(ConfigurationSubmenu3, ConfigurationSubmenu3, {"CONFIGURATION PAGE 3"});
-  ADD_SCREEN_WITH_TEXT(DisableAutoUpdates, DisableAutoUpdates, {checkAutoUpdatesOn() ? "DISABLE UPDATES?" : "ENABLE UPDATES?"});
-  ADD_SCREEN_WITH_TEXT(SleepSettings, SleepSettings, {"SLEEP SETTINGS"});
-  ADD_SCREEN_WITH_TEXT(DTTBRandomEyes, DTTBRandomEyes, {"TOGGLE DTTB EYES?"});
-  ADD_SCREEN_WITH_TEXT(OldNewAlexa, OldNewAlexa, {_classicAlexa ? "USE MODERN ALEXA?" : "USE BETA ALEXA?"});
-  ADD_SCREEN_WITH_TEXT(Reloading, Reloading, {"RELOADING..."});
-  ADD_SCREEN_WITH_TEXT(Reonboarding, Reonboarding, {"REONBOARDING..."});
-  ADD_SCREEN_WITH_TEXT(Reonboard, Reonboard, {"REONBOARD?"});
-  ADD_SCREEN_WITH_TEXT(RTS, RTS, {_disableReactToSound ? "ENABLE RTS?" : "DISABLE RTS?"});
-  ADD_SCREEN_WITH_TEXT(RTP, RTP, {_disablePersonCheck ? "ENABLE RTP?" : "DISABLE RTP?"});
-  ADD_SCREEN_WITH_TEXT(SetFrequency, SetFrequency, {"SET SPEED TO?"});
-  ADD_SCREEN_WITH_TEXT(Snoring, Snoring, {_snoringDisabled ? "ENABLE SNORING?" : "DISABLE SNORING?"});
-  ADD_SCREEN_WITH_TEXT(SwitchSlot, SwitchSlot, {"SWAP SYS SLOT?"});
-  ADD_SCREEN_WITH_TEXT(SwitchSlotReboot, SwitchSlotReboot, {"SWITCHING SLOT..."});
-  ADD_SCREEN_WITH_TEXT(Toggle30fps, Toggle30fps, {_using30fps() ? "TOGGLE 60 FPS?" : "TOGGLE 30 FPS?"});
+  ADD_SCREEN_WITH_COLORED_TEXT(AutoUpdates, AutoUpdates, {ColoredTextLine("UPDATE SETTINGS", NamedColors::ORANGE)});
+  ADD_SCREEN_WITH_COLORED_TEXT(BackpackLights, BackpackLights, {ColoredTextLine(_wireoslights() ? "USE ANKI LIGHTS?" : "USE WIREOS LIGHTS?", _wireoslights() ? NamedColors::GREEN : NamedColors::RED)});
+  ADD_SCREEN_WITH_COLORED_TEXT(BackpackLightsMenu, BackpackLightsMenu, {ColoredTextLine("BACKPACK SETTINGS", NamedColors::GREEN)});
+  ADD_SCREEN_WITH_COLORED_TEXT(BackpackLightsDot, BackpackLightsDot, {ColoredTextLine("DOT LIGHT SETTINGS", NamedColors::GREEN)});
+  ADD_SCREEN_WITH_COLORED_TEXT(BackpackLightsDotBlink, BackpackLightsDotBlink, {ColoredTextLine("BLINK DOT LIGHT?", NamedColors::GREEN)});
+  ADD_SCREEN_WITH_COLORED_TEXT(BackpackLightsDotFade, BackpackLightsDotFade, {ColoredTextLine("FADE DOT LIGHT?", NamedColors::GREEN)});
+  ADD_SCREEN_WITH_COLORED_TEXT(BootRecovery, BootRecovery, {ColoredTextLine("RECOVERY MODE?", NamedColors::RED)});
+  ADD_SCREEN_WITH_COLORED_TEXT(Cloudless, Cloudless, {ColoredTextLine(_cloudlessEnabled ? "USE NORMAL CLOUD?" : "USE VIC-CLOUDLESS?", NamedColors::CYAN)});
+  ADD_SCREEN_WITH_COLORED_TEXT(ConfigurationSubmenu, ConfigurationSubmenu, {ColoredTextLine("CONFIGURATION PAGE 1", NamedColors::GREEN)});
+  ADD_SCREEN_WITH_COLORED_TEXT(ConfigurationSubmenu2, ConfigurationSubmenu2, {ColoredTextLine("CONFIGURATION PAGE 2", NamedColors::GREEN)});
+  ADD_SCREEN_WITH_COLORED_TEXT(ConfigurationSubmenu3, ConfigurationSubmenu3, {ColoredTextLine("CONFIGURATION PAGE 3", NamedColors::GREEN)});
+  ADD_SCREEN_WITH_COLORED_TEXT(DisableAutoUpdates, DisableAutoUpdates, {ColoredTextLine(checkAutoUpdatesOn() ? "DISABLE UPDATES?" : "ENABLE UPDATES?", NamedColors::ORANGE)});
+  ADD_SCREEN_WITH_COLORED_TEXT(SleepSettings, SleepSettings, {ColoredTextLine("SLEEP SETTINGS", NamedColors::CYAN)});
+  ADD_SCREEN_WITH_COLORED_TEXT(DTTBRandomEyes, DTTBRandomEyes, {ColoredTextLine("TOGGLE DTTB EYES?", NamedColors::YELLOW)});
+  ADD_SCREEN_WITH_COLORED_TEXT(OldNewAlexa, OldNewAlexa, {ColoredTextLine(_classicAlexa ? "USE MODERN ALEXA?" : "USE BETA ALEXA?", NamedColors::GREEN)});
+  ADD_SCREEN_WITH_COLORED_TEXT(Reloading, Reloading, {ColoredTextLine("RELOADING...", NamedColors::GREEN)});
+  ADD_SCREEN_WITH_COLORED_TEXT(Reonboarding, Reonboarding, {ColoredTextLine("REONBOARDING...", NamedColors::GREEN)});
+  ADD_SCREEN_WITH_COLORED_TEXT(Reonboard, Reonboard, {ColoredTextLine("REONBOARD?", NamedColors::GREEN)});
+  ADD_SCREEN_WITH_COLORED_TEXT(RTS, RTS, {ColoredTextLine(_disableReactToSound ? "ENABLE RTS?" : "DISABLE RTS?", NamedColors::CYAN)});
+  ADD_SCREEN_WITH_COLORED_TEXT(RTP, RTP, {ColoredTextLine(_disablePersonCheck ? "ENABLE RTP?" : "DISABLE RTP?", NamedColors::CYAN)});
+  ADD_SCREEN_WITH_COLORED_TEXT(SetFrequency, SetFrequency, {ColoredTextLine("SET SPEED TO?", NamedColors::ORANGE)});
+  ADD_SCREEN_WITH_COLORED_TEXT(Snoring, Snoring, {_snoringDisabled ? "ENABLE SNORING?" : "DISABLE SNORING?", NamedColors::CYAN});
+  ADD_SCREEN_WITH_COLORED_TEXT(SwitchSlot, SwitchSlot, {ColoredTextLine("SWAP SYS SLOT?", NamedColors::RED)});
+  ADD_SCREEN_WITH_COLORED_TEXT(SwitchSlotReboot, SwitchSlotReboot, {ColoredTextLine("SWITCHING SLOT...", NamedColors::GREEN)});
+  ADD_SCREEN_WITH_COLORED_TEXT(Toggle30fps, Toggle30fps, {ColoredTextLine(_using30fps() ? "TOGGLE 60 FPS?" : "TOGGLE 30 FPS?", NamedColors::GREEN)});
   ADD_SCREEN(UpdateRebuild, UpdateRebuild);
   ADD_SCREEN(Updating, Updating);
-  ADD_SCREEN_WITH_TEXT(UserDataSubmenu, UserDataSubmenu, {"DATA OPTIONS"});
+  ADD_SCREEN_WITH_COLORED_TEXT(UserDataSubmenu, UserDataSubmenu, ColoredTextLine("DATA OPTIONS", NamedColors::GREEN));
   // end rebuild custom screens
 
-  ADD_SCREEN_WITH_TEXT(ClearUserData, Main, {"CLEAR USER DATA?"});
-  ADD_SCREEN_WITH_TEXT(ClearUserDataFail, Main, {"CLEAR USER DATA FAILED"});
-  ADD_SCREEN_WITH_TEXT(Rebooting, Rebooting, {"REBOOTING..."});
-  ADD_SCREEN_WITH_TEXT(SelfTest, Main, {"START SELF TEST?"});
+  ADD_SCREEN_WITH_COLORED_TEXT(ClearUserData, Main, {ColoredTextLine("CLEAR USER DATA?", NamedColors::RED)});
+  ADD_SCREEN_WITH_COLORED_TEXT(ClearUserDataFail, Main, {ColoredTextLine("CLEAR USER DATA FAILED", NamedColors::RED)});
+  ADD_SCREEN_WITH_COLORED_TEXT(Rebooting, Rebooting, {ColoredTextLine("REBOOTING...", NamedColors::GREEN)});
+  ADD_SCREEN_WITH_COLORED_TEXT(SelfTest, Main, {ColoredTextLine("START SELF TEST?", NamedColors::ORANGE)});
   ADD_SCREEN(SelfTestRunning, SelfTestRunning)
   ADD_SCREEN(Network, SensorInfo);
   ADD_SCREEN(SensorInfo, IMUInfo);
@@ -1721,9 +1735,9 @@ void FaceInfoScreenManager::DrawNetwork()
   auto getStatusString = [](const auto& status) {
     switch (status) {
       case CloudMic::ConnectionCode::Available:   { return ColoredText("CONNECTED",    NamedColors::GREEN); }
-      case CloudMic::ConnectionCode::Connectivity:{ return ColoredText("CONNECTIVITY", NamedColors::RED); }
-      case CloudMic::ConnectionCode::Tls:         { return ColoredText("TLS",          NamedColors::RED); }
-      case CloudMic::ConnectionCode::Auth:        { return ColoredText("AUTH",         NamedColors::RED); }
+      case CloudMic::ConnectionCode::Connectivity:{ return ColoredText("ANKI2 DOWN",   NamedColors::RED); }
+      case CloudMic::ConnectionCode::Tls:         { return ColoredText("CERT BAD",     NamedColors::RED); }
+      case CloudMic::ConnectionCode::Auth:        { return ColoredText("VC DOWN",      NamedColors::RED); }
       case CloudMic::ConnectionCode::Bandwidth:   { return ColoredText("BANDWIDTH",    NamedColors::RED); }
       default:                                    { return ColoredText("CHECKING...",  NamedColors::BLUE); }
     }
@@ -1742,7 +1756,7 @@ void FaceInfoScreenManager::DrawNetwork()
                              { {"IP: "}, {ip, (osstate->IsValidIPAddress(ip) ? NamedColors::GREEN : NamedColors::RED)} },
                              {},
                              { {currTime} },
-                             { {"NETWORK: "}, _testingNetwork ? ColoredText("") : getStatusString(_networkStatus) }
+                             { {"SERVER: "}, _testingNetwork ? ColoredText("CHECKING...", NamedColors::BLUE) : getStatusString(_networkStatus) }
                            };
 #endif
   DrawTextOnScreen(lines);

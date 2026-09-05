@@ -13,9 +13,19 @@
 #ifndef __AnimProcess_CozmoAnim_FaceDisplay_FaceInfoScreenTypes_H_
 #define __AnimProcess_CozmoAnim_FaceDisplay_FaceInfoScreenTypes_H_
 
+#include "coretech/common/engine/colorRGBA.h"
+#include <string>
+
 namespace Anki {
 namespace Vector {
   
+struct ColoredTextLine {
+  ColoredTextLine(const std::string& text, const ColorRGBA& color = NamedColors::WHITE)
+  : text(text), color(color) {}
+  std::string text;
+  ColorRGBA color;
+};
+
 // The names of all the screens that are supported
 enum class ScreenName : uint8_t {
   None = 0,

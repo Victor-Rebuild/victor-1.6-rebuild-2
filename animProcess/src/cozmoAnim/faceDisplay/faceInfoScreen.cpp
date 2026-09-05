@@ -15,6 +15,7 @@
 */
 #include "anki/cozmo/shared/cozmoConfig.h"
 #include "cozmoAnim/faceDisplay/faceInfoScreen.h"
+#include "coretech/common/engine/colorRGBA.h"
 #include "coretech/common/shared/math/rect_impl.h"
 #include "coretech/common/engine/utils/timer.h"
 #include "coretech/vision/engine/image.h"
@@ -22,10 +23,20 @@
 namespace Anki {
 namespace Vector {
 
+namespace {
+  std::vector<ColoredTextLine> ToColoredLines(const std::vector<std::string>& text) {
+    std::vector<ColoredTextLine> lines;
+    lines.reserve(text.size());
+    for (const auto& s : text) {
+      lines.emplace_back(s);
+    }
+    return lines;
+  }
+}
 
 FaceInfoScreen::FaceInfoScreen(ScreenName name,
                                ScreenName buttonGotoScreen)
-:FaceInfoScreen(name, buttonGotoScreen, {})
+:FaceInfoScreen(name, buttonGotoScreen, std::vector<ColoredTextLine>{})
 {
 }
 
@@ -33,6 +44,13 @@ FaceInfoScreen::FaceInfoScreen(ScreenName name,
 FaceInfoScreen::FaceInfoScreen(ScreenName name,
                                ScreenName buttonGotoScreen,
                                const std::vector<std::string>& staticText)
+:FaceInfoScreen(name, buttonGotoScreen, ToColoredLines(staticText))
+{
+}
+
+FaceInfoScreen::FaceInfoScreen(ScreenName name,
+                               ScreenName buttonGotoScreen,
+                               const std::vector<ColoredTextLine>& staticText)
 : _name(name)
 , _buttonScreen(buttonGotoScreen)
 , _timeoutScreen(ScreenName::None)
@@ -90,12 +108,12 @@ void FaceInfoScreen::RestartTimeout()
   }
 }
   
-void FaceInfoScreen::AppendMenuItem(const std::string& text, ScreenName gotoScreen)
+void FaceInfoScreen::AppendMenuItem(const std::string& text, ScreenName gotoScreen, const ColorRGBA& color)
 {
   AppendMenuItem(text, [gotoScreen](){ return gotoScreen;});
 }
   
-void FaceInfoScreen::AppendMenuItem(const std::string& text, MenuItemAction action)
+void FaceInfoScreen::AppendMenuItem(const std::string& text, MenuItemAction action, const ColorRGBA& color)
 {
   _menu.emplace_back(text, action);
 }
@@ -103,14 +121,15 @@ void FaceInfoScreen::AppendMenuItem(const std::string& text, MenuItemAction acti
 void FaceInfoScreen::DrawMenuVertical(Vision::ImageRGB565& img) const
 {
   const ColorRGBA& menuBgColor = NamedColors::BLACK;
+  const ColorRGBA& menuCursorColor = NamedColors::GREEN;
   const ColorRGBA& menuItemColor = NamedColors::WHITE;
   const f32 locX = 10;
   const f32 stepY = 11;
   const f32 textScale = 0.4f;
 
   f32 locY = stepY;
-  for (auto& text : _staticText) {
-    img.DrawText({0,locY}, text, menuItemColor, textScale);
+  for (auto& line : _staticText) {
+    img.DrawText({0, locY}, line.text, line.color, textScale);
     locY += stepY;
   }
   
@@ -121,7 +140,7 @@ void FaceInfoScreen::DrawMenuVertical(Vision::ImageRGB565& img) const
       
       if (_menuCursor == i) {
         // Draw cursor
-        img.DrawText({0,locY}, ">", menuItemColor, textScale);
+        img.DrawText({0,locY}, ">", menuCursorColor, textScale);
       } else {
         const Rectangle<f32> rect( 0.f, locY-stepY, FACE_DISPLAY_WIDTH, stepY);
         img.DrawFilledRect(rect, menuBgColor);
@@ -137,13 +156,14 @@ void FaceInfoScreen::DrawMenuVertical(Vision::ImageRGB565& img) const
 void FaceInfoScreen::DrawMenuHorizontal(Vision::ImageRGB565& img) const
 {
   const ColorRGBA& menuBgColor = NamedColors::BLACK;
+  const ColorRGBA& menuCursorColor = NamedColors::GREEN;
   const ColorRGBA& menuItemColor = NamedColors::WHITE;
   const f32 stepY = 11;
   const f32 textScale = 0.4f;
 
   f32 locY = stepY;
-  for (auto& text : _staticText) {
-    img.DrawText({0,locY}, text, menuItemColor, textScale);
+  for (auto& line : _staticText) {
+    img.DrawText({0, locY}, line.text, line.color, textScale);
     locY += stepY;
   }
 
@@ -166,7 +186,7 @@ void FaceInfoScreen::DrawMenuHorizontal(Vision::ImageRGB565& img) const
       f32 y = locY;
 
       // Draw menu item text
-      if (_menuCursor == i) img.DrawText({x, y}, ">", menuItemColor, textScale);
+      if (_menuCursor == i) img.DrawText({x, y}, ">", menuCursorColor, textScale);
       img.DrawText({x + 10, y}, _menu[i].text, menuItemColor, textScale);
       blockDrawn++;
     }
