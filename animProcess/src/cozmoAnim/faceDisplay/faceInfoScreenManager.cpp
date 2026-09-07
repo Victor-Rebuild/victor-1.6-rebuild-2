@@ -2188,7 +2188,7 @@ void FaceInfoScreenManager::DrawUpdatePrompt()
 
 void FaceInfoScreenManager::DrawUpdate()
 {
-  (void)system("systemctl start update-engine-rebuild-victor-only");
+  (void)system("systemctl start update-engine-rebuild-victor-only && reboot");
   const std::string animName = "anim_pairing_icon_update";
   const bool shouldInterrupt = true;
   const bool shouldOverrideEyeHue = true;
