@@ -123,6 +123,10 @@ bool checkAutoUpdatesOn() {
 }
 
 bool needsUpdate() {
+  if (isDeployed()) {
+    return false;
+  }
+
   if (Util::FileUtils::FileExists("/run/rebuild/needs-update")) {
     isCheckingUpdate = false;
     return true;
@@ -296,7 +300,6 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   // * Microphone visualization
   // * Camera
   const bool hideSpecialDebugScreens = (FACTORY_TEST && Factory::GetEMR()->fields.PLAYPEN_PASSED_FLAG) || !ANKI_DEV_CHEATS;  // TODO: Use this line in master
-  //const bool hideSpecialDebugScreens = (FACTORY_TEST && Factory::GetEMR()->fields.PLAYPEN_PASSED_FLAG);                        // Use this line in factory branch
 
   ADD_SCREEN(None, None);
   ADD_SCREEN(Pairing, Pairing);
@@ -666,7 +669,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   auto updateRebuild = [this]() {
     DrawUpdate();
   };
-  if (osstate->IsWallTimeSynced() && needsUpdate()) {
+  if (osstate->IsWallTimeSynced() && osstate->IsValidIPAddress(osstate->GetIPAddress()) && needsUpdate()) {
     ADD_MENU_ITEM(UpdateRebuild, "UPDATE", Updating);
   }
   SET_ENTER_ACTION(Updating, updateRebuild);
@@ -2155,7 +2158,7 @@ void FaceInfoScreenManager::DrawUpdatePrompt()
     (void)system("systemctl start update-engine-rebuild-check.service &");
   }
 
-  if (osstate->IsWallTimeSynced() && needsUpdate()) {
+  if (osstate->IsWallTimeSynced() && osstate->IsValidIPAddress(osstate->GetIPAddress()) && needsUpdate()) {
     const std::string okToUpdate = "UPDATE REBUILD?";
 
     const std::string currOSVer = IsXray() ? "CURR: " + osstate->GetOSBuildVersion() : "CURRENT: " + osstate->GetOSBuildVersion();
