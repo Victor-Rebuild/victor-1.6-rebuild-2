@@ -127,7 +127,7 @@ void BehaviorSnakeGame::OnBehaviorActivated()
 void BehaviorSnakeGame::OnBehaviorDeactivated()
 {
   if (_dVars.points > RebuildToggles::GetInt("snakeHighScoreVector")) {
-    RebuildToggles::SetInt(nullptr, "snakeHighScoreVector", _dVars.points);
+    RebuildToggles::SetInt(nullptr, "snakeHighScoreVector", _dVars.points, true);
   }
 }
 
