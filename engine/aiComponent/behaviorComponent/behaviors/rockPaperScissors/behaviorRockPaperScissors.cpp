@@ -22,6 +22,7 @@
 #include "engine/aiComponent/behaviorComponent/userIntentComponent.h"
 #include "engine/aiComponent/behaviorComponent/userIntents.h"
 #include "engine/components/localeComponent.h"
+#include "engine/components/rebuildConfig.h"
 #include "engine/externalInterface/externalInterface.h"
 
 namespace Anki {
@@ -312,11 +313,15 @@ void BehaviorRockPaperScissors::PlayWinLoseTieAnim()
   CompoundActionSequential *messageAnimation = new CompoundActionSequential();
   if (_dVars.winLoseTie == 0) {
     messageAnimation->AddAction(new TriggerLiftSafeAnimationAction(AnimationTrigger::BlackJack_VictorWin), true);
+    RebuildToggles::SetInt(nullptr, "rockPaperScissorsVectorWins", RebuildToggles::GetInt("rockPaperScissorsVectorWins") + 1, true);
   } else if (_dVars.winLoseTie == 1) {
     messageAnimation->AddAction(new TriggerLiftSafeAnimationAction(AnimationTrigger::BlackJack_VictorLose), true);
+    RebuildToggles::SetInt(nullptr, "rockPaperScissorsVectorLosses", RebuildToggles::GetInt("rockPaperScissorsVectorLosses") + 1, true);
   } else if (_dVars.winLoseTie == 2) {
     messageAnimation->AddAction(new TriggerLiftSafeAnimationAction(AnimationTrigger::BlackJack_VictorPush), true);
+    RebuildToggles::SetInt(nullptr, "rockPaperScissorsVectorTies", RebuildToggles::GetInt("rockPaperScissorsTies") + 1, true);
   }
+  RebuildToggles::SetInt(nullptr, "rockPaperScissorsPlayCount", RebuildToggles::GetInt("rockPaperScissorsPlayCount") + 1, true);
   DelegateIfInControl(messageAnimation, &BehaviorRockPaperScissors::TransitionToPlayAgainPrompt);
 }
 
