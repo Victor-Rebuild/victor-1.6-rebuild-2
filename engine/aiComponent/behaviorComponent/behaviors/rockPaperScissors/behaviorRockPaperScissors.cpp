@@ -23,7 +23,6 @@
 #include "engine/aiComponent/behaviorComponent/userIntents.h"
 #include "engine/components/localeComponent.h"
 #include "engine/components/rebuildConfig.h"
-#include "engine/externalInterface/externalInterface.h"
 
 namespace Anki {
 namespace Vector {
@@ -229,9 +228,9 @@ void BehaviorRockPaperScissors::RockPaperOrScissors()
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BehaviorRockPaperScissors::RockPaperOrScissorsVectorSearch()
 {
-  CompoundActionSequential *messageAnimation = new CompoundActionSequential();
-  messageAnimation->AddAction(new TriggerLiftSafeAnimationAction(AnimationTrigger::RPSDecideGetin), true);
-  DelegateIfInControl(messageAnimation, &BehaviorRockPaperScissors::RockPaperOrScissorsVector);
+  CompoundActionSequential *decideAnim = new CompoundActionSequential();
+  decideAnim->AddAction(new TriggerLiftSafeAnimationAction(AnimationTrigger::RPSDecideGetin), true);
+  DelegateIfInControl(decideAnim, &BehaviorRockPaperScissors::RockPaperOrScissorsVector);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -279,19 +278,19 @@ void BehaviorRockPaperScissors::RockPaperOrScissorsVector()
 
   const std::string finalString = localeComponent.GetString("RockPaperScissors.VectorChose") + " " + chosenOne + "." + winLoosePush;
 
-  CompoundActionSequential *messageAnimation = new CompoundActionSequential();
+  CompoundActionSequential *drawAnim = new CompoundActionSequential();
   if (_dVars.whatdidvectorchoose == 0) {
-    messageAnimation->AddAction(new TriggerLiftSafeAnimationAction(AnimationTrigger::RPSDecideGetOutRock), true);
+    drawAnim->AddAction(new TriggerLiftSafeAnimationAction(AnimationTrigger::RPSDecideGetOutRock), true);
     _iConfig.rockPaperScissorsVectorResponseBehaviorRock->SetTextToSay( finalString );
-    DelegateIfInControl(messageAnimation, &BehaviorRockPaperScissors::RockPaperOrScissorsVectorStartTTS);
+    DelegateIfInControl(drawAnim, &BehaviorRockPaperScissors::RockPaperOrScissorsVectorStartTTS);
   } else if (_dVars.whatdidvectorchoose == 1) {
-    messageAnimation->AddAction(new TriggerLiftSafeAnimationAction(AnimationTrigger::RPSDecideGetOutPaper), true);
+    drawAnim->AddAction(new TriggerLiftSafeAnimationAction(AnimationTrigger::RPSDecideGetOutPaper), true);
     _iConfig.rockPaperScissorsVectorResponseBehaviorPaper->SetTextToSay( finalString );
-    DelegateIfInControl(messageAnimation, &BehaviorRockPaperScissors::RockPaperOrScissorsVectorStartTTS);
+    DelegateIfInControl(drawAnim, &BehaviorRockPaperScissors::RockPaperOrScissorsVectorStartTTS);
   } else if (_dVars.whatdidvectorchoose == 2) {
-    messageAnimation->AddAction(new TriggerLiftSafeAnimationAction(AnimationTrigger::RPSDecideGetOutScissors), true);
+    drawAnim->AddAction(new TriggerLiftSafeAnimationAction(AnimationTrigger::RPSDecideGetOutScissors), true);
     _iConfig.rockPaperScissorsVectorResponseBehaviorScissors->SetTextToSay( finalString );
-    DelegateIfInControl(messageAnimation, &BehaviorRockPaperScissors::RockPaperOrScissorsVectorStartTTS);
+    DelegateIfInControl(drawAnim, &BehaviorRockPaperScissors::RockPaperOrScissorsVectorStartTTS);
   }
 }
 
@@ -310,19 +309,19 @@ void BehaviorRockPaperScissors::RockPaperOrScissorsVectorStartTTS()
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BehaviorRockPaperScissors::PlayWinLoseTieAnim()
 {
-  CompoundActionSequential *messageAnimation = new CompoundActionSequential();
+  CompoundActionSequential *winLoseTieAnim = new CompoundActionSequential();
   if (_dVars.winLoseTie == 0) {
-    messageAnimation->AddAction(new TriggerLiftSafeAnimationAction(AnimationTrigger::BlackJack_VictorWin), true);
+    winLoseTieAnim->AddAction(new TriggerLiftSafeAnimationAction(AnimationTrigger::BlackJack_VictorWin), true);
     RebuildToggles::SetInt(nullptr, "rockPaperScissorsVectorWins", RebuildToggles::GetInt("rockPaperScissorsVectorWins") + 1, true);
   } else if (_dVars.winLoseTie == 1) {
-    messageAnimation->AddAction(new TriggerLiftSafeAnimationAction(AnimationTrigger::BlackJack_VictorLose), true);
+    winLoseTieAnim->AddAction(new TriggerLiftSafeAnimationAction(AnimationTrigger::BlackJack_VictorLose), true);
     RebuildToggles::SetInt(nullptr, "rockPaperScissorsVectorLosses", RebuildToggles::GetInt("rockPaperScissorsVectorLosses") + 1, true);
   } else if (_dVars.winLoseTie == 2) {
-    messageAnimation->AddAction(new TriggerLiftSafeAnimationAction(AnimationTrigger::BlackJack_VictorPush), true);
+    winLoseTieAnim->AddAction(new TriggerLiftSafeAnimationAction(AnimationTrigger::BlackJack_VictorPush), true);
     RebuildToggles::SetInt(nullptr, "rockPaperScissorsVectorTies", RebuildToggles::GetInt("rockPaperScissorsTies") + 1, true);
   }
   RebuildToggles::SetInt(nullptr, "rockPaperScissorsPlayCount", RebuildToggles::GetInt("rockPaperScissorsPlayCount") + 1, true);
-  DelegateIfInControl(messageAnimation, &BehaviorRockPaperScissors::TransitionToPlayAgainPrompt);
+  DelegateIfInControl(winLoseTieAnim, &BehaviorRockPaperScissors::TransitionToPlayAgainPrompt);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

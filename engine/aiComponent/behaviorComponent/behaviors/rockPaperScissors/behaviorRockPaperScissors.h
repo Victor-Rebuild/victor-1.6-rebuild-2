@@ -82,8 +82,6 @@ private:
   void TransitionToPlayAgainPrompt();
   void TransitionToPlayAgain();
 
-  bool isPowerOff = false;
-
 };
 
 } // namespace Vector
