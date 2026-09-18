@@ -181,45 +181,24 @@ void BehaviorDisplayWeather::InitBehavior()
     auto* spriteCache = dataAccessorComp.GetSpriteCache();
     Vision::HSImageHandle faceHueAndSaturation = ProceduralFace::GetHueSatWrapper();
 
-    if (IsXray()) {
-      _iConfig->compImg = std::make_unique<Vision::CompositeImage>(spriteCache, faceHueAndSaturation,
-                                                                   160, 80);
-    } else {
-      _iConfig->compImg = std::make_unique<Vision::CompositeImage>(spriteCache, faceHueAndSaturation,
-                                                                   184, 96);
-    }
+    _iConfig->compImg = std::make_unique<Vision::CompositeImage>(spriteCache, faceHueAndSaturation,
+                                                                  IsXray() ? 160 : 184, IsXray() ? 80 : 96);
   }
 
   auto& compImgMap = *dataAccessorComp.GetCompImgMap();
   auto& compLayoutMap = *dataAccessorComp.GetCompLayoutMap();
 
-  if (IsXray()) {
-    for(const auto& name : kPosTemperatureLayouts_Xray){
-      auto iter = compLayoutMap.find(name);
-      if(iter != compLayoutMap.end()){
-        _iConfig->temperatureLayouts.emplace_back(iter->second);
-      }
+  for(const auto& name : IsXray() ? kPosTemperatureLayouts_Xray : kPosTemperatureLayouts){
+    auto iter = compLayoutMap.find(name);
+    if(iter != compLayoutMap.end()){
+      _iConfig->temperatureLayouts.emplace_back(iter->second);
     }
+  }
 
-    for(const auto& name : kNegTemperatureLayouts_Xray){
-      auto iter = compLayoutMap.find(name);
-      if(iter != compLayoutMap.end()){
-        _iConfig->temperatureLayouts.emplace_back(iter->second);
-      }
-    }
-  } else {
-    for(const auto& name : kPosTemperatureLayouts){
-      auto iter = compLayoutMap.find(name);
-      if(iter != compLayoutMap.end()){
-        _iConfig->temperatureLayouts.emplace_back(iter->second);
-      }
-    }
-
-    for(const auto& name : kNegTemperatureLayouts){
-      auto iter = compLayoutMap.find(name);
-      if(iter != compLayoutMap.end()){
-        _iConfig->temperatureLayouts.emplace_back(iter->second);
-      }
+  for(const auto& name : IsXray() ? kNegTemperatureLayouts_Xray : kPosTemperatureLayouts){
+    auto iter = compLayoutMap.find(name);
+    if(iter != compLayoutMap.end()){
+      _iConfig->temperatureLayouts.emplace_back(iter->second);
     }
   }
 
