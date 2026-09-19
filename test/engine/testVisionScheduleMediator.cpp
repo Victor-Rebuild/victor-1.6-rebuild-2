@@ -91,7 +91,7 @@ TEST(VisionScheduleMediator, Interleaving)
         "relativeCost" : 16
       },
       {
-        "mode"         : "Pets",
+        "mode"         : "Hands",
         "low"          : 8,
         "med"          : 4,
         "high"         : 2,
@@ -129,9 +129,9 @@ TEST(VisionScheduleMediator, Interleaving)
   TestSubscriber medFaceSubscriber(&vsm, { { VisionMode::Faces, EVisionUpdateFrequency::Med } });
   TestSubscriber highFaceSubscriber(&vsm, { { VisionMode::Faces, EVisionUpdateFrequency::High } });
 
-  TestSubscriber lowPetSubscriber(&vsm, { { VisionMode::Pets, EVisionUpdateFrequency::Low } });
-  TestSubscriber medPetSubscriber(&vsm, { { VisionMode::Pets, EVisionUpdateFrequency::Med } });
-  TestSubscriber highPetSubscriber(&vsm, { { VisionMode::Pets, EVisionUpdateFrequency::High } });
+  TestSubscriber lowHandSubscriber(&vsm, { { VisionMode::Hands, EVisionUpdateFrequency::Low } });
+  TestSubscriber medHandSubscriber(&vsm, { { VisionMode::Hands, EVisionUpdateFrequency::Med } });
+  TestSubscriber highHandSubscriber(&vsm, { { VisionMode::Hands, EVisionUpdateFrequency::High } });
   
   TestSubscriber lowMotionSubscriber(&vsm, { { VisionMode::Motion, EVisionUpdateFrequency::Low } });
   TestSubscriber medMotionSubscriber(&vsm, { { VisionMode::Motion, EVisionUpdateFrequency::Med } });
@@ -153,7 +153,7 @@ TEST(VisionScheduleMediator, Interleaving)
       case VisionMode::Markers:
         EXPECT_TRUE((modeSchedule.second._schedule == std::vector<bool>({false, false, false, true})));
         break;
-      case VisionMode::Pets:
+      case VisionMode::Hands:
         EXPECT_TRUE((modeSchedule.second._schedule == std::vector<bool>({false, true, false, false,
                                                                          false, false, false, false})));
         break;
@@ -183,7 +183,7 @@ TEST(VisionScheduleMediator, Interleaving)
       case VisionMode::Markers:
         EXPECT_TRUE((modeSchedule.second._schedule == std::vector<bool>({false, true})));
         break;
-      case VisionMode::Pets:
+      case VisionMode::Hands:
         EXPECT_TRUE((modeSchedule.second._schedule == std::vector<bool>({false, true, false, false})));
         break;
       case VisionMode::Motion:
@@ -212,7 +212,7 @@ TEST(VisionScheduleMediator, Interleaving)
       case VisionMode::Markers:
         EXPECT_TRUE((modeSchedule.second._schedule == std::vector<bool>({false, false, false, true})));
         break;
-      case VisionMode::Pets:
+      case VisionMode::Hands:
         EXPECT_TRUE((modeSchedule.second._schedule == std::vector<bool>({false, true, false, false,
                                                                          false, false, false, false})));
         break;
