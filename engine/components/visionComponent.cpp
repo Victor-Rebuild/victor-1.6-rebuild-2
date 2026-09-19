@@ -1937,7 +1937,7 @@ namespace Vector {
   inline static std::string GetFullFaceAlbumPath(const CozmoContext* context, const std::string& pathIn)
   {
     const std::string fullPath = context->GetDataPlatform()->pathToResource(Util::Data::Scope::Persistent,
-                                                                            Util::FileUtils::FullFilePath({"faceAlbums", pathIn}));
+                                                                            Util::FileUtils::FullFilePath({"faceAlbums_v2", pathIn}));
     return fullPath;
   }
 

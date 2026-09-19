@@ -22,11 +22,15 @@ namespace Vision {
 static const u16 VersionNumber = Util::numeric_cast<u16>(FaceRecognitionConstants::EnrolledFaceStorageVersionNumber);
 static const u16 VersionPrefix[2] = {0xFACE, VersionNumber};
 
-CONSOLE_VAR_RANGED(s32, kFaceRecognitionThreshold, "Vision.FaceRecognition", 550, 0, 1000);
+CONSOLE_VAR_RANGED(s32, kFaceRecognitionThreshold, "Vision.FaceRecognition", 650, 0, 1000);
 
-CONSOLE_VAR_RANGED(s32, kFaceVerificationThreshold, "Vision.FaceRecognition", 450, 0, 1000);
+CONSOLE_VAR_RANGED(s32, kFaceVerificationThreshold, "Vision.FaceRecognition", 550, 0, 1000);
 
-CONSOLE_VAR_RANGED(s32, kFaceRecognitionGuessThreshold, "Vision.FaceRecognition", 400, 0, 1000);
+CONSOLE_VAR_RANGED(s32, kFaceRecognitionGuessThreshold, "Vision.FaceRecognition", 550, 0, 1000);
+
+CONSOLE_VAR_RANGED(s32, kFaceEnrollmentUpdateThreshold, "Vision.FaceRecognition", 750, 0, 1000);
+
+CONSOLE_VAR_RANGED(s32, kFaceVerifyFailuresBeforeDrop, "Vision.FaceRecognition", 3, 1, 20);
 
 CONSOLE_VAR_RANGED(s32, kFaceRecognitionThresholdMarginForAdding, "Vision.FaceRecognition", 150, 0, 1000);
 
@@ -557,6 +561,7 @@ void FaceRecognizer::RemoveTrackingID(TrackingID_t trackerID)
     _trackingToFaceID.erase(iter);
   }
 
+  _trackingIDtoVerifyFailures.erase(trackerID);
   _trackingIDtoBestGuessName.erase(trackerID);
 }
 
@@ -572,6 +577,7 @@ void FaceRecognizer::ClearAllTrackingDataInternal()
     enrollData.second.ClearTrackingID();
   }
   _trackingToFaceID.clear();
+  _trackingIDtoVerifyFailures.clear();
   _trackingIDtoBestGuessName.clear();
 
   if(_isRunningAsync)
@@ -657,6 +663,16 @@ void FaceRecognizer::VerifyTrackedFace()
 
   if(bestScore < kFaceVerificationThreshold)
   {
+    const s32 numFailures = ++_trackingIDtoVerifyFailures[_trackingID];
+    if(numFailures < kFaceVerifyFailuresBeforeDrop)
+    {
+      LOG_INFO("FaceRecognizer.VerifyTrackedFace.VerifyFailed",
+               "TrackID:%d vs FaceID:%d score:%d < %d, failure %d of %d",
+               -_trackingID, claimedID, bestScore, kFaceVerificationThreshold,
+               numFailures, kFaceVerifyFailuresBeforeDrop);
+      return;
+    }
+
     LOG_INFO("FaceRecognizer.VerifyTrackedFace.IdentityLost",
              "TrackID:%d no longer matches FaceID:%d (score:%d < %d), dropping association",
              -_trackingID, claimedID, bestScore, kFaceVerificationThreshold);
@@ -664,6 +680,7 @@ void FaceRecognizer::VerifyTrackedFace()
   }
   else
   {
+    _trackingIDtoVerifyFailures.erase(_trackingID);
     enrollIter->second.SetScore(bestScore);
   }
 }
@@ -1447,7 +1464,7 @@ Result FaceRecognizer::RecognizeFace(FaceID_t& faceID, RecognitionScore& recogni
     faceID = matchingID;
     recognitionScore = matchingScore;
 
-    if(shouldUpdateAlbumEntry)
+    if(shouldUpdateAlbumEntry && (matchingScore >= kFaceEnrollmentUpdateThreshold))
     {
       Result result = UpdateExistingAlbumEntry(matchingAlbumEntries[matchIndex], _feature, recognitionScore);
       if(RESULT_OK != result) {

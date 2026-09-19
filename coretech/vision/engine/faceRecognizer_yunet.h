@@ -206,6 +206,7 @@ namespace Vision {
     Feature        _feature;
 
     std::map<TrackingID_t, FaceID_t>     _trackingToFaceID;
+    std::map<TrackingID_t, s32>          _trackingIDtoVerifyFailures;
     std::map<TrackingID_t, std::string>  _trackingIDtoBestGuessName;
     AlbumEntryToFaceID                   _albumEntryToFaceID;
     bool                                 _shouldClearAllTrackingData = false;

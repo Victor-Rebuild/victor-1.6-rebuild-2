@@ -37,8 +37,8 @@ namespace Vision {
     CONSOLE_VAR_RANGED(s32, kMinFaceSize,              "Vision.FaceDetectorCommon", 20, 8, 8192);
     CONSOLE_VAR_RANGED(f32, kTrackingMinIOU,           "Vision.FaceDetectorCommon", 0.35f, 0.f, 1.f);
     CONSOLE_VAR_RANGED(f32, kTrackingMaxAreaRatio,     "Vision.FaceDetectorCommon", 2.0f, 1.f, 100.f);
-    CONSOLE_VAR_RANGED(s32, kMaxTrackAge_ms,           "Vision.FaceDetectorCommon", 200, 0, 10000);
-    CONSOLE_VAR_RANGED(s32, kNamedTrackReverify_ms,    "Vision.FaceDetectorCommon", 1000, 0, 60000);
+    CONSOLE_VAR_RANGED(s32, kMaxTrackAge_ms,           "Vision.FaceDetectorCommon", 1000, 0, 10000);
+    CONSOLE_VAR_RANGED(s32, kNamedTrackReverify_ms,    "Vision.FaceDetectorCommon", 3000, 0, 60000);
     CONSOLE_VAR(bool,       kRefineLandmarks,          "Vision.FaceDetectorCommon", true);
   }
 

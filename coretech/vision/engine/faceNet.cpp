@@ -37,6 +37,63 @@ const s32 kAlignedFaceSize = 112;
 const f32 kEmbedderMean  = 127.5f;
 const f32 kEmbedderScale = 1.f/128.f;
 
+cv::Mat EstimateSimilarityTransform(const std::vector<cv::Point2f>& src,
+                                    const std::vector<cv::Point2f>& dst)
+{
+  const s32 numPoints = (s32)src.size();
+  if(numPoints < 2 || src.size() != dst.size()) {
+    return cv::Mat();
+  }
+
+  cv::Point2f srcMean(0.f, 0.f), dstMean(0.f, 0.f);
+  for(s32 i = 0; i < numPoints; ++i) {
+    srcMean += src[i];
+    dstMean += dst[i];
+  }
+  srcMean *= (1.f/(f32)numPoints);
+  dstMean *= (1.f/(f32)numPoints);
+
+  f64 srcVar = 0.;
+  cv::Mat cov = cv::Mat::zeros(2, 2, CV_64F);
+  for(s32 i = 0; i < numPoints; ++i)
+  {
+    const cv::Point2f s = src[i] - srcMean;
+    const cv::Point2f d = dst[i] - dstMean;
+    srcVar += (f64)s.x*s.x + (f64)s.y*s.y;
+    cov.at<f64>(0,0) += (f64)d.x*s.x;
+    cov.at<f64>(0,1) += (f64)d.x*s.y;
+    cov.at<f64>(1,0) += (f64)d.y*s.x;
+    cov.at<f64>(1,1) += (f64)d.y*s.y;
+  }
+  srcVar /= (f64)numPoints;
+  cov    /= (f64)numPoints;
+
+  if(srcVar <= 0.) {
+    return cv::Mat();
+  }
+
+  cv::Mat u, w, vt;
+  cv::SVD::compute(cov, w, u, vt);
+
+  cv::Mat s = cv::Mat::eye(2, 2, CV_64F);
+  if(cv::determinant(u)*cv::determinant(vt) < 0.) {
+    s.at<f64>(1,1) = -1.;
+  }
+
+  const cv::Mat rot = u * s * vt;
+  const f64 scale = (w.at<f64>(0)*s.at<f64>(0,0) + w.at<f64>(1)*s.at<f64>(1,1)) / srcVar;
+
+  cv::Mat transform(2, 3, CV_64F);
+  transform.at<f64>(0,0) = scale*rot.at<f64>(0,0);
+  transform.at<f64>(0,1) = scale*rot.at<f64>(0,1);
+  transform.at<f64>(1,0) = scale*rot.at<f64>(1,0);
+  transform.at<f64>(1,1) = scale*rot.at<f64>(1,1);
+  transform.at<f64>(0,2) = dstMean.x - (transform.at<f64>(0,0)*srcMean.x + transform.at<f64>(0,1)*srcMean.y);
+  transform.at<f64>(1,2) = dstMean.y - (transform.at<f64>(1,0)*srcMean.x + transform.at<f64>(1,1)*srcMean.y);
+
+  return transform;
+}
+
 void NonMaximaSuppression(std::vector<FaceDetection>& detections, f32 threshold)
 {
   std::sort(detections.begin(), detections.end(),
@@ -455,7 +512,7 @@ Result FaceEmbedderNet::ComputeEmbedding(const Image& gray, const FaceLandmarks&
     dst.emplace_back(kAlignedRefPoints[i][0], kAlignedRefPoints[i][1]);
   }
 
-  cv::Mat transform = cv::estimateAffinePartial2D(src, dst, cv::noArray(), cv::LMEDS);
+  cv::Mat transform = EstimateSimilarityTransform(src, dst);
   if(transform.empty()) {
     LOG_WARNING("FaceEmbedderNet.ComputeEmbedding.AlignmentFailed", "");
     return RESULT_FAIL;
