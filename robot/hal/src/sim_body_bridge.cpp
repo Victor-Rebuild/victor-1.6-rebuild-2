@@ -33,6 +33,10 @@ namespace {
   std::deque<VicBridgeImu> imuQueue_;
   const size_t kMaxImuQueue = 8;
 
+  struct AudioFrame { int16_t samples[MICDATA_SAMPLES_COUNT]; };
+  std::deque<AudioFrame> audioQueue_;
+  const size_t kMaxAudioQueue = 16;
+
   bool gripperOn_ = false;
   uint8_t setpointValid_ = 0;
   uint32_t headCmdSeq_ = 0;
@@ -77,6 +81,12 @@ namespace {
         imuQueue_.push_back(frame.imu);
         while (imuQueue_.size() > kMaxImuQueue) {
           imuQueue_.pop_front();
+        }
+        AudioFrame audio;
+        memcpy(audio.samples, frame.b2h.audio, sizeof(audio.samples));
+        audioQueue_.push_back(audio);
+        while (audioQueue_.size() > kMaxAudioQueue) {
+          audioQueue_.pop_front();
         }
       }
     }
@@ -192,6 +202,21 @@ bool PopImu(HAL::IMU_DataStructure& imu)
   imu.temperature_degC = src.temperature_degC;
   imuQueue_.pop_front();
   return true;
+}
+
+bool PopAudio(int16_t* samples)
+{
+  if (audioQueue_.empty()) {
+    return false;
+  }
+  memcpy(samples, audioQueue_.front().samples, sizeof(audioQueue_.front().samples));
+  audioQueue_.pop_front();
+  return true;
+}
+
+bool HasAudio()
+{
+  return !audioQueue_.empty();
 }
 
 bool IsConnected()

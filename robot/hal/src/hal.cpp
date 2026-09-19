@@ -701,7 +701,13 @@ Result HAL::Step(void)
 
 #ifdef STANDALONE_SIM
   headData_.framecounter++;
-  const int freshBodyFrames = SimBodyBridge::Exchange(headData_);
+  int freshBodyFrames = SimBodyBridge::Exchange(headData_);
+  while (freshBodyFrames == 0 && simClockAnchored_ && SimBodyBridge::IsConnected()) {
+    if (*shutdownSignal_ != 0) {
+      break;
+    }
+    freshBodyFrames = SimBodyBridge::Exchange(headData_);
+  }
   const BodyToHead* simBody = SimBodyBridge::LatestBody();
   bodyData_ = simBody ? const_cast<BodyToHead*>(simBody) : &dummyBodyData_;
   if (freshBodyFrames > 0) {
@@ -711,6 +717,8 @@ Result HAL::Step(void)
     } else {
       simTimeMs_ += (TimeStamp_t)freshBodyFrames * ROBOT_TIME_STEP_MS;
     }
+  } else if (simClockAnchored_) {
+    simTimeMs_ += ROBOT_TIME_STEP_MS;
   }
 #endif
 
@@ -1054,7 +1062,16 @@ bool HAL::HandleLatestMicData(SendDataFunction sendDataFunc)
 {
   #if MICDATA_ENABLED
   {
+#ifdef STANDALONE_SIM
+    s16 audio[MICDATA_SAMPLES_COUNT];
+    if (!SimBodyBridge::PopAudio(audio)) {
+      return false;
+    }
+    sendDataFunc(audio, MICDATA_SAMPLES_COUNT);
+    return SimBodyBridge::HasAudio();
+#else
     sendDataFunc(bodyData_->audio, MICDATA_SAMPLES_COUNT);
+#endif
   }
   #endif
   return false;

@@ -8,4 +8,4 @@ procs:
   anim:
     shell: "sleep 3 && bash simulator/mprocs/run_chroot.sh /anki/bin/vic-anim"
   cloud:
-    shell: "sleep 4 && bash simulator/mprocs/run_chroot.sh /anki/bin/vic-cloud"
+    shell: "sleep 4 && bash simulator/mprocs/run_native.sh vic-cloud"

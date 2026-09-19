@@ -30,6 +30,10 @@ const BodyToHead* LatestBody();
 
 bool PopImu(HAL::IMU_DataStructure& imu);
 
+bool PopAudio(int16_t* samples);
+
+bool HasAudio();
+
 bool IsConnected();
 
 void Shutdown();

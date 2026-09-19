@@ -174,17 +174,17 @@ To do this:
 
 ```
 # Arch:
-sudo pacman -S qemu-user-static qemu-user-static-binfmt alsa-lib
+sudo pacman -S qemu-user-static qemu-user-static-binfmt alsa-lib opus
 sudo systemctl enable --now systemd-binfmt.service
 # if already enabled
 sudo systemctl restart systemd-binfmt.service
 
 # Debian / Ubuntu:
-sudo apt install qemu-user-static qemu-user-binfmt libasound2-dev
+sudo apt install qemu-user-static qemu-user-binfmt libasound2-dev libopus-dev
 sudo systemctl restart systemd-binfmt.service
 
 # Fedora
-sudo dnf install qemu-user-static qemu-user-binfmt alsa-lib
+sudo dnf install qemu-user-static qemu-user-binfmt alsa-lib opus
 sudo systemctl restart systemd-binfmt.service
 ```
 

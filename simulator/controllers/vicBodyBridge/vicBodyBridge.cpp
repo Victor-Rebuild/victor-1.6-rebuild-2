@@ -65,14 +65,61 @@ static double WallNow()
 
 static std::mutex micMutex;
 static std::deque<int16_t> micRing;
-static const size_t kMicRingMax = 16000 / 5;
+static const size_t kMicTarget  = 16000 * 60 / 1000;
+static const size_t kMicRingMax = 16000 * 250 / 1000;
+static const double kMicTrackMax = 0.15;
+static bool micPrimed = false;
+static double micFrac = 0.0;
+static int16_t micPrev = 0;
+
+static float MicGain()
+{
+  static const float gain = []() -> float {
+    const char* g = getenv("VIC_MIC_GAIN");
+    if (g == nullptr || g[0] == '\0') {
+      return 0.25f;
+    }
+    const float v = strtof(g, nullptr);
+    return (v >= 0.f) ? v : 0.25f;
+  }();
+  return gain;
+}
 
 static void MicCaptureCB(ma_device*, void*, const void* input, ma_uint32 frames)
 {
   const int16_t* in = (const int16_t*)input;
   std::lock_guard<std::mutex> lk(micMutex);
   for (ma_uint32 i = 0; i < frames; ++i) micRing.push_back(in[i]);
-  while (micRing.size() > kMicRingMax) micRing.pop_front();
+  if (micRing.size() > kMicRingMax) {
+    micRing.erase(micRing.begin(), micRing.end() - kMicTarget);
+    micPrimed = false;
+  }
+}
+
+static int16_t MicNextSample()
+{
+  if (micRing.empty()) {
+    micPrimed = false;
+    return micPrev;
+  }
+  const double next = (double)micRing.front();
+  const double out = micPrev + (next - micPrev) * micFrac;
+
+  double err = ((double)micRing.size() - (double)kMicTarget) / (double)kMicTarget;
+  if (err > 1.0) err = 1.0;
+  if (err < -1.0) err = -1.0;
+  micFrac += 1.0 + kMicTrackMax * err;
+
+  while (micFrac >= 1.0) {
+    if (micRing.empty()) {
+      micPrimed = false;
+      break;
+    }
+    micPrev = micRing.front();
+    micRing.pop_front();
+    micFrac -= 1.0;
+  }
+  return (int16_t)out;
 }
 
 static std::mutex spkMutex;
@@ -549,12 +596,19 @@ int main(int, char**)
     b.failureCode = BOOT_FAIL_NONE;
 
     if (micLive) {
+      const float micGain = MicGain();
       std::lock_guard<std::mutex> lk(micMutex);
+      if (!micPrimed && micRing.size() >= kMicTarget) {
+        micPrimed = true;
+        micFrac = 0.0;
+        micPrev = micRing.front();
+      }
       for (int s = 0; s < AUDIO_SAMPLES_PER_FRAME; ++s) {
-        int16_t v = 0;
-        if (!micRing.empty()) { v = micRing.front(); micRing.pop_front(); }
+        const int16_t v = micPrimed ? MicNextSample() : 0;
+        const float scaled = roundf((float)v * micGain);
+        const int16_t out = (int16_t)std::max(-32768.f, std::min(32767.f, scaled));
         int16_t* dst = &b.audio[s * 4];
-        dst[0] = dst[1] = dst[2] = dst[3] = v;
+        dst[0] = dst[1] = dst[2] = dst[3] = out;
       }
     }
 
