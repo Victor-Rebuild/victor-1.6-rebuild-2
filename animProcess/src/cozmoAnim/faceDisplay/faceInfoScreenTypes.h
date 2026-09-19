@@ -82,6 +82,7 @@ enum class ScreenName : uint8_t {
   Reloading,
   RTP,
   RTS,
+  SkipOnboarding,
   SleepSettings,
   Snoring,
   ServerInformation,

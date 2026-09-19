@@ -330,6 +330,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   ADD_SCREEN_WITH_COLORED_TEXT(RTP, RTP, {ColoredTextLine(_disablePersonCheck ? "ENABLE RTP?" : "DISABLE RTP?", NamedColors::CYAN)});
   ADD_SCREEN_WITH_COLORED_TEXT(SetFrequency, SetFrequency, {ColoredTextLine("SET SPEED TO?", NamedColors::ORANGE)});
   ADD_SCREEN_WITH_COLORED_TEXT(Snoring, Snoring, {_snoringDisabled ? "ENABLE SNORING?" : "DISABLE SNORING?", NamedColors::CYAN});
+  ADD_SCREEN_WITH_COLORED_TEXT(SkipOnboarding, SkipOnboarding, ColoredTextLine("SKIP ONBOARDING?", NamedColors::GREEN))
   ADD_SCREEN_WITH_COLORED_TEXT(SwitchSlot, SwitchSlot, {ColoredTextLine("SWAP SYS SLOT?", NamedColors::ORANGE)});
   ADD_SCREEN_WITH_COLORED_TEXT(SwitchSlotReboot, SwitchSlotReboot, {ColoredTextLine("SWITCHING SLOT...", NamedColors::ORANGE)});
   ADD_SCREEN_WITH_COLORED_TEXT(Toggle30fps, Toggle30fps, {ColoredTextLine(_using30fps() ? "TOGGLE 60 FPS?" : "TOGGLE 30 FPS?", NamedColors::GREEN)});
@@ -443,6 +444,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   // === User Data Menu ===
   ADD_MENU_ITEM(UserDataSubmenu, "EXIT", Main);
   ADD_MENU_ITEM(UserDataSubmenu, "REONBOARD", Reonboard);
+  ADD_MENU_ITEM(UserDataSubmenu, "SKIP ONBOARDING", SkipOnboarding)
   ADD_MENU_ITEM(UserDataSubmenu, "CLEAR USER DATA", ClearUserData);
   DISABLE_TIMEOUT(UserDataSubmenu);
 
@@ -457,6 +459,13 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   };
   ADD_MENU_ITEM_WITH_ACTION(SelfTest, "CONFIRM", confirmSelfTest);
   DISABLE_TIMEOUT(SelfTestRunning);
+
+  FaceInfoScreen::MenuItemAction confirmSkipOnboarding = []() {
+    (void)system("curl 'http://localhost:8888/consolefunccall' -X POST --data-raw 'func=Exit Onboarding - Mark Complete&args=' &");
+    return ScreenName::None;
+  };
+  ADD_MENU_ITEM(SkipOnboarding, "BACK", UserDataSubmenu);
+  ADD_MENU_ITEM_WITH_ACTION(SkipOnboarding, "CONFIRM", confirmSkipOnboarding);
 
   // Clear User Data menu
   FaceInfoScreen::MenuItemAction confirmClearUserData = [this]() {
@@ -474,7 +483,6 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   ADD_MENU_ITEM(ClearUserData, "BACK", UserDataSubmenu);
   ADD_MENU_ITEM_WITH_ACTION(ClearUserData, "CONFIRM", confirmClearUserData);
   SET_TIMEOUT(ClearUserDataFail, 3.f, UserDataSubmenu);
-
 
   // === Network screen ===
   auto networkEnterFcn = [this]() {
