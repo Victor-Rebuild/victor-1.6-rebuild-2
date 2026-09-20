@@ -166,6 +166,8 @@ sudo umount "$OSPATH/tmp"
 sudo umount "$OSPATH/sys"
 sudo umount "$OSPATH/proc"
 sudo umount "$OSPATH/etc/resolv.conf"
+sync
+sudo umount "$OSPATH"
 
 echo
 echo "unmounted"
