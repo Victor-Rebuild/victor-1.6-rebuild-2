@@ -464,10 +464,7 @@ uchar LRRawPixelsClassifier::PredictClass(const std::vector<FeatureType>& values
   DEV_ASSERT(values.size() == 3, "LRRawPixelsClassifier.PredictClass.WrongInputSize");
 
   // Step 1: get the GMM response
-  cv::Mat pixelMat(1, 3, CV_32F);
-  pixelMat.at<float>(0, 0) = values[0];
-  pixelMat.at<float>(0, 1) = values[1];
-  pixelMat.at<float>(0, 2) = values[2];
+  const cv::Mat pixelMat = (cv::Mat_<float>(1,3) << values[0], values[1], values[2]);
 
   // Step 2: calculate the Mahalanobis distance
   const std::vector<float> minDistances = this->MinMahalanobisDistanceFromGMM(pixelMat);
@@ -491,10 +488,7 @@ uchar THRawPixelsClassifier::PredictClass(const std::vector<FeatureType>& values
   DEV_ASSERT(values.size() == 3, "THRawPixelsClassifier.PredictClass.WrongInputSize");
 
   // Step 1: get the GMM response
-  cv::Mat pixelMat(1, 3, CV_32F);
-  pixelMat.at<float>(0, 0) = values[0];
-  pixelMat.at<float>(0, 1) = values[1];
-  pixelMat.at<float>(0, 2) = values[2];
+  const cv::Mat pixelMat = (cv::Mat_<float>(1,3) << values[0], values[1], values[2]);
 
   // Step 2: calculate the Mahalanobis distance
   const std::vector<float> minDistances = this->MinMahalanobisDistanceFromGMM(pixelMat);
@@ -591,9 +585,7 @@ DTRawPixelsClassifier::DTRawPixelsClassifier(const Json::Value& config, const Co
   _dtree->setMinSampleCount(minSampleCount);
   _dtree->setTruncatePrunedTree(truncatePrunedTree);
   // prior
-  cv::Mat_<float> prior(1, 2);
-  prior(0, 0) = 1.0f;
-  prior(0, 1) = positiveWeight;
+  const cv::Mat prior = (cv::Mat_<float>(1,2) << 1.0, positiveWeight);
   _dtree->setPriors(prior);
 
   // fixed parameters
