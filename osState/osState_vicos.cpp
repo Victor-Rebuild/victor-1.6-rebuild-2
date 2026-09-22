@@ -366,6 +366,9 @@ void OSState::UpdateTemperature_C() const
   _temperatureFile.open(kTemperatureFile, std::ifstream::in);
   if (_temperatureFile.is_open()) {
     _temperatureFile >> _cpuTemp_C;
+    if (_cpuTemp_C > 999) {
+      _cpuTemp_C /= 1000;
+    }
     _temperatureFile.close();
   }
   else {
