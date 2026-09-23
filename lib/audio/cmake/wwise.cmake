@@ -43,7 +43,7 @@ set(WWISE_LIBS
   AkVorbisDecoder
 )
 
-set(WWISE_SDK_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/wwise/versions/current)
+set(WWISE_SDK_ROOT ${CMAKE_SOURCE_DIR}/EXERNALS/deps/wwise/2017.2.7_a)
 set(WWISE_INCLUDE_PATH ${WWISE_SDK_ROOT}/include)
 
 # Set Lib Platform

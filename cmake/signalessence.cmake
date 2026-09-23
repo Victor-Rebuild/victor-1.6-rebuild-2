@@ -38,7 +38,7 @@ set(SIGNALESSENCE_INCLUDE_PATHS
 )
 
 set(SIGNALESSENCE_LIBS
-  mmfx
+  signalessence_softfp
 )
 
 if (VICOS)

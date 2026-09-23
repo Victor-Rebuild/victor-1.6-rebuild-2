@@ -38,8 +38,3 @@ if [[ ! -d "$ADEPS/vicos-sdk/dist/${TOOLCHAIN_VERSION}/prebuilt" ]]; then
     tar -zxf vicos-sdk_${TOOLCHAIN_VERSION}_$HOST.tar.gz
     rm -f vicos-sdk_${TOOLCHAIN_VERSION}_$HOST.tar.gz
 fi
-
-#if [[ ! -f "$ADEPS/vicos-sdk/dist/${TOOLCHAIN_VERSION}/prebuilt/lib/libtinfo.so.5" ]] && [[ "$(uname -a)" == *"Linux"* ]]; then
-#    echo "Patching compiler to include libtinfo5"
-#    cp -r "$ORIGDIR/3rd/libtinfo5/$TINFO_HOST/libtinfo.so.5.9" "$ADEPS/vicos-sdk/dist/${TOOLCHAIN_VERSION}/prebuilt/lib/libtinfo.so.5"
-#fi
