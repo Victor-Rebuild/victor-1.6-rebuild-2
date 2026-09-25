@@ -634,6 +634,12 @@ function(check_licenses)
                 libruy_trmul.a
                 libruy_tune.a
                 libruy_wait.a
+                libprotobuf.a
+                libprotoc.a
+                libxnnpack-delegate.a
+                libmicrokernels-all.a
+                libmicrokernels-prod.a
+                libabsl_kernel_timeout_internal.a
                 libtensorflow-lite.a
                 libXNNPACK.a # end: tensorflow lite libs
                 liblttng-ust.so
