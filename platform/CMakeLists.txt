@@ -55,16 +55,14 @@ if (VICOS)
   set(STRIP_TARGETS
     libatomic.so.1
     libc++.so.1
-    libopencv_calib3d.so.414
-    libopencv_core.so.414
-    libopencv_dnn.so.414
-    libopencv_features2d.so.414
-    libopencv_flann.so.414
-    libopencv_highgui.so.414
-    libopencv_imgcodecs.so.414
-    libopencv_imgproc.so.414
-    libopencv_ml.so.414
-    libopencv_objdetect.so.414
+    libopencv_calib3d.so.412
+    libopencv_core.so.412
+    libopencv_features2d.so.412
+    libopencv_flann.so.412
+    libopencv_imgcodecs.so.412
+    libopencv_imgproc.so.412
+    libopencv_ml.so.412
+    libopencv_objdetect.so.412
   )
   foreach (target ${STRIP_TARGETS})
     add_strip_target(${target})
