@@ -9,7 +9,6 @@ asset_project(
                 ('assets', 'faceOverlays/*.jpg'),
                 ('externals/deps/sensory', 'sensorySpeechRecModels/hey_vector/**/*.raw'),
                 ('externals/deps/sensory', 'sensorySpeechRecModels/alexa/**/*.raw'),
-                ('externals/deps/pryon_lite', 'pryonSpeechRecModels/**/*.bin'),
                 ('externals/animation-assets', 'animations/**/*.bin'),
                 ('externals/animation-assets', 'animationGroups/**/*.json'),
                 ('externals/animation-assets', 'sprites/**/*.png'),
