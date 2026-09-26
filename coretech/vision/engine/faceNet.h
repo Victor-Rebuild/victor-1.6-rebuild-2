@@ -2,7 +2,10 @@
 #define __Anki_Vision_FaceNet_H__
 
 #include "coretech/common/shared/math/point.h"
+#include "coretech/common/shared/math/matrix_impl.h"
+#include "coretech/common/shared/math/rect_impl.h"
 #include "coretech/common/shared/math/rect.h"
+#include "coretech/common/shared/array2d_impl.h"
 #include "coretech/common/shared/types.h"
 #include "coretech/vision/engine/image.h"
 

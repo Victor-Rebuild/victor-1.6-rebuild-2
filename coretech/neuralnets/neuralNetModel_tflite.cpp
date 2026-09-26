@@ -43,6 +43,11 @@ Result TFLiteModel::LoadModelInternal(const std::string& modelPath,
 {
   DEV_ASSERT(!modelPath.empty(), "TFLiteModel.LoadModelInternal.EmptyModelPath");
 
+  const Result paramsResult = _params.SetFromConfig(config);
+  if (RESULT_OK != paramsResult) {
+    return paramsResult;
+  }
+
   const std::string graphFile = Util::FileUtils::FullFilePath({modelPath, _params.graphFile});
   if (!Util::FileUtils::FileExists(graphFile)) {
     LOG_ERROR("TFLiteModel.LoadModelInternal.GraphFileDoesNotExist", "%s", graphFile.c_str());
