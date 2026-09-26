@@ -345,8 +345,6 @@ enum int_32 AnimationTrigger
   PettingLevel4Getout,
   PettingBlissLoop,
   PettingBlissGetout,
-  PetDetectionDog,
-  PetDetectionCat,
   PickupCubePreperation,
   PickupCubeRetry,
   PickupCubeSuccess,

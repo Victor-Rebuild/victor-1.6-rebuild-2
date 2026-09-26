@@ -524,9 +524,6 @@ enum uint_16 BehaviorID {
   WeatherResponses,
   WeatherTextToSpeech,
 
-  // victorBehaviorTree
-  PetDetection,
-
 }
 
 }

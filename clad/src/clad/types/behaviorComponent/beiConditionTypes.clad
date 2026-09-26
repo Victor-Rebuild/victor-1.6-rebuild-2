@@ -48,7 +48,6 @@ enum uint_8 BEIConditionType {
   OffTreadsState,
   OnCharger,
   OnChargerPlatform,
-  PetInitialDetection,
   ProxInRange,
   RobotHeldInPalm,
   RobotInHabitat,

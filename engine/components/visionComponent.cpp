@@ -29,7 +29,6 @@
 #include "engine/navMap/mapComponent.h"
 #include "engine/externalInterface/gatewayInterface.h"
 #include "engine/faceWorld.h"
-#include "engine/petWorld.h"
 #include "engine/robot.h"
 #include "engine/robotDataLoader.h"
 #include "engine/robotStateHistory.h"
@@ -928,10 +927,6 @@ namespace Vector {
         //  and should be done before sending RobotProcessedImage below!)
         tryAndReport(&VisionComponent::UpdateFaces,                {VisionMode::Faces});
 
-        // NOTE: UpdatePets will also update PetWorld (which broadcasts pet face observations
-        //  and should be done before sending RobotProcessedImage below!)
-        tryAndReport(&VisionComponent::UpdatePets,                 {VisionMode::Pets});
-
         tryAndReport(&VisionComponent::UpdateMotionCentroid,       {VisionMode::Motion});
         tryAndReport(&VisionComponent::UpdateOverheadEdges,        {VisionMode::OverheadEdges});
         tryAndReport(&VisionComponent::UpdateComputedCalibration,  {VisionMode::Calibration});
@@ -1143,12 +1138,6 @@ namespace Vector {
 
     return lastResult;
   } // UpdateFaces()
-
-  Result VisionComponent::UpdatePets(const VisionProcessingResult& procResult)
-  {
-    Result lastResult = _robot->GetPetWorld().Update(procResult.pets);
-    return lastResult;
-  }
 
   Result VisionComponent::UpdateMotionCentroid(const VisionProcessingResult& procResult)
   {
