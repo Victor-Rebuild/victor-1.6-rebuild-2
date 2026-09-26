@@ -22,9 +22,18 @@ namespace Vision {
 
 namespace {
 
-const char* const kCacheToken     = "anki";
-const char* const kSeedPrefix     = "anki";
 const char* const kSeedExtension  = "bin";
+
+std::string MakeCacheToken(const std::string& modelPath)
+{
+  std::string token = modelPath;
+  for(auto & c : token) {
+    if('/' == c || '\\' == c) {
+      c = '_';
+    }
+  }
+  return token;
+}
 
 std::once_flag s_seedOnceFlag;
 
@@ -38,15 +47,8 @@ void SeedGpuCache(const std::string& modelCacheDir, const std::string& gpuCacheD
     return;
   }
 
-  const std::vector<std::string> files = Util::FileUtils::FilesInDirectory(modelCacheDir, false,
-                                                                          kSeedExtension);
-
-  std::vector<std::string> toCopy;
-  for(auto const& file : files) {
-    if(0 == file.compare(0, strlen(kSeedPrefix), kSeedPrefix)) {
-      toCopy.push_back(file);
-    }
-  }
+  const std::vector<std::string> toCopy = Util::FileUtils::FilesInDirectory(modelCacheDir, false,
+                                                                            kSeedExtension);
 
   if(toCopy.empty()) {
     return;
@@ -123,6 +125,7 @@ struct TfliteModel::Impl
   std::unique_ptr<tflite::FlatBufferModel> model;
   std::unique_ptr<tflite::Interpreter>     interpreter;
   TfLiteDelegate*                          gpuDelegate = nullptr;
+  std::string                              cacheToken;
   bool                                     isUsingGpu  = false;
 
   ~Impl()
@@ -170,8 +173,9 @@ struct TfliteModel::Impl
     if(!config.gpuCacheDir.empty() &&
        Util::FileUtils::CreateDirectory(config.gpuCacheDir, false, true))
     {
+      cacheToken = MakeCacheToken(config.modelPath);
       options.serialization_dir   = config.gpuCacheDir.c_str();
-      options.model_token         = kCacheToken;
+      options.model_token         = cacheToken.c_str();
       options.experimental_flags |= TFLITE_GPU_EXPERIMENTAL_FLAGS_ENABLE_SERIALIZATION;
     }
     else if(!config.gpuCacheDir.empty())
@@ -215,6 +219,16 @@ struct TfliteModel::Impl
 
     interpreter->SetNumThreads(config.numThreads);
     interpreter->SetAllowFp16PrecisionForFp32(config.allowFp16);
+
+    if(!config.inputDims.empty())
+    {
+      const std::vector<int> sizes(config.inputDims.begin(), config.inputDims.end());
+      if(kTfLiteOk != interpreter->ResizeInputTensor(interpreter->inputs()[0], sizes)) {
+        LOG_ERROR("TfliteModel.BuildInterpreter.ResizeInputFailed", "%s", config.modelPath.c_str());
+        return false;
+      }
+    }
+
     return true;
   }
 };
@@ -311,30 +325,6 @@ TfliteTensor TfliteModel::GetOutput(s32 index) const
     return TfliteTensor();
   }
   return MakeTensor(_impl->interpreter->output_tensor(index));
-}
-
-Result TfliteModel::ResizeInput(s32 index, const std::vector<s32>& dims)
-{
-  if(!IsLoaded() || index < 0 || index >= GetNumInputs()) {
-    return RESULT_FAIL;
-  }
-
-  const std::vector<int> sizes(dims.begin(), dims.end());
-  if(kTfLiteOk != _impl->interpreter->ResizeInputTensor(_impl->interpreter->inputs()[index], sizes)) {
-    LOG_ERROR("TfliteModel.ResizeInput.Failed", "input %d", index);
-    return RESULT_FAIL;
-  }
-
-  return RESULT_OK;
-}
-
-Result TfliteModel::AllocateTensors()
-{
-  if(!IsLoaded() || kTfLiteOk != _impl->interpreter->AllocateTensors()) {
-    LOG_ERROR("TfliteModel.AllocateTensors.Failed", "");
-    return RESULT_FAIL;
-  }
-  return RESULT_OK;
 }
 
 Result TfliteModel::Invoke()

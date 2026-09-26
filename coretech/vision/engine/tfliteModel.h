@@ -35,12 +35,13 @@ struct TfliteTensor
 
 struct TfliteConfig
 {
-  std::string modelPath;
-  s32         numThreads    = 2;
-  bool        useGpu        = true;
-  bool        allowFp16     = true;
-  std::string gpuCacheDir   = "/data/data/com.anki.victor/cache/gpuCache";
-  std::string modelCacheDir = "/anki/data/assets/cozmo_resources/config/vision/model-cache";
+  std::string      modelPath;
+  s32              numThreads    = 2;
+  bool             useGpu        = true;
+  bool             allowFp16     = true;
+  std::vector<s32> inputDims;
+  std::string      gpuCacheDir   = "/data/data/com.anki.victor/cache/gpuCache";
+  std::string      modelCacheDir = "/anki/data/assets/cozmo_resources/config/vision/model-cache";
 };
 
 class TfliteModel
@@ -63,8 +64,6 @@ public:
   TfliteTensor GetInput(s32 index) const;
   TfliteTensor GetOutput(s32 index) const;
 
-  Result ResizeInput(s32 index, const std::vector<s32>& dims);
-  Result AllocateTensors();
   Result Invoke();
 
   static void WriteGray(const TfliteTensor& tensor, const cv::Mat& gray, f32 mean, f32 scale);

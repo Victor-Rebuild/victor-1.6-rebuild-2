@@ -52,15 +52,10 @@ Result TFLiteModel::LoadModelInternal(const std::string& modelPath,
   Vision::TfliteConfig tfConfig;
   tfConfig.modelPath  = graphFile;
   tfConfig.numThreads = kNumThreads;
+  tfConfig.inputDims  = {1, _params.inputHeight, _params.inputWidth, 3};
 
   _model = std::make_unique<Vision::TfliteModel>();
   if (_model->Load(tfConfig) != RESULT_OK) {
-    _model.reset();
-    return RESULT_FAIL;
-  }
-
-  if (_model->ResizeInput(0, {1, _params.inputHeight, _params.inputWidth, 3}) != RESULT_OK ||
-      _model->AllocateTensors() != RESULT_OK) {
     _model.reset();
     return RESULT_FAIL;
   }
