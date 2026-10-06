@@ -259,14 +259,26 @@ void SpriteWrapper::LoadSprite(ImageRGBA* outImage, const HSImageHandle& hsImage
     PRINT_NAMED_ERROR("SpriteWrapper.LoadSprite.OutImageIsNull", "");
   }
   
-  if((hsImage != nullptr) &&
+  static const bool isXray = Vector::IsXray();
+  bool alreadyScaled = false;
+
+  if ((hsImage != nullptr) &&
      hsImage->GetHSID() != 0){
     // Load the image as a grayscale image and merge it with a hue image
     Image grayImg;
-    grayImg.Load(_fullSpritePath.c_str());
+    {
+      grayImg.Load(_fullSpritePath.c_str());
+    }
+    if (isXray) {
+      // Scale the image before the HSV to RGB conversion which helps performance
+      grayImg.Resize(grayImg.GetNumRows() * 80 / 96, grayImg.GetNumCols() * 160 / 184);
+      alreadyScaled = true;
+    }
     outImage->Allocate(grayImg.GetNumRows(), grayImg.GetNumCols());
-    ApplyHS(grayImg, hsImage, outImage);
-  }else{
+    {
+      ApplyHS(grayImg, hsImage, outImage);
+    }
+  } else {
     // Load the image in as an RGB directly 
     auto res = outImage->Load(_fullSpritePath.c_str());
     ANKI_VERIFY(RESULT_OK == res,
@@ -274,7 +286,7 @@ void SpriteWrapper::LoadSprite(ImageRGBA* outImage, const HSImageHandle& hsImage
                 "Failed to load sprite %s",
                 _fullSpritePath.c_str());
   }
-  if(Vector::IsXray()) {
+  if (isXray && !alreadyScaled) {
     outImage->Resize(outImage->GetNumRows() * 80 / 96, outImage->GetNumCols() * 160 / 184);
   }
 }
