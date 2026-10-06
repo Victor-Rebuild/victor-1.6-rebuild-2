@@ -75,7 +75,7 @@ namespace Vector {
 #endif
 
   // Whether or not to send 'debug' images
-  CONSOLE_VAR(bool, kSendDebugImages,  "Vision.General", true);
+  CONSOLE_VAR(bool, kSendDebugImages,  "Vision.General", false);
 
   CONSOLE_VAR(bool, kSendUndistortedImages, "Vision.General", false);
 

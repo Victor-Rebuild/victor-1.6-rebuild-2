@@ -92,6 +92,7 @@ bool BehaviorCoordinateWeather::WantsToBeActivatedBehavior() const
 void BehaviorCoordinateWeather::GetBehaviorOperationModifiers(BehaviorOperationModifiers& modifiers) const
 {
   modifiers.wantsToBeActivatedWhenOffTreads = true;
+  modifiers.visionModesForActiveScope->insert({ VisionMode::Markers_Off, EVisionUpdateFrequency::High });
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

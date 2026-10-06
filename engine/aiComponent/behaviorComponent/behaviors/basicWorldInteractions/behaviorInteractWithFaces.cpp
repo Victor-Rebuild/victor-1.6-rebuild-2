@@ -135,7 +135,7 @@ void BehaviorInteractWithFaces::GetBehaviorOperationModifiers(BehaviorOperationM
   
   // Avoid marker detection to improve performance
   // TODO: Remove with VIC-6838
-  modifiers.visionModesForActiveScope->insert({ VisionMode::Markers_Off, EVisionUpdateFrequency::Standard });
+  modifiers.visionModesForActiveScope->insert({ VisionMode::Markers_Off, EVisionUpdateFrequency::High });
 }
   
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

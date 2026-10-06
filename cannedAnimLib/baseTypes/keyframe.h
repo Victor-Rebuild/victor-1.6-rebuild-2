@@ -287,7 +287,7 @@ namespace Vector {
   class SpriteSequenceKeyFrame : public IKeyFrame
   {
   public:
-    static constexpr TimeStamp_t SPRITE_FRAME_INTERVAL_MS = 33;
+    static constexpr TimeStamp_t SPRITE_FRAME_INTERVAL_MS = Vector::SPRITE_FRAME_INTERVAL_MS;
 
     SpriteSequenceKeyFrame(Vision::SpriteHandle spriteHandle,
                            TimeStamp_t triggerTime_ms, 

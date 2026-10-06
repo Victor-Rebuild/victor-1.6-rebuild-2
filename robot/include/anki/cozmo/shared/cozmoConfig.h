@@ -351,7 +351,7 @@ namespace Vector {
   const u32 SPRITE_FRAME_INTERVAL_MS = 33;
 
   // 30fps stuff for powersave mode
-  const u32 ANIM_TIME_STEP_POWERSAVE_MS = 33;
+  const u32 ANIM_TIME_STEP_POWERSAVE_MS = SPRITE_FRAME_INTERVAL_MS;
   const u32 ANIM_TIME_STEP_POWERSAVE_US = ANIM_TIME_STEP_POWERSAVE_MS * 1000;
   
   inline bool& _using30fps() {

@@ -169,15 +169,15 @@ static inline bool IsWhiskey()
     #define HEADID_HWREV_XRAY_EVT   0x20 //XRay (Vector 2.0)
   */
   
-
   const uint32_t hardware = Factory::GetEMR()->fields.HW_VER;
-  return (hardware >= 0x7 && hardware && hardware <= 0x19);
+  static const bool isWhiskey = (hardware >= 0x7 && hardware <= 0x19);
+  return isWhiskey;
 }
 
 static inline const bool IsXray()
 {
-    static const bool isXray = (Factory::GetEMR()->fields.HW_VER >= 0x20);
-    return isXray;
+  static const bool isXray = (Factory::GetEMR()->fields.HW_VER >= 0x20);
+  return isXray;
 }
 
 }

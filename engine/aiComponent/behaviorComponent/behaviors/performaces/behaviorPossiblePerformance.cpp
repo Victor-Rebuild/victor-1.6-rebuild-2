@@ -122,6 +122,7 @@ RobotTimeStamp_t BehaviorPossiblePerformance::GetRecentFaceTime() const
 void BehaviorPossiblePerformance::GetBehaviorOperationModifiers(BehaviorOperationModifiers& modifiers) const
 {
   modifiers.wantsToBeActivatedWhenOnCharger = true;
+  modifiers.visionModesForActiveScope->insert({ VisionMode::Markers_Off, EVisionUpdateFrequency::High });
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
