@@ -15,6 +15,7 @@
 
 #include "coretech/common/shared/types.h"
 #include "coretech/common/shared/math/point.h"
+#include "coretech/common/shared/array2d_impl.h"
 #include "coretech/vision/engine/image.h"
 #include "anki/cozmo/shared/cozmoConfig.h"
 #include "clad/types/proceduralFaceTypes.h"
