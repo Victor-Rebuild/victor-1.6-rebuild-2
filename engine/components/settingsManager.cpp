@@ -718,13 +718,13 @@ namespace Anki
               while (!_stopRainbowEyeThread.load(std::memory_order_acquire))
               {
                 _robot->SendRobotMessage<RobotInterface::SetFaceHue>(hue);
-                hue += 0.01f;
+                hue += 0.001f;
                 if (hue > 1.0f)
                 {
                   hue = 0.0f;
                 }
                 std::unique_lock<std::mutex> lock(_rainbowEyeMutex);
-                _rainbowEyeCV.wait_for(lock, std::chrono::milliseconds(30), [this]() {
+                _rainbowEyeCV.wait_for(lock, std::chrono::milliseconds(15), [this]() {
                   return _stopRainbowEyeThread.load(std::memory_order_acquire);
                 });
 
