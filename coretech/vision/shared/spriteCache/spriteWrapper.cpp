@@ -242,7 +242,7 @@ void SpriteWrapper::LoadSprite(Image* outImage) const
               _fullSpritePath.c_str());
 
   if(Vector::IsXray()) {
-    outImage->Resize(outImage->GetNumRows() * 80 / 96, outImage->GetNumCols() * 160 / 184);
+    outImage->Resize(outImage->GetNumRows() * 80 / 96, outImage->GetNumCols() * 160 / 184, ResizeMethod::NearestNeighbor);
   }
 }
 
@@ -271,7 +271,7 @@ void SpriteWrapper::LoadSprite(ImageRGBA* outImage, const HSImageHandle& hsImage
     }
     if (isXray) {
       // Scale the image before the HSV to RGB conversion which helps performance
-      grayImg.Resize(grayImg.GetNumRows() * 80 / 96, grayImg.GetNumCols() * 160 / 184);
+      grayImg.Resize(grayImg.GetNumRows() * 80 / 96, grayImg.GetNumCols() * 160 / 184, ResizeMethod::NearestNeighbor);
       alreadyScaled = true;
     }
     outImage->Allocate(grayImg.GetNumRows(), grayImg.GetNumCols());
@@ -287,7 +287,7 @@ void SpriteWrapper::LoadSprite(ImageRGBA* outImage, const HSImageHandle& hsImage
                 _fullSpritePath.c_str());
   }
   if (isXray && !alreadyScaled) {
-    outImage->Resize(outImage->GetNumRows() * 80 / 96, outImage->GetNumCols() * 160 / 184);
+    outImage->Resize(outImage->GetNumRows() * 80 / 96, outImage->GetNumCols() * 160 / 184, ResizeMethod::NearestNeighbor);
   }
 }
 

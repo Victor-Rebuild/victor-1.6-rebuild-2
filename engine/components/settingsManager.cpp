@@ -766,16 +766,23 @@ namespace Anki
                 }
 
                 if (Util::FileUtils::DirectoryDoesNotExist("/data/data/rebuild")) {
-                  LOG_WARNING("SettingsManager.RebuildEyes.CreateInital", "Creating inital files");
+                  LOG_INFO("SettingsManager.RebuildEyes.CreateInitalFiles", "Creating inital files");
                   std::vector<std::string> command;
                   command.push_back("/usr/bin/sudo");
                   command.push_back("/usr/sbin/save-eye-color");
                   command.push_back("1");
                   command.push_back("1");
                   const bool success = ExecCommand(command);
-                  LOG_WARNING("SettingsManager.RebuildEyes.CreateInital", success ? "Inital files created" : "Failed to create inital files");
+                  if (success) {
+                    LOG_INFO("SettingsManager.RebuildEyes.CreateInitalFiles", "Inital files created");
+                  } else {
+                    LOG_ERROR("SettingsManager.RebuildEyes.CreateInitalFiles", "Failed to create inital files");
+                  }
                 }
 
+                const std::string eyesSaveFailed = "Failed to save values";
+                const std::string eyesSaveSaving = "Saving rebuild eye colors";
+                const std::string eyesSaveSuccess = "Current values saved";
                 float adjustedSaturation;
                 RebuildXMBColor color;
 
@@ -792,11 +799,8 @@ namespace Anki
                   // Get XMB color for current date/time
                   color = GetInterpolatedRebuildXMBColor(month, day, hour, minute);
 
-                  // Get XMB brightness for current time
-                  float brightness = GetRebuildXMBBrightnessForHour(hour, minute);
-
                   // Apply brightness to saturation (lower brightness = lower saturation)
-                  adjustedSaturation = color.saturation * brightness;
+                  adjustedSaturation = color.saturation * GetRebuildXMBBrightnessForHour(hour, minute);;
 
                   if (IsXray()) {
                     adjustedSaturation = adjustedSaturation + 0.15;
@@ -810,7 +814,7 @@ namespace Anki
                     (std::stof(Util::FileUtils::ReadFile("/data/data/rebuild/rebuildEyesHue")) != color.hue) &&
                     (std::stof(Util::FileUtils::ReadFile("/data/data/rebuild/rebuildEyesSaturation")) != adjustedSaturation))
                   {
-                    LOG_WARNING("SettingsManager.RebuildEyes.HourlySave", "Saving values");
+                    LOG_INFO("SettingsManager.RebuildEyes.3HourlySave", "%s", eyesSaveSaving.c_str());
                     nextThirdHour = (hour + 3) % 24;
                     std::vector<std::string> command;
                     command.push_back("/usr/bin/sudo");
@@ -818,7 +822,11 @@ namespace Anki
                     command.push_back(std::to_string(adjustedSaturation));
                     command.push_back(std::to_string(color.hue));
                     const bool success = ExecCommand(command);
-                    LOG_WARNING("SettingsManager.RebuildEyes.5HourlySave", success ? "Current values saved" : "Failed to save values");
+                    if (success) {
+                      LOG_INFO("SettingsManager.RebuildEyes.3HourlySave", "%s", eyesSaveSuccess.c_str());
+                    } else {
+                      LOG_ERROR("SettingsManager.RebuildEyes.3HourlySave", "%s", eyesSaveFailed.c_str());
+                    }
                   }
                 }
 
@@ -828,12 +836,12 @@ namespace Anki
                 {
                   adjustedSaturation = std::stof(Util::FileUtils::ReadFile("/data/data/rebuild/rebuildEyesSaturation"));
                   color.hue = std::stof(Util::FileUtils::ReadFile("/data/data/rebuild/rebuildEyesHue"));
-                  LOG_WARNING("SettingsManager.RebuildEyes.Delay", "Doing Delay");
+                  LOG_INFO("SettingsManager.RebuildEyes.Delay", "Doing Delay");
                 }
 
                 // Set the face color
-                _robot->SendRobotMessage<RobotInterface::SetFaceHue>(color.hue);
                 _robot->SendRobotMessage<RobotInterface::SetFaceSaturation>(adjustedSaturation);
+                _robot->SendRobotMessage<RobotInterface::SetFaceHue>(color.hue);
 
                 // Check if "REBUILD_EYES" is still active by checking the setting
                 const std::string rebuildEyesStrInTh = "REBUILD_EYES";
@@ -841,19 +849,23 @@ namespace Anki
                 const auto& currentHueKey = EyeColor_Name(static_cast<external_interface::EyeColor>(eyeval));
                 if (currentHueKey != rebuildEyesStrInTh)
                 {
-                  LOG_WARNING("SettingsManager.ApplySettingEyeColor.Apply", "Stopping Rebuild Eyes thread");
-                  LOG_WARNING("SettingsManager.RebuildEyes.SaveValues", "Saving rebuild eye colors");
+                  LOG_INFO("SettingsManager.ApplySettingEyeColor.Apply", "Stopping Rebuild Eyes thread");
+                  LOG_INFO("SettingsManager.RebuildEyes.SaveValues", "%s", eyesSaveSaving.c_str());
                   std::vector<std::string> command;
                   command.push_back("/usr/bin/sudo");
                   command.push_back("/usr/sbin/save-eye-color");
                   command.push_back(std::to_string(adjustedSaturation));
                   command.push_back(std::to_string(color.hue));
                   const bool success = ExecCommand(command);
-                  LOG_WARNING("SettingsManager.RebuildEyes.SaveValues", success ? "Current values saved" : "Failed to save values");
+                  if (success) {
+                    LOG_INFO("SettingsManager.RebuildEyes.SaveValues", "%s", eyesSaveSuccess.c_str());
+                  } else {
+                    LOG_ERROR("SettingsManager.RebuildEyes.SaveValues", "%s", eyesSaveFailed.c_str());
+                  }
                   _stopRebuildEyeThread.store(true, std::memory_order_release);
                   break;
                 }
-                // Refresh every 15 seconds
+                // Refresh every 30 seconds
                 std::unique_lock<std::mutex> lock(_rebuildEyeMutex);
                 _rebuildEyeCV.wait_for(lock, std::chrono::seconds(30), [this]() {
                   return _stopRebuildEyeThread.load(std::memory_order_acquire);
