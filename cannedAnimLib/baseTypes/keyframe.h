@@ -372,7 +372,7 @@ namespace Vector {
                             Vision::SpriteHandle& handle,
                             uint16_t& numLayers);
 
-    Vision::CompositeImage& GetCompositeImage() { assert(_compositeImage != nullptr); return *_compositeImage; }
+    Vision::CompositeImage& GetCompositeImage() { assert(_compositeImage != nullptr); _renderCacheDirty = true; return *_compositeImage; }
     
     void OverrideShouldRenderInEyeHue(bool shouldRenderInEyeHue);
 
@@ -408,7 +408,13 @@ namespace Vector {
     TimeStamp_t  _internalUpdateInterval_ms = _getAnimTimeStepMS();
     TimeStamp_t _keyframeActiveDuration_ms = 0;
     mutable u32 _lastDisplayedFrame = 0;
-    
+
+    Vision::SpriteHandle _cachedFaceHandle;
+    uint16_t             _cachedNumLayers = 0;
+    u32                  _lastRenderedFrame = 0;
+    TimeStamp_t          _lastRenderTime_ms = 0;
+    bool                 _renderCacheDirty = true;
+
   }; // class SpriteSequenceKeyFrame
 
   class ProceduralFaceKeyFrame : public IKeyFrame

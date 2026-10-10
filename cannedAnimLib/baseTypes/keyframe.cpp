@@ -489,9 +489,22 @@ void SafeNumericCast(const FromType& fromVal, ToType& toVal, const char* debugNa
         _lastDisplayedFrame = curFrame;
       }
 
-      // Always render, but use _lastDisplayedFrame to prevent advancing too fast
+      // Don't always render and instead do it every other frame, and use _lastDisplayedFrame to prevent advancing too fast
       if (NewImageContentAvailable(timeSinceAnimStart_ms))
       {
+        const bool canReuseLastRender = (_cachedFaceHandle != nullptr) &&
+                                        !_renderCacheDirty &&
+                                        !_compositeImageUpdated &&
+                                        (_lastDisplayedFrame == _lastRenderedFrame) &&
+                                        (timeSinceAnimStart_ms >= _lastRenderTime_ms);
+        if (canReuseLastRender)
+        {
+          handle = _cachedFaceHandle;
+          numLayers = _cachedNumLayers;
+          _lastRenderTime_ms = timeSinceAnimStart_ms;
+          return true;
+        }
+
         const auto& layerLayoutMap = _compositeImage->GetLayerLayoutMap();
         numLayers = layerLayoutMap.size();
 
@@ -519,6 +532,12 @@ void SafeNumericCast(const FromType& fromVal, ToType& toVal, const char* debugNa
         handle = std::make_shared<Vision::SpriteWrapper>(img);
         _compositeImageUpdated = false;
 
+        _cachedFaceHandle   = handle;
+        _cachedNumLayers    = numLayers;
+        _lastRenderedFrame  = _lastDisplayedFrame;
+        _lastRenderTime_ms  = timeSinceAnimStart_ms;
+        _renderCacheDirty   = false;
+
         return true;
       }else{
         return false;
@@ -529,6 +548,7 @@ void SafeNumericCast(const FromType& fromVal, ToType& toVal, const char* debugNa
     {
       auto renderMethod = shouldRenderInEyeHue ? Vision::SpriteRenderMethod::CustomHue : Vision::SpriteRenderMethod::RGBA;
       _compositeImage->OverrideRenderMethod(renderMethod);
+      _renderCacheDirty = true;
     }
 
 
