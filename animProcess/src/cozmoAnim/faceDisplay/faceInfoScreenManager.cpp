@@ -127,6 +127,10 @@ bool needsUpdate() {
     return false;
   }
 
+  if ((Util::FileUtils::ReadFile("/etc/rebuild-dev-or-indev") == "internal") || Util::FileUtils::FileExists("/etc/do-not-auto-update")) {
+    return false;
+  }
+
   if (Util::FileUtils::FileExists("/run/rebuild/needs-update")) {
     isCheckingUpdate = false;
     return true;
