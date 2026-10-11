@@ -541,7 +541,11 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   ADD_MENU_ITEM(ConfigurationSubmenu3, "EXIT", Main);
   ADD_MENU_ITEM(ConfigurationSubmenu3, _classicAlexa ? "USE MODERN ALEXA" : "USE BETA ALEXA", OldNewAlexa);
   ADD_MENU_ITEM(ConfigurationSubmenu3, "DTTB RANDOM EYES", DTTBRandomEyes);
-  ADD_MENU_ITEM(ConfigurationSubmenu3, _cloudlessEnabled ? "USE NORMAL CLOUD" : "USE VIC-CLOUDLESS", Cloudless);
+  if (Util::FileUtils::DirectoryExists("/anki/data/cloudswitch/")) {
+    ADD_MENU_ITEM(ConfigurationSubmenu3, _cloudlessEnabled ? "USE NORMAL CLOUD" : "USE VIC-CLOUDLESS", Cloudless);
+  } else {
+    ADD_MENU_ITEM(ConfigurationSubmenu3, "NO CLOUDLESS", ConfigurationSubmenu3);
+  }
   DISABLE_TIMEOUT(ConfigurationSubmenu3)
 
   // === SwitchSlot screen ===
