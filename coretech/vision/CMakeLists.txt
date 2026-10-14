@@ -46,7 +46,7 @@ endif()
 target_compile_options(cti_vision
 PRIVATE
   $<$<CONFIG:Debug>:-O0>
-  $<$<CONFIG:Release>:-O3 -ffast-math>
+  $<$<CONFIG:Release>:-O2>
   ${SYMBOL_VISIBILITY_FLAGS}
   ${ASAN_CXX_FLAGS}
 )

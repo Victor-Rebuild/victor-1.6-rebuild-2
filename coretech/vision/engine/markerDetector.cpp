@@ -197,7 +197,7 @@ Result MarkerDetector::Detect(const Image& inputImageGray, std::list<ObservedMar
   
   // Victor markers are all light-on-dark
   bool kDarkOnLightMode = false;
-  // for (int i = 0; i < 2; ++i) {
+  for (int i = 0; i < 2; ++i) {
 
     markers.set_size(maxMarkers);
     for(s32 i=0; i<maxMarkers; i++) {
@@ -240,8 +240,8 @@ Result MarkerDetector::Detect(const Image& inputImageGray, std::list<ObservedMar
                                  quad, _camera);
     } // for(each marker)
 
-    // kDarkOnLightMode = true;
-  // }
+    kDarkOnLightMode = true;
+  }
   
   return RESULT_OK;
 }
