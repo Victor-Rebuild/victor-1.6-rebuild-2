@@ -123,6 +123,10 @@ bool checkAutoUpdatesOn() {
 }
 
 bool needsUpdate() {
+
+#ifdef STANDALONE_SIM
+  return false;
+#else
   if (isDeployed()) {
     return false;
   }
@@ -138,7 +142,7 @@ bool needsUpdate() {
     isCheckingUpdate = false;
     return false;
   } else if (!Util::FileUtils::FileExists("/run/rebuild/needs-update") &&
-             !Util::FileUtils::FileExists("/run/rebuild/dont-need-update"))
+            !Util::FileUtils::FileExists("/run/rebuild/dont-need-update"))
   {
     if (!isCheckingUpdate) {
       (void)system("systemctl start update-engine-rebuild-check.service &");
@@ -148,6 +152,7 @@ bool needsUpdate() {
   } else {
     return false;
   }
+#endif
 }
 
 bool namedRobot() {
@@ -229,9 +234,11 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
 
   _context = context;
   _animationStreamer = animStreamer;
-  
+
   // osstate is useful
+#ifndef STANDALONE_SIM
   auto osstate = OSState::getInstance();
+#endif
 
   // allow us to send debug info out to the web server
   _webService = context->GetWebService();
@@ -442,15 +449,19 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   SET_ENTER_ACTION(Main, mainEnterFcn);
 
   ADD_MENU_ITEM(Main, "EXIT", None);
+#ifndef STANDALONE_SIM
   ADD_MENU_ITEM(Main, IsXray() ? "DATA" : "DATA OPTIONS", UserDataSubmenu);
+#endif
   ADD_MENU_ITEM(Main, IsXray() ? "CONF" : "CONFIGURATION", ConfigurationSubmenu);
 
+#ifndef STANDALONE_SIM
   // === User Data Menu ===
   ADD_MENU_ITEM(UserDataSubmenu, "EXIT", Main);
   ADD_MENU_ITEM(UserDataSubmenu, "REONBOARD", Reonboard);
   ADD_MENU_ITEM(UserDataSubmenu, "SKIP ONBOARDING", SkipOnboarding)
   ADD_MENU_ITEM(UserDataSubmenu, "CLEAR USER DATA", ClearUserData);
   DISABLE_TIMEOUT(UserDataSubmenu);
+#endif
 
   // === Self test screen ===
   ADD_MENU_ITEM(SelfTest, "BACK", ConfigurationSubmenu);
@@ -464,6 +475,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   ADD_MENU_ITEM_WITH_ACTION(SelfTest, "CONFIRM", confirmSelfTest);
   DISABLE_TIMEOUT(SelfTestRunning);
 
+#ifndef STANDALONE_SIM
   FaceInfoScreen::MenuItemAction confirmSkipOnboarding = []() {
     (void)system("curl 'http://localhost:8888/consolefunccall' -X POST --data-raw 'func=Exit Onboarding - Mark Complete&args=' &");
     return ScreenName::None;
@@ -487,6 +499,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   ADD_MENU_ITEM(ClearUserData, "BACK", UserDataSubmenu);
   ADD_MENU_ITEM_WITH_ACTION(ClearUserData, "CONFIRM", confirmClearUserData);
   SET_TIMEOUT(ClearUserDataFail, 3.f, UserDataSubmenu);
+#endif
 
   // === Network screen ===
   auto networkEnterFcn = [this]() {
@@ -500,6 +513,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   };
   SET_ENTER_ACTION(ServerInformation, serverEnterFcn);
 
+#ifndef STANDALONE_SIM
   // === Reonboard screen ===
   FaceInfoScreen::MenuItemAction confirmReonboard = [] {
     LOG_INFO("FaceInfoScreenManager.Reonboard.Confirmed", "");
@@ -510,6 +524,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   ADD_MENU_ITEM(Reonboard, "BACK", UserDataSubmenu);
   ADD_MENU_ITEM_WITH_ACTION(Reonboard, "CONFIRM", confirmReonboard);
   DISABLE_TIMEOUT(Reonboard);
+#endif
 
   // === Configuration Submenu ===
   // FaceInfoScreen::MenuItemAction incSlotDown = [] {
@@ -524,8 +539,10 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   // === Screen 1 ===
   ADD_MENU_ITEM(ConfigurationSubmenu, "EXIT", Main);
   ADD_MENU_ITEM(ConfigurationSubmenu, "SELF TEST", SelfTest);
+#ifndef STANDALONE_SIM
   ADD_MENU_ITEM(ConfigurationSubmenu, "CHANGE SLOT", SwitchSlot);
   ADD_MENU_ITEM(ConfigurationSubmenu, "ENTER RECOVERY", BootRecovery);
+#endif
   ADD_MENU_ITEM(ConfigurationSubmenu, "BACKPACK SETTINGS", BackpackLightsMenu);
   DISABLE_TIMEOUT(ConfigurationSubmenu)
 
@@ -533,8 +550,10 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   ADD_MENU_ITEM(ConfigurationSubmenu2, "EXIT", Main);
   ADD_MENU_ITEM(ConfigurationSubmenu2, _using30fps() ? "TOGGLE 60 FPS" : "TOGGLE 30 FPS", Toggle30fps);
   ADD_MENU_ITEM(ConfigurationSubmenu2, "SLEEP SETTINGS", SleepSettings);
+#ifndef STANDALONE_SIM
   ADD_MENU_ITEM(ConfigurationSubmenu2, "UPDATE SETTINGS", AutoUpdates);
   ADD_MENU_ITEM(ConfigurationSubmenu2, "CHANGE PERF PROFILE", SetFrequency);
+#endif
   DISABLE_TIMEOUT(ConfigurationSubmenu2)
 
   // === Screen 3 ===
@@ -548,6 +567,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   }
   DISABLE_TIMEOUT(ConfigurationSubmenu3)
 
+#ifndef STANDALONE_SIM
   // === SwitchSlot screen ===
   FaceInfoScreen::MenuItemAction confirmSlotSwitch = [this] {
     LOG_INFO("FaceInfoScreenManager.SwitchSlot.Confirmed", "");
@@ -557,10 +577,11 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   };
   ADD_MENU_ITEM(SwitchSlot, "BACK", ConfigurationSubmenu);
   ADD_MENU_ITEM_WITH_ACTION(SwitchSlot, "CONFIRM", confirmSlotSwitch);
+#endif
 
   ADD_MENU_ITEM(BackpackLightsMenu, "BACK", ConfigurationSubmenu);
   if (_userlights()) {
-    ADD_MENU_ITEM(BackpackLightsMenu, "CUSTOM LIGHTS ON", ConfigurationSubmenu);
+    ADD_MENU_ITEM(BackpackLightsMenu, "CUSTOM LIGHTS ON", BackpackLightsMenu);
   } else if (_wireoslights()) {
     ADD_MENU_ITEM(BackpackLightsMenu, "ANKI LIGHTS", BackpackLights);
   } else {
@@ -608,6 +629,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   ADD_MENU_ITEM(BackpackLightsDotBlink, "BACK", BackpackLightsDot);
   ADD_MENU_ITEM_WITH_ACTION(BackpackLightsDotBlink, "CONFIRM", confirmToggleDotLightBlink);
 
+#ifndef STANDALONE_SIM
   // === Recovery screen ===
   FaceInfoScreen::MenuItemAction confirmBootRecovery = [] {
     LOG_INFO("FaceInfoScreenManager.Recovery.Confirmed", "");
@@ -639,6 +661,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   ADD_MENU_ITEM_WITH_ACTION(SetFrequency, "REGULAR", confirmSetSpeedReg);
   ADD_MENU_ITEM_WITH_ACTION(SetFrequency, "BALANCED", confirmSetSpeedBal);
   ADD_MENU_ITEM_WITH_ACTION(SetFrequency, "PERFORMANCE", confirmSetSpeedPerf);
+#endif
 
   // === Enable/disable 30 fps ===
   FaceInfoScreen::MenuItemAction confirmToggle30fps = [this] {
@@ -656,6 +679,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   ADD_MENU_ITEM(Toggle30fps, "BACK", ConfigurationSubmenu2);
   ADD_MENU_ITEM_WITH_ACTION(Toggle30fps, "CONFIRM", confirmToggle30fps);
 
+#ifndef STANDALONE_SIM
   // === Update Settings ===
   FaceInfoScreen::MenuItemAction confirmAutoUpdates = [this] {
     LOG_INFO("FaceInfoScreenManager.AutoUpdates.Confirmed", "");
@@ -690,6 +714,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   }
   SET_ENTER_ACTION(Updating, updateRebuild);
   DISABLE_TIMEOUT(Updating);
+#endif
 
   // Sleep settings
   ADD_MENU_ITEM(SleepSettings, "BACK", ConfigurationSubmenu2);
@@ -2166,6 +2191,7 @@ void FaceInfoScreenManager::DrawMuteAnimation()
 
 }
 
+#ifndef STANDALONE_SIM
 void FaceInfoScreenManager::DrawUpdatePrompt()
 {
   auto osstate = OSState::getInstance();
@@ -2216,6 +2242,7 @@ void FaceInfoScreenManager::DrawUpdate()
                                       shouldOverrideEyeHue, shouldRenderInEyeHue);
 
 }
+#endif
 
 void FaceInfoScreenManager::DrawAlexaNotification()
 {
