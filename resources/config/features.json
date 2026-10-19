@@ -29,7 +29,7 @@
   },
   {
     "feature": "ReactToHeldCube",
-    "enabled": true
+    "enabled": false
   },
   {
     "feature": "RollCube",
