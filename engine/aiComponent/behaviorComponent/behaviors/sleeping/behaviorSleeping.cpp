@@ -115,6 +115,10 @@ void BehaviorSleeping::TransitionToSleeping()
 
 void BehaviorSleeping::TransitionToBoutOfStirring()
 {
+  if( _iConfig.shouldEnterPowerSave ) {
+    SmartRequestPowerSaveMode();
+  }
+
   if (GetBEI().GetSleepTracker().IsNightTime() && _disableSnoring) {
     TransitionToSleeping();
   }
@@ -127,8 +131,7 @@ void BehaviorSleeping::TransitionToBoutOfStirring()
     // start bout (wait first, then animate)    
     const float waitTime_s = GetRNG().RandDblInRange(kSleepingBoutSpacing_min_s, kSleepingBoutSpacing_max_s);
     HoldFaceForTime(waitTime_s, &BehaviorSleeping::TransitionToPlayStirAnim);
-  }
-  else {
+  } else {
     // back to sleep
     TransitionToSleeping();
   }
@@ -139,6 +142,10 @@ void BehaviorSleeping::TransitionToPlayStirAnim()
 {
   SetDebugStateName("stirring");
   _dVars.animIsPlaying = true;
+
+  if( _iConfig.shouldEnterPowerSave ) {
+    SmartRemovePowerSaveModeRequest();
+  }
 
   DelegateIfInControl(new TriggerAnimationAction(AnimationTrigger::GoToSleepSleeping),
                       &BehaviorSleeping::TransitionToBoutOfStirring);  
