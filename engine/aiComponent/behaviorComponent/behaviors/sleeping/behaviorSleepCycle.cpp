@@ -926,7 +926,9 @@ void BehaviorSleepCycle::TransitionToCheckingForPerson()
   // Mute audio and lock the lift so that the person check is as quiet as possible
   MuteForPersonCheck(true);
 
-  DelegateIfInControl( new TriggerAnimationAction(AnimationTrigger::WakeupGetout), [this]() {
+  auto* action = new TriggerAnimationAction(AnimationTrigger::WakeupGetout);
+  action->SetRenderInEyeHue(false);
+  DelegateIfInControl( action, [this]() {
       if( _iConfig.personCheckBehavior->WantsToBeActivated() ) {
         DelegateIfInControl( _iConfig.personCheckBehavior.get(), &BehaviorSleepCycle::RespondToPersonCheck );
       }
