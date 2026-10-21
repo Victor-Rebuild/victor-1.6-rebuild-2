@@ -875,10 +875,10 @@ void BehaviorSleepCycle::WakeUp(const WakeReason& reason, bool playWakeUp)
     }
   };
 
-  if( !wasPlayingReaction &&
-      playWakeUp &&
-      _iConfig.wakeUpBehavior->WantsToBeActivated() ) {
-    DelegateNow( _iConfig.wakeUpBehavior.get(), awakeCallback);
+  if( !wasPlayingReaction && playWakeUp ) {
+    auto* action = new TriggerAnimationAction(AnimationTrigger::WakeupGetout);
+    action->SetRenderInEyeHue(false);
+    DelegateNow( action, awakeCallback);
   }
   else {
     awakeCallback();

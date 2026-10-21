@@ -23,6 +23,7 @@
 #include "engine/aiComponent/behaviorComponent/userIntents.h"
 #include "engine/components/dataAccessorComponent.h"
 #include "robot.h"
+#include "util/logging/logging.h"
 
 namespace Anki {
 namespace Vector {
@@ -144,7 +145,7 @@ void BehaviorPowerRobotOff::TransitionToCharger()
 {
   if( GetBEI().GetRobotInfo().IsOnChargerContacts() ) {
     // skip straight to powering off
-    LOG_WARNING("BehaviorPowerRobotOff.TransitionToCharger.WontRun", "On charger");
+    LOG_CH_INFO("BehaviorPowerRobotOff.TransitionToCharger.WontRun", "On charger.", "Powering off now");
     TransitionToPoweringOff();
   }
   else {
