@@ -110,7 +110,7 @@ namespace {
   constexpr int kMaxPlayTries = 20;
 
   // Check if we want to use the old alexa voice or the modern voice
-  bool classicAlexa = RebuildToggles::GetBool("classicAlexa");
+  const bool classicAlexa = RebuildToggles::GetBool("classicAlexa");
 
   // define wwise objects depending on player type
   constexpr PluginId_t kPluginIdTTS = 10;

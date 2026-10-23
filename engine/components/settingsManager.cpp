@@ -13,6 +13,7 @@
 #include "engine/components/settingsManager.h"
 
 #include "engine/components/jdocsManager.h"
+#include "engine/components/rebuildConfig.h"
 #include "engine/components/robotHealthReporter.h"
 #include "engine/components/settingsCommManager.h"
 #include "engine/robot.h"
@@ -765,15 +766,15 @@ namespace Anki
                   gotTime = OSState::getInstance()->IsWallTimeSynced();
                 }
 
-                if (Util::FileUtils::DirectoryDoesNotExist("/data/data/rebuild")) {
+                const std::string hueName = "rebuildEyesHue";
+                const std::string satName = "rebuildEyesSaturation";
+
+                if ((RebuildToggles::GetFloat(hueName) == -1.f) && (RebuildToggles::GetFloat(satName) == -1.f)) {
                   LOG_INFO("SettingsManager.RebuildEyes.CreateInitalFiles", "Creating inital files");
-                  std::vector<std::string> command;
-                  command.push_back("/usr/bin/sudo");
-                  command.push_back("/usr/sbin/save-eye-color");
-                  command.push_back("1");
-                  command.push_back("1");
-                  const bool success = ExecCommand(command);
-                  if (success) {
+                  RebuildToggles::SetFloat(nullptr, hueName, 0.1f);
+                  RebuildToggles::SetFloat(nullptr, satName, 0.1f);
+                  if ((RebuildToggles::GetFloat(hueName) != -1.f) &&
+                      (RebuildToggles::GetFloat(satName) != -1.f)) {
                     LOG_INFO("SettingsManager.RebuildEyes.CreateInitalFiles", "Inital files created");
                   } else {
                     LOG_ERROR("SettingsManager.RebuildEyes.CreateInitalFiles", "Failed to create inital files");
@@ -811,18 +812,15 @@ namespace Anki
                   }
 
                   if (nextThirdHour == hour &&
-                    (std::stof(Util::FileUtils::ReadFile("/data/data/rebuild/rebuildEyesHue")) != color.hue) &&
-                    (std::stof(Util::FileUtils::ReadFile("/data/data/rebuild/rebuildEyesSaturation")) != adjustedSaturation))
+                    (RebuildToggles::GetFloat(hueName) != color.hue) &&
+                    (RebuildToggles::GetFloat(satName) != adjustedSaturation))
                   {
                     LOG_INFO("SettingsManager.RebuildEyes.3HourlySave", "%s", eyesSaveSaving.c_str());
                     nextThirdHour = (hour + 3) % 24;
-                    std::vector<std::string> command;
-                    command.push_back("/usr/bin/sudo");
-                    command.push_back("/usr/sbin/save-eye-color");
-                    command.push_back(std::to_string(adjustedSaturation));
-                    command.push_back(std::to_string(color.hue));
-                    const bool success = ExecCommand(command);
-                    if (success) {
+                    RebuildToggles::SetFloat(nullptr, hueName, color.hue);
+                    RebuildToggles::SetFloat(nullptr, satName, adjustedSaturation);
+                    if ((RebuildToggles::GetFloat(hueName) == color.hue) &&
+                        (RebuildToggles::GetFloat(satName) == adjustedSaturation)) {
                       LOG_INFO("SettingsManager.RebuildEyes.3HourlySave", "%s", eyesSaveSuccess.c_str());
                     } else {
                       LOG_ERROR("SettingsManager.RebuildEyes.3HourlySave", "%s", eyesSaveFailed.c_str());
@@ -831,11 +829,11 @@ namespace Anki
                 }
 
                 if (!gotTime &&
-                  Util::FileUtils::FileExists("/data/data/rebuild/rebuildEyesSaturation") &&
-                  Util::FileUtils::FileExists("/data/data/rebuild/rebuildEyesHue"))
+                  (RebuildToggles::GetFloat(hueName) != -1.f) &&
+                  (RebuildToggles::GetFloat(satName) != -1.f))
                 {
-                  adjustedSaturation = std::stof(Util::FileUtils::ReadFile("/data/data/rebuild/rebuildEyesSaturation"));
-                  color.hue = std::stof(Util::FileUtils::ReadFile("/data/data/rebuild/rebuildEyesHue"));
+                  adjustedSaturation = RebuildToggles::GetFloat(hueName);
+                  color.hue = RebuildToggles::GetFloat(satName);
                   LOG_INFO("SettingsManager.RebuildEyes.Delay", "Doing Delay");
                 }
 
@@ -851,13 +849,10 @@ namespace Anki
                 {
                   LOG_INFO("SettingsManager.ApplySettingEyeColor.Apply", "Stopping Rebuild Eyes thread");
                   LOG_INFO("SettingsManager.RebuildEyes.SaveValues", "%s", eyesSaveSaving.c_str());
-                  std::vector<std::string> command;
-                  command.push_back("/usr/bin/sudo");
-                  command.push_back("/usr/sbin/save-eye-color");
-                  command.push_back(std::to_string(adjustedSaturation));
-                  command.push_back(std::to_string(color.hue));
-                  const bool success = ExecCommand(command);
-                  if (success) {
+                  RebuildToggles::SetFloat(nullptr, hueName, color.hue);
+                  RebuildToggles::SetFloat(nullptr, satName, adjustedSaturation);
+                  if ((RebuildToggles::GetFloat(hueName) == color.hue) &&
+                      (RebuildToggles::GetFloat(satName) == adjustedSaturation)) {
                     LOG_INFO("SettingsManager.RebuildEyes.SaveValues", "%s", eyesSaveSuccess.c_str());
                   } else {
                     LOG_ERROR("SettingsManager.RebuildEyes.SaveValues", "%s", eyesSaveFailed.c_str());
