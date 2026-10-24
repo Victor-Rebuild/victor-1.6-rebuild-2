@@ -138,9 +138,9 @@ WallTime::~WallTime()
 
 bool WallTime::GetLocalTime(struct tm& localTime)
 {
-  if( !IsTimeSynced() ) {
-    return false;
-  }
+  // if( !IsTimeSynced() ) {
+  //   return false;
+  // }
 
   const bool timeOK = WallTime::GetApproximateLocalTime(localTime);
   return timeOK;
