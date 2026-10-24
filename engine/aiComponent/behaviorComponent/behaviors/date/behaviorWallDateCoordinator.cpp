@@ -22,6 +22,7 @@
 #include "engine/components/localeComponent.h"
 #include "engine/components/settingsManager.h"
 #include "engine/faceWorld.h"
+#include "osState/osState.h"
 #include "osState/wallTime.h"
 
 #include <iomanip>
@@ -179,7 +180,7 @@ void BehaviorWallDateCoordinator::TransitionToICantDoThat()
 {
   ANKI_VERIFY(_iConfig.iCantDoThatBehavior->WantsToBeActivated(), 
               "BehaviorWallDateCoordinator.TransitionToICantDoThat.BehaviorDoesntWantToBeActivated", "");
-  DelegateIfInControl(_iConfig.iCantDoThatBehavior.get());
+  DelegateIfInControl(_iConfig.iCantDoThatBehavior.get(), [this](){CancelSelf();});
   // annnnnd we're done (behaviorAlwaysDelegates = false)
 }
 
@@ -247,73 +248,77 @@ std::string BehaviorWallDateCoordinator::GetTTSStringForDate()
   std::string monthString;
   std::string dayString;
   std::string dayStringEnd;
-  struct tm localDate;
 
-  int dayWeek = 0;
+  if (OSState::getInstance()->IsWallTimeSynced()) {
+    int dayWeek = 0;
 
-  WallTime::getInstance()->GetLocalTime(localDate);
-  WallTime::getInstance()->GetDayOfWeek(dayWeek);
+    WallTime::getInstance()->GetDayOfWeek(dayWeek);
+    const struct tm& localDate = _dVars.date;
 
-  int currentMonth = localDate.tm_mon;
-  int currentDay = localDate.tm_mday;
+    int currentMonth = localDate.tm_mon;
+    int currentDay = localDate.tm_mday;
 
-  const auto & localeComponent = GetBEI().GetRobotInfo().GetLocaleComponent();
+    const auto & localeComponent = GetBEI().GetRobotInfo().GetLocaleComponent();
 
-  const std::string monthStringLocalized[] = {
-    localeComponent.GetString(kDateJanuary),
-    localeComponent.GetString(kDateFebruary),
-    localeComponent.GetString(kDateMarch),
-    localeComponent.GetString(kDateApril),
-    localeComponent.GetString(kDateMay),
-    localeComponent.GetString(kDateJune),
-    localeComponent.GetString(kDateJuly),
-    localeComponent.GetString(kDateAugust),
-    localeComponent.GetString(kDateSeptember),
-    localeComponent.GetString(kDateOctober),
-    localeComponent.GetString(kDateNovember),
-    localeComponent.GetString(kDateDecember)
-  };
+    const std::string monthStringLocalized[] = {
+      localeComponent.GetString(kDateJanuary),
+      localeComponent.GetString(kDateFebruary),
+      localeComponent.GetString(kDateMarch),
+      localeComponent.GetString(kDateApril),
+      localeComponent.GetString(kDateMay),
+      localeComponent.GetString(kDateJune),
+      localeComponent.GetString(kDateJuly),
+      localeComponent.GetString(kDateAugust),
+      localeComponent.GetString(kDateSeptember),
+      localeComponent.GetString(kDateOctober),
+      localeComponent.GetString(kDateNovember),
+      localeComponent.GetString(kDateDecember)
+    };
 
-  const std::string dayStringLocalized[] = {
-    localeComponent.GetString(kDaySunday),
-    localeComponent.GetString(kDayMonday),
-    localeComponent.GetString(kDayTuesday),
-    localeComponent.GetString(kDayWednesday),
-    localeComponent.GetString(kDayThursday),
-    localeComponent.GetString(kDayFriday),
-    localeComponent.GetString(kDaySaturday)
-  };
+    const std::string dayStringLocalized[] = {
+      localeComponent.GetString(kDaySunday),
+      localeComponent.GetString(kDayMonday),
+      localeComponent.GetString(kDayTuesday),
+      localeComponent.GetString(kDayWednesday),
+      localeComponent.GetString(kDayThursday),
+      localeComponent.GetString(kDayFriday),
+      localeComponent.GetString(kDaySaturday)
+    };
 
-  if (dayWeek >= 0 && dayWeek <= 6) {
-    dayString = dayStringLocalized[dayWeek];
+    if (dayWeek >= 0 && dayWeek <= 6) {
+      dayString = dayStringLocalized[dayWeek];
+    } else {
+      // This shouldn't be anything outside the range of 0-6 (1-7 (Sunday to Saturday)), but if it does we handle it by cancelling the behavior
+      TransitionToICantDoThat();
+    }
+
+    if (currentMonth >= 0 && currentMonth <= 11) {
+      monthString = monthStringLocalized[currentMonth];
+    } else {
+      // This shouldn't be anything outside the range of 0-11 (1-12 (January to December)), but if it does we handle it by cancelling the behavior
+      TransitionToICantDoThat();
+    }
+
+    if ((currentDay % 100 >= 11) && (currentDay % 100 <= 13)) {
+      dayStringEnd = "th";
+    } else if (currentDay % 10 == 1) {
+      dayStringEnd = "st";
+    } else if (currentDay % 10 == 2) {
+      dayStringEnd = "nd";
+    } else if (currentDay % 10 == 3) {
+      dayStringEnd = "rd";
+    } else {
+      dayStringEnd = "";
+    }
+
+    ss << dayString + " " + monthString + " " + std::to_string(currentDay) + dayStringEnd;
+    LOG_WARNING("Date", "Final full date string: %s Month: %i Day: %i", ss.str().c_str(), currentMonth, currentDay);
+
+    return ss.str();
   } else {
-    // This shouldn't be anything outside the range of 0-6 (1-7 (Sunday to Saturday)), but if it does we handle it by cancelling the behavior
     TransitionToICantDoThat();
+    return "";
   }
-
-  if (currentMonth >= 0 && currentMonth <= 11) {
-    monthString = monthStringLocalized[currentMonth];
-  } else {
-    // This shouldn't be anything outside the range of 0-11 (1-12 (January to December)), but if it does we handle it by cancelling the behavior
-    TransitionToICantDoThat();
-  }
-
-  if ((currentDay % 100 >= 11) && (currentDay % 100 <= 13)) {
-    dayStringEnd = "th";
-  } else if (currentDay % 10 == 1) {
-    dayStringEnd = "st";
-  } else if (currentDay % 10 == 2) {
-    dayStringEnd = "nd";
-  } else if (currentDay % 10 == 3) {
-    dayStringEnd = "rd";
-  } else {
-    dayStringEnd = "";
-  }
-    
-  ss << dayString + " " + monthString + " " + std::to_string(currentDay) + dayStringEnd;
-  LOG_WARNING("Date", "Final full date string: %s Month: %i Day: %i", ss.str().c_str(), currentMonth, currentDay);
-
-  return ss.str();
 }
 
 } // namespace Vector
