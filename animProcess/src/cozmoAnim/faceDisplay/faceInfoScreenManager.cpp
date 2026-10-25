@@ -105,6 +105,7 @@ const f32 FaceInfoScreenManager::kDefaultTextScale = 0.4f;
 int confPageNumber = 1;
 
 bool isCheckingUpdate = false;
+bool drawUpdateSelection = false;
 
 bool isDeployed() {
     struct stat info;
@@ -131,7 +132,9 @@ bool needsUpdate() {
     return false;
   }
 
-  if ((Util::FileUtils::ReadFile("/etc/rebuild-dev-or-indev") == "internal") || Util::FileUtils::FileExists("/etc/do-not-auto-update")) {
+  if ((Util::FileUtils::ReadFile("/etc/rebuild-dev-or-indev") == "internal") ||
+      Util::FileUtils::FileExists("/etc/do-not-auto-update"))
+  {
     return false;
   }
 
@@ -236,9 +239,9 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   _animationStreamer = animStreamer;
 
   // osstate is useful
-#ifndef STANDALONE_SIM
-  auto osstate = OSState::getInstance();
-#endif
+// #ifndef STANDALONE_SIM
+//   auto osstate = OSState::getInstance();
+// #endif
 
   // allow us to send debug info out to the web server
   _webService = context->GetWebService();
@@ -709,7 +712,8 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   auto updateRebuild = [this]() {
     DrawUpdate();
   };
-  if (osstate->IsWallTimeSynced() && osstate->IsValidIPAddress(osstate->GetIPAddress()) && needsUpdate()) {
+  if (drawUpdateSelection) {
+    drawUpdateSelection = false;
     ADD_MENU_ITEM(UpdateRebuild, "UPDATE", Updating);
   }
   SET_ENTER_ACTION(Updating, updateRebuild);
@@ -2196,11 +2200,9 @@ void FaceInfoScreenManager::DrawUpdatePrompt()
 {
   auto osstate = OSState::getInstance();
 
-  if (osstate->IsWallTimeSynced()) {
-    (void)system("systemctl start update-engine-rebuild-check.service &");
-  }
-
   if (osstate->IsWallTimeSynced() && osstate->IsValidIPAddress(osstate->GetIPAddress()) && needsUpdate()) {
+    drawUpdateSelection = true;
+
     const std::string okToUpdate = "UPDATE REBUILD?";
 
     const std::string currOSVer = IsXray() ? "CURR: " + osstate->GetOSBuildVersion() : "CURRENT: " + osstate->GetOSBuildVersion();
