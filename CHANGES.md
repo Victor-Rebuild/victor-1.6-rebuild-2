@@ -20,6 +20,7 @@
 - Rebuild Eyes! Default and can be set by asking Vector `Change eye color to Cross Media Bar` (Changes eye color on the same schedule as the PS3 XMB)!
 - Mystery Eyes! (Random eye color every boot)
 - Petting Lights (Code from WireOS but petting colors are mine)
+- Backpack Lights when taking a photo!
 - Alt power on eye animations
 - More expressive power on anims
 - Face image overlays (Code used from WireOS)
@@ -65,7 +66,6 @@
 ## Miscellaneous changes
 - Improved Japanese, French and German TTS voices
 - Proper translations for each language
-- OpenCV 4.14, newer than what's in WireOS (4.12)
 - Upped temprature limit for Vector 2.0
 - Support for DVT bodyboards
 - Compiling with -O2 and fast math
