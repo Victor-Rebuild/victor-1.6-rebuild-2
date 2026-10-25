@@ -13,6 +13,7 @@
 
 #include "engine/aiComponent/behaviorComponent/behaviors/photoTaking/behaviorTakeAPhotoCoordinator.h"
 
+#include "components/backpackLights/engineBackpackLightComponent.h"
 #include "engine/actions/animActions.h"
 #include "engine/actions/basicActions.h"
 #include "engine/aiComponent/behaviorComponent/behaviorContainer.h"
@@ -94,6 +95,7 @@ void BehaviorTakeAPhotoCoordinator::GetBehaviorJsonKeys(std::set<const char*>& e
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BehaviorTakeAPhotoCoordinator::InitBehavior()
 {
+  GetBEI().GetBackpackLightComponent().ClearAllBackpackLightConfigs();
   const auto& BC = GetBEI().GetBehaviorContainer();
   _iConfig.frameFacesBehavior          = BC.FindBehaviorByID(BEHAVIOR_ID(FrameFaces));
   _iConfig.storageIsFullBehavior       = BC.FindBehaviorByID(BEHAVIOR_ID(SingletonICantDoThat));
@@ -139,6 +141,7 @@ void BehaviorTakeAPhotoCoordinator::OnBehaviorActivated()
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BehaviorTakeAPhotoCoordinator::OnBehaviorDeactivated()
 {
+  GetBEI().GetBackpackLightComponent().ClearAllBackpackLightConfigs();
   if(RESULT_OK != GetBEI().GetPhotographyManager().EnablePhotoMode(false))
   {
     PRINT_NAMED_ERROR("BehaviorTakeAPhotoCoordinator.OnBehaviorDectivated.DisablePhotoModeFailed",
@@ -243,7 +246,9 @@ void BehaviorTakeAPhotoCoordinator::CaptureCurrentImage()
     new WaitForLambdaAction(waitLambda, kTakingPhotoTimeout_sec),
   });
   
+  GetBEI().GetBackpackLightComponent().SetBackpackAnimation(BackpackAnimationTrigger::Petting);
   DelegateIfInControl(action, [this, photoHandle](ActionResult result) {
+    GetBEI().GetBackpackLightComponent().ClearAllBackpackLightConfigs();
     if(ActionResult::SUCCESS == result) {
       PRINT_CH_INFO("Behaviors", "BehaviorTakeAPhotoCoordinator.CaptureCurrentImage.PhotoWasTaken",
                     "Handle: %zu", photoHandle);
