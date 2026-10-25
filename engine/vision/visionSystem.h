@@ -51,11 +51,13 @@
 
 #include "util/bitFlags/bitFlags.h"
 
+#include <condition_variable>
 #include <mutex>
 #include <queue>
+#include <thread>
 
 namespace Anki {
- 
+
 namespace Vision {
   class Benchmark;
   class BrightColorDetector;
@@ -171,7 +173,9 @@ namespace Vector {
     Result SetNextCameraParams(const Vision::CameraParams& params);
     
     bool CheckMailbox(VisionProcessingResult& result);
-    
+
+    bool CheckVizMailbox(Vision::CompressedImage& compressedImg);
+
     const RollingShutterCorrector& GetRollingShutterCorrector() { return _rollingShutterCorrector; }
     void  ShouldDoRollingShutterCorrection(bool b) { _doRollingShutterCorrection = b; }
     bool  IsDoingRollingShutterCorrection() const { return _doRollingShutterCorrection; }
@@ -245,7 +249,20 @@ namespace Vector {
 
     Vision::CompressedImage _compressedDisplayImg;
     s32 _imageCompressQuality = 0;
-    
+
+    std::thread             _vizCompressThread;
+    std::mutex              _vizCompressMutex;
+    std::condition_variable _vizCompressCondition;
+    Vision::ImageRGB        _vizPendingImage;
+    Vision::ImageRGB        _vizCompressingImage;
+    s32                     _vizPendingQuality = 0;
+    bool                    _hasVizPendingImage = false;
+    bool                    _hasCompressedDisplayImg = false;
+    bool                    _stopVizCompressThread = false;
+
+    void QueueVizImageForCompression(const Vision::ImageRGB& img);
+    void VizCompressLoop();
+
     Result UpdatePoseData(const VisionPoseData& newPoseData);
     Radians GetCurrentHeadAngle();
     Radians GetPreviousHeadAngle();
@@ -341,6 +358,8 @@ namespace Vector {
 
     // Size of images broadcasted to the Viz
     Vision::ImageCacheSize _vizImageBroadcastSize = Vision::ImageCacheSize::Half;
+
+    Vision::ImageRGB _cameraParamsImage;
 
 }; // class VisionSystem
   
