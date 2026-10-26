@@ -236,8 +236,15 @@ OSState::OSState()
 
     // Initialize memory info
     UpdateMemoryInfo();
-
   }
+
+  // get rebuild indev or release
+  if (Util::FileUtils::FileExists("/etc/os-version")) {
+    std::string indevOrReleasestr = Util::FileUtils::ReadFile("/etc/rebuild-dev-or-indev");
+    indevOrReleasestr.erase(indevOrReleasestr.find_last_not_of(" \t\n\r\f\v") + 1);
+    _indevRelease = indevOrReleasestr;
+  }
+
   const bool versionsValid = _majorVersion >= 0 &&
                              _minorVersion >= 0 &&
                              _incrementalVersion >= 0 &&
@@ -571,6 +578,11 @@ const std::string& OSState::GetBuildSha()
 const std::string& OSState::GetBuildBranch()
 {
   return _buildBranch;
+}
+
+const std::string& OSState::GetRebuildIndevRelease()
+{
+  return _indevRelease;
 }
 
 const std::string& OSState::GetRobotName() const

@@ -123,11 +123,8 @@ bool checkAutoUpdatesOn() {
   }
 }
 
+#ifndef STANDALONE_SIM
 bool needsUpdate() {
-
-#ifdef STANDALONE_SIM
-  return false;
-#else
   if (isDeployed()) {
     return false;
   }
@@ -155,8 +152,8 @@ bool needsUpdate() {
   } else {
     return false;
   }
-#endif
 }
+#endif
 
 bool namedRobot() {
   if (Util::FileUtils::FileExists("/data/data/customBotName") ||
@@ -1742,6 +1739,7 @@ void FaceInfoScreenManager::DrawMain()
   std::string osVer = isDeployed() ? "SHA: "  + osstate->GetBuildSha() : "VER: " + osstate->GetOSBuildVersion();
 
   std::string ip             = osstate->GetIPAddress();
+
   if (ip.empty()) {
     ip = "NOT CONNECTED";
   }
@@ -1946,13 +1944,10 @@ void FaceInfoScreenManager::DrawSensorInfo(const RobotState& state)
 }
 
 void FaceInfoScreenManager::DrawBuildInfo() {
-  std::string indevOrReleasestr = Util::FileUtils::ReadFile("/etc/rebuild-dev-or-indev");
-  indevOrReleasestr.erase(indevOrReleasestr.find_last_not_of(" \t\n\r\f\v") + 1);
-
   auto *osstate = OSState::getInstance();
   const std::string osProject = "OS: " + OSProject;
   const std::string branch = "BRANCH: " + osstate->GetBuildBranch();
-  const std::string indevOrRelease = "TYPE: " + indevOrReleasestr;
+  const std::string indevOrRelease = "TYPE: " + osstate->GetRebuildIndevRelease();
   const std::string osVer = "VER: " + osstate->GetOSBuildVersion();
   const std::string sha = "SHA: " + osstate->GetBuildSha();
   const std::string creator = Creator;
@@ -2215,10 +2210,16 @@ void FaceInfoScreenManager::DrawUpdatePrompt()
       targetOSVer = targetOSVer + "UNDEFINED";
     }
 
+    const std::string changelogs = "CHANGELOGS:";
+
+    const std::string changelog_url = "anki2.ca/1.6/c";
+
     ColoredTextLines lines = {{{okToUpdate, NamedColors::GREEN}},
                               {},
                               {currOSVer},
                               {targetOSVer},
+                              {changelogs},
+                              {changelog_url},
                             };
 
     DrawTextOnScreen(lines);
