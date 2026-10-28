@@ -735,7 +735,7 @@ namespace Anim {
     uint8_t* imageData_i = _faceImageGrayscale.GetDataPointer();
     std::copy_n(msg.faceData, numPixels, imageData_i + (msg.chunkIndex * kMaxNumPixelsPerChunk) );
 
-    if (_faceImageGrayscaleChunksReceivedBitMask == IsXray() ? kAllFaceImageGrayscaleChunksReceivedMaskFor15Chunks : kAllFaceImageGrayscaleChunksReceivedMaskFor15Chunks) {
+    if (_faceImageGrayscaleChunksReceivedBitMask == IsXray() ? kAllFaceImageGrayscaleChunksReceivedMaskFor11Chunks : kAllFaceImageGrayscaleChunksReceivedMaskFor15Chunks) {
       auto* img = new Vision::ImageRGBA(static_cast<int16_t>(FACE_DISPLAY_HEIGHT), static_cast<int16_t>(FACE_DISPLAY_WIDTH));
       img->SetFromGray(_faceImageGrayscale);
       auto handle = std::make_shared<Vision::SpriteWrapper>(img);

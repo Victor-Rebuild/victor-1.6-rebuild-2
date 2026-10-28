@@ -102,9 +102,9 @@ namespace Vector {
 const Point2f FaceInfoScreenManager::kDefaultTextStartingLoc_pix = {0,10};
 const u32 FaceInfoScreenManager::kDefaultTextSpacing_pix = 11;
 const f32 FaceInfoScreenManager::kDefaultTextScale = 0.4f;
-int confPageNumber = 1;
 
 bool isCheckingUpdate = false;
+bool isRestartRequired = false;
 
 bool isDeployed() {
     struct stat info;
@@ -523,16 +523,6 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   DISABLE_TIMEOUT(Reonboard);
 #endif
 
-  // === Configuration Submenu ===
-  // FaceInfoScreen::MenuItemAction incSlotDown = [] {
-  //     confPageNumber -= 1;
-  //     switch(confPageNumber) {
-  //         case 1:  return ScreenName::ConfigurationSubmenu;
-  //         case 2:  return ScreenName::ConfigurationSubmenu2;
-  //         default: confPageNumber = 3; return ScreenName::ConfigurationSubmenu3;
-  //     }
-  // };
-
   // === Screen 1 ===
   ADD_MENU_ITEM(ConfigurationSubmenu, "EXIT", Main);
   ADD_MENU_ITEM(ConfigurationSubmenu, "SELF TEST", SelfTest);
@@ -591,7 +581,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
     LOG_INFO("FaceInfoScreenManager.Swaplights.Confirmed", "");
     RebuildToggles::SetBool(_context->GetDataPlatform(), "wireOSLights", !RebuildToggles::GetBool("wireOSLights"));
 
-    _isRestartRequired = true;
+    isRestartRequired = true;
 
     return ScreenName::ConfigurationSubmenu;
   };
@@ -607,7 +597,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
     LOG_INFO("FaceInfoScreenManager.BlinkDotLight.Confirmed", "");
     RebuildToggles::SetBool(_context->GetDataPlatform(), "fadeDotLight", !RebuildToggles::GetBool("fadeDotLight"));
 
-    _isRestartRequired = true;
+    isRestartRequired = true;
 
     return ScreenName::ConfigurationSubmenu;
   };
@@ -619,7 +609,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
     LOG_INFO("FaceInfoScreenManager.BlinkDotLight.Confirmed", "");
     RebuildToggles::SetBool(_context->GetDataPlatform(), "blinkDotLight", !RebuildToggles::GetBool("blinkDotLight"));
 
-    _isRestartRequired = true;
+    isRestartRequired = true;
 
     return ScreenName::ConfigurationSubmenu;
   };
@@ -661,7 +651,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
 #endif
 
   // === Enable/disable 30 fps ===
-  FaceInfoScreen::MenuItemAction confirmToggle30fps = [this] {
+  FaceInfoScreen::MenuItemAction confirmToggle30fps = [] {
     LOG_INFO("FaceInfoScreenManager.Swaplights.Confirmed", "");
     if (!_using30fps()) {
       Util::FileUtils::WriteFile("/data/data/rebuild/using-30-fps", "");
@@ -669,7 +659,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
       Util::FileUtils::DeleteFile("/data/data/rebuild/using-30-fps");
     }
 
-    _isRestartRequired = true;
+    isRestartRequired = true;
 
     return ScreenName::ConfigurationSubmenu2;
   };
@@ -678,7 +668,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
 
 #ifndef STANDALONE_SIM
   // === Update Settings ===
-  FaceInfoScreen::MenuItemAction confirmAutoUpdates = [this] {
+  FaceInfoScreen::MenuItemAction confirmAutoUpdates = [] {
     LOG_INFO("FaceInfoScreenManager.AutoUpdates.Confirmed", "");
     if (checkAutoUpdatesOn()) {
       Util::FileUtils::WriteFile("/data/data/user-do-not-auto-update", "");
@@ -686,7 +676,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
       Util::FileUtils::DeleteFile("/data/data/user-do-not-auto-update");
     }
 
-    _isRestartRequired = true;
+    isRestartRequired = true;
 
     return ScreenName::ConfigurationSubmenu2;
   };
@@ -723,7 +713,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   FaceInfoScreen::MenuItemAction confirmToggleSnoring = [this] {
     LOG_INFO("FaceInfoScreenManager.Snoring.Confirmed", "");
     RebuildToggles::SetBool(_context->GetDataPlatform(), "snoringDisabled", !_snoringDisabled);
-    _isRestartRequired = true;
+    isRestartRequired = true;
 
     return ScreenName::SleepSettings;
   };
@@ -735,7 +725,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
     LOG_INFO("FaceInfoScreenManager.ReacttoPerson.Confirmed", "");
     RebuildToggles::SetBool(_context->GetDataPlatform(), "disablePersonCheck", !_disablePersonCheck);
 
-    _isRestartRequired = true;
+    isRestartRequired = true;
 
     return ScreenName::SleepSettings;
   };
@@ -747,7 +737,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
     LOG_INFO("FaceInfoScreenManager.ReacttoSound.Confirmed", "");
     RebuildToggles::SetBool(_context->GetDataPlatform(), "disableReactToSound", !_disableReactToSound);
 
-    _isRestartRequired = true;
+    isRestartRequired = true;
 
     return ScreenName::SleepSettings;
   };
@@ -759,7 +749,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
     LOG_INFO("FaceInfoScreenManager.SwapDTTBEyes.Confirmed", "");
     RebuildToggles::SetBool(_context->GetDataPlatform(), "dttbRandomEyes", !RebuildToggles::GetBool("dttbRandomEyes"));
 
-    _isRestartRequired = true;
+    isRestartRequired = true;
 
     return ScreenName::ConfigurationSubmenu3;
   };
@@ -770,7 +760,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   FaceInfoScreen::MenuItemAction confirmOldNewAlexa = [this] {
     LOG_INFO("FaceInfoScreenManager.OldNewAlexa.Confirmed", "");
     RebuildToggles::SetBool(_context->GetDataPlatform(), "classicAlexa", !_classicAlexa);
-    _isRestartRequired = true;
+    isRestartRequired = true;
 
     return ScreenName::ConfigurationSubmenu3;
   };
@@ -786,7 +776,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
       Util::FileUtils::DeleteFile("/data/data/forceCloudless");
     }
 
-    _isRestartRequired = true;
+    isRestartRequired = true;
 
     return ScreenName::ConfigurationSubmenu3;
   };
@@ -1714,7 +1704,7 @@ void FaceInfoScreenManager::DrawMain()
     esn = "NO ESN!";
   #endif
 
-  std::string botname;
+  std::string botname = "Vector";
   if (namedRobot()) {
     if (Util::FileUtils::FileExists("/data/data/customBotName")) {
       botname = Util::FileUtils::ReadFile("/data/data/customBotName");
@@ -1723,7 +1713,7 @@ void FaceInfoScreenManager::DrawMain()
     }
   }
 
-  const std::string name = namedRobot() ? "BOT: " + botname : "BOT: Vector";
+  const std::string name = "BOT: " + botname;
 
   const std::string serialNo = "ESN: " + esn;
 
@@ -1740,9 +1730,7 @@ void FaceInfoScreenManager::DrawMain()
     ip = "NOT CONNECTED";
   }
 
-  confPageNumber = 1;
-
-  if (_isRestartRequired) {
+  if (isRestartRequired) {
     (void)system("curl 'http://localhost:8080/api/extra/restartvic' &");
     SetScreen(ScreenName::Reloading);
   } else {

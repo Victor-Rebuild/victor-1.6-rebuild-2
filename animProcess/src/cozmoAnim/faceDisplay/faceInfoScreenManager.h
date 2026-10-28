@@ -253,7 +253,6 @@ private:
 
   // Server config screen stuff
   bool _invalidServConfig = false;
-  bool _isRestartRequired = false;
   bool _usesCustServConfig = true;
   bool _usesEscapePod = true;
 
