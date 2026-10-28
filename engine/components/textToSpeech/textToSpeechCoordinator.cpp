@@ -15,6 +15,7 @@
 #include "coretech/common/engine/jsonTools.h"
 #include "coretech/common/engine/utils/timer.h"
 #include "engine/components/dataAccessorComponent.h"
+#include "engine/components/rebuildConfig.h"
 #include "engine/robotComponents_fwd.h"
 #include "engine/robot.h"
 #include "engine/robotInterface/messageHandler.h"
@@ -163,7 +164,7 @@ const uint8_t TextToSpeechCoordinator::CreateUtterance(const std::string& uttera
   // Compose a request to prepare TTS audio
   const uint8_t utteranceID = GetNextID();
   msg.ttsID = utteranceID;
-  msg.style = style;
+  msg.style = Anki::Vector::RebuildToggles::GetBool("classicVectorTTS") ? AudioTtsProcessingStyle::Unprocessed : style;
   msg.triggerMode = GetTriggerMode(triggerType);
   msg.durationScalar = durationScalar;
   msg.pitchScalar = pitchScalar;

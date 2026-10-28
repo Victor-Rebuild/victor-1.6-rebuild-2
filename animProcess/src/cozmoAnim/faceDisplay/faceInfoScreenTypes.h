@@ -72,6 +72,7 @@ enum class ScreenName : uint8_t {
   BackpackLightsMenu,
   BootRecovery,
   CheckForUpdates,
+  ClassicVectorTTS,
   Cloudless,
   ConfigurationSubmenu, // Let's you change configurations and has some other useful options
   ConfigurationSubmenu2, // ^

@@ -262,6 +262,7 @@ private:
   static constexpr const char* kTogglesPath = "/data/data/rebuild/settings.json";
 
   const bool _classicAlexa = RebuildToggles::GetBool("classicAlexa");
+  const bool _classicVectorTTS = RebuildToggles::GetBool("classicVectorTTS");
   const bool _snoringDisabled = RebuildToggles::GetBool("snoringDisabled");
   const bool _disablePersonCheck = RebuildToggles::GetBool("disablePersonCheck");
   const bool _disableReactToSound = RebuildToggles::GetBool("disableReactToSound");

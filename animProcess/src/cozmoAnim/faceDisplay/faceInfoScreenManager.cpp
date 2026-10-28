@@ -323,6 +323,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   ADD_SCREEN_WITH_COLORED_TEXT(BackpackLightsDotBlink, BackpackLightsDotBlink, {ColoredTextLine("BLINK DOT LIGHT?", NamedColors::GREEN)});
   ADD_SCREEN_WITH_COLORED_TEXT(BackpackLightsDotFade, BackpackLightsDotFade, {ColoredTextLine("FADE DOT LIGHT?", NamedColors::GREEN)});
   ADD_SCREEN_WITH_COLORED_TEXT(BootRecovery, BootRecovery, {ColoredTextLine("RECOVERY MODE?", NamedColors::ORANGE)});
+  ADD_SCREEN_WITH_COLORED_TEXT(ClassicVectorTTS, ClassicVectorTTS, {ColoredTextLine(_classicVectorTTS ? "USE MODERN TTS?" : "USE 0.11 TTS?", NamedColors::GREEN)});
   ADD_SCREEN_WITH_COLORED_TEXT(Cloudless, Cloudless, {ColoredTextLine(_cloudlessEnabled ? "USE NORMAL CLOUD?" : "USE VIC-CLOUDLESS?", NamedColors::CYAN)});
   ADD_SCREEN_WITH_COLORED_TEXT(ConfigurationSubmenu, ConfigurationSubmenu, {ColoredTextLine("CONFIGURATION PAGE 1", NamedColors::GREEN)});
   ADD_SCREEN_WITH_COLORED_TEXT(ConfigurationSubmenu2, ConfigurationSubmenu2, {ColoredTextLine("CONFIGURATION PAGE 2", NamedColors::GREEN)});
@@ -545,12 +546,13 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
 
   // === Screen 3 ===
   ADD_MENU_ITEM(ConfigurationSubmenu3, "EXIT", Main);
+  ADD_MENU_ITEM(ConfigurationSubmenu3, _classicVectorTTS ? "USE MODERN TTS" : "USE 0.11 TTS", ClassicVectorTTS);
   ADD_MENU_ITEM(ConfigurationSubmenu3, _classicAlexa ? "USE MODERN ALEXA" : "USE BETA ALEXA", OldNewAlexa);
   ADD_MENU_ITEM(ConfigurationSubmenu3, "DTTB RANDOM EYES", DTTBRandomEyes);
   if (Util::FileUtils::DirectoryExists("/anki/data/cloudswitch/")) {
     ADD_MENU_ITEM(ConfigurationSubmenu3, _cloudlessEnabled ? "USE NORMAL CLOUD" : "USE VIC-CLOUDLESS", Cloudless);
   } else {
-    ADD_MENU_ITEM(ConfigurationSubmenu3, "NO CLOUDLESS", ConfigurationSubmenu3);
+    ADD_MENU_ITEM(ConfigurationSubmenu3, "NO CLOUDLESS", Main);
   }
   DISABLE_TIMEOUT(ConfigurationSubmenu3)
 
@@ -755,6 +757,17 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   };
   ADD_MENU_ITEM(DTTBRandomEyes, "BACK", ConfigurationSubmenu3);
   ADD_MENU_ITEM_WITH_ACTION(DTTBRandomEyes, "CONFIRM", confirmToggleDTTBEyes);
+
+  // === Old/New TTS screen ===
+  FaceInfoScreen::MenuItemAction confirmOldNewTTS = [this] {
+    LOG_INFO("FaceInfoScreenManager.OldNewAlexa.Confirmed", "");
+    RebuildToggles::SetBool(_context->GetDataPlatform(), "classicVectorTTS", !_classicVectorTTS);
+    isRestartRequired = true;
+
+    return ScreenName::ConfigurationSubmenu3;
+  };
+  ADD_MENU_ITEM(ClassicVectorTTS, "BACK", ConfigurationSubmenu3);
+  ADD_MENU_ITEM_WITH_ACTION(ClassicVectorTTS, "CONFIRM", confirmOldNewTTS);
 
   // === Old/New alexa screen ===
   FaceInfoScreen::MenuItemAction confirmOldNewAlexa = [this] {
