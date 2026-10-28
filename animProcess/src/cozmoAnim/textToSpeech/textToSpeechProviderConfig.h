@@ -65,7 +65,9 @@ private:
   std::string _tts_language;
   std::string _tts_voice;
   int _tts_speed;
+  int _tts_speed_011;
   int _tts_shaping;
+  int _tts_shaping_011;
   int _tts_pitch;
   int _tts_pausepunctuation;
 

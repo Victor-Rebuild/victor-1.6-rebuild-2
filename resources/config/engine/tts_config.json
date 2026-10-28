@@ -66,12 +66,14 @@
     {
       "voice": "co-USEnglish-Bendnn-22khz/enu/enu_bendnn_22k_co.fl.ini",
       "speed": 80,
+      "speed_011": 90,
       "speedTraits": [
         { "textLengthMin": 0, "textLengthMax": 10, "rangeMin": 68, "rangeMax": 68},
         { "textLengthMin": 10, "textLengthMax": 9999, "rangeMin": 83, "rangeMax": 83}
       ],
       "pitch": 100,
-      "shaping": 130
+      "shaping": 130,
+      "shaping_011": 115
     },
     "fr":
     {

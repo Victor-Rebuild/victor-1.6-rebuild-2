@@ -10,6 +10,7 @@
 #include "textToSpeechProviderConfig.h"
 
 #include "coretech/common/engine/jsonTools.h"
+#include "engine/components/rebuildConfig.h"
 
 #include "util/console/consoleInterface.h"
 #include "util/helpers/ankiDefines.h"
@@ -45,10 +46,12 @@
 #endif
 
 // Configuration keys
-#define TTS_VOICE_KEY   "voice"
-#define TTS_SPEED_KEY   "speed"
-#define TTS_SHAPING_KEY "shaping"
-#define TTS_PITCH_KEY   "pitch"
+#define TTS_VOICE_KEY       "voice"
+#define TTS_SPEED_KEY       "speed"
+#define TTS_SPEED_011_KEY   "speed_011"
+#define TTS_SHAPING_KEY     "shaping"
+#define TTS_SHAPING_011_KEY "shaping_011"
+#define TTS_PITCH_KEY       "pitch"
 
 #define TTS_SPEEDTRAITS_KEY   "speedTraits"
 #define TTS_TEXTLENGTHMIN_KEY "textLengthMin"
@@ -74,6 +77,8 @@ namespace {
   CONSOLE_VAR_RANGED(u32, kPauseBracket_ms, CONSOLE_GROUP, TTS_PAUSEBRACKET_MS, 50, 4000);
   CONSOLE_VAR_RANGED(u32, kPauseSpelling_ms, CONSOLE_GROUP, TTS_PAUSESPELLING_MS, 50, 4000);
   CONSOLE_VAR(bool, kEnablePausePrams, CONSOLE_GROUP, TTS_ENABLEPAUSEPARAMS);
+
+  bool useOldVoice = Anki::Vector::RebuildToggles::GetBool("classicVectorTTS");
 }
 
 #endif
@@ -89,7 +94,9 @@ TextToSpeechProviderConfig::TextToSpeechProviderConfig(const std::string & langu
   _tts_language = TTS_DEFAULT_LANGUAGE;
   _tts_voice = TTS_DEFAULT_VOICE;
   _tts_speed = TTS_DEFAULT_SPEED;
+  _tts_speed_011 = TTS_DEFAULT_SPEED;
   _tts_shaping = TTS_DEFAULT_SHAPING;
+  _tts_shaping_011 = TTS_DEFAULT_SHAPING;
   _tts_pitch = TTS_DEFAULT_PITCH;
   _tts_pausepunctuation = TTS_PAUSEPUNCTUATION_MS;
 
@@ -99,9 +106,15 @@ TextToSpeechProviderConfig::TextToSpeechProviderConfig(const std::string & langu
     _tts_language = language;
     JsonTools::GetValueOptional(language_config, TTS_VOICE_KEY, _tts_voice);
     JsonTools::GetValueOptional(language_config, TTS_SPEED_KEY, _tts_speed);
+    JsonTools::GetValueOptional(language_config, TTS_SPEED_011_KEY, _tts_speed_011);
     JsonTools::GetValueOptional(language_config, TTS_SHAPING_KEY, _tts_shaping);
+    JsonTools::GetValueOptional(language_config, TTS_SHAPING_011_KEY, _tts_shaping_011);
     JsonTools::GetValueOptional(language_config, TTS_PITCH_KEY, _tts_pitch);
     JsonTools::GetValueOptional(language_config, TTS_PAUSEPUNCTUATION_KEY, _tts_pausepunctuation);
+  }
+
+  if (_tts_speed_011 == 100 || _tts_shaping_011 == 100) {
+    useOldVoice = false;
   }
 
   // Allow config traits to override language configuration
@@ -114,8 +127,8 @@ TextToSpeechProviderConfig::TextToSpeechProviderConfig(const std::string & langu
 
   // Initialize sliders to base values for this language
   #if REMOTE_CONSOLE_ENABLED
-  kVoiceSpeed = _tts_speed;
-  kVoiceShaping = _tts_shaping;
+  kVoiceSpeed = useOldVoice ? _tts_speed_011 : _tts_speed;
+  kVoiceShaping = useOldVoice ? _tts_shaping_011 : _tts_shaping;
   kVoicePitch = _tts_pitch;
   kPausePunctuation_ms = _tts_pausepunctuation;
   #endif
@@ -127,7 +140,7 @@ int TextToSpeechProviderConfig::GetSpeed() const
 #if REMOTE_CONSOLE_ENABLED
   return kVoiceSpeed;
 #else
-  return _tts_speed;
+  return useOldVoice ? _tts_speed_011 : _tts_speed;
 #endif
 }
 
@@ -136,7 +149,7 @@ int TextToSpeechProviderConfig::GetShaping() const
 #if REMOTE_CONSOLE_ENABLED
   return kVoiceShaping;
 #else
-  return _tts_shaping;
+  return useOldVoice ? _tts_shaping_011 : _tts_shaping;
 #endif
 }
 
@@ -229,12 +242,14 @@ int TextToSpeechProviderConfig::GetSpeed(Anki::Util::RandomGenerator * rng, size
   // Start with base speed, possibly modified by console var
   int speed = GetSpeed();
 
-  // Look for matching trait
-  for (const auto & trait : _speedTraits) {
-    if (trait.textLengthMin <= textLength && textLength <= trait.textLengthMax) {
-      // Note that matching trait will override console var.
-      speed = rng->RandIntInRange(trait.rangeMin, trait.rangeMax);
-      break;
+  if (!useOldVoice) {
+    // Look for matching trait
+    for (const auto & trait : _speedTraits) {
+      if (trait.textLengthMin <= textLength && textLength <= trait.textLengthMax) {
+        // Note that matching trait will override console var.
+        speed = rng->RandIntInRange(trait.rangeMin, trait.rangeMax);
+        break;
+      }
     }
   }
 
