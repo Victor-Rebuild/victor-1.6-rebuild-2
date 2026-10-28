@@ -316,37 +316,67 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   ADD_SCREEN(Main, Network);
 
   // Start rebuild custom screens
-  ADD_SCREEN_WITH_COLORED_TEXT(AutoUpdates, AutoUpdates, {ColoredTextLine("UPDATE SETTINGS", NamedColors::GREEN)});
+
+  // Alexa
+  ADD_SCREEN_WITH_COLORED_TEXT(OldNewAlexa, OldNewAlexa, {ColoredTextLine(_classicAlexa ? "USE MODERN ALEXA?" : "USE BETA ALEXA?", NamedColors::GREEN)});
+
+  // Backpack lights
   ADD_SCREEN_WITH_COLORED_TEXT(BackpackLights, BackpackLights, {ColoredTextLine(_wireoslights() ? "USE ANKI LIGHTS?" : "USE WIREOS LIGHTS?", _wireoslights() ? NamedColors::GREEN : NamedColors::RED)});
   ADD_SCREEN_WITH_COLORED_TEXT(BackpackLightsMenu, BackpackLightsMenu, {ColoredTextLine("BACKPACK SETTINGS", NamedColors::GREEN)});
   ADD_SCREEN_WITH_COLORED_TEXT(BackpackLightsDot, BackpackLightsDot, {ColoredTextLine("DOT LIGHT SETTINGS", NamedColors::GREEN)});
   ADD_SCREEN_WITH_COLORED_TEXT(BackpackLightsDotBlink, BackpackLightsDotBlink, {ColoredTextLine("BLINK DOT LIGHT?", NamedColors::GREEN)});
   ADD_SCREEN_WITH_COLORED_TEXT(BackpackLightsDotFade, BackpackLightsDotFade, {ColoredTextLine("FADE DOT LIGHT?", NamedColors::GREEN)});
-  ADD_SCREEN_WITH_COLORED_TEXT(BootRecovery, BootRecovery, {ColoredTextLine("RECOVERY MODE?", NamedColors::ORANGE)});
-  ADD_SCREEN_WITH_COLORED_TEXT(ClassicVectorTTS, ClassicVectorTTS, {ColoredTextLine(_classicVectorTTS ? "USE MODERN TTS?" : "USE 0.11 TTS?", NamedColors::GREEN)});
+
+  // Cloudless
   ADD_SCREEN_WITH_COLORED_TEXT(Cloudless, Cloudless, {ColoredTextLine(_cloudlessEnabled ? "USE NORMAL CLOUD?" : "USE VIC-CLOUDLESS?", NamedColors::CYAN)});
+
+  // Config submenus
   ADD_SCREEN_WITH_COLORED_TEXT(ConfigurationSubmenu, ConfigurationSubmenu, {ColoredTextLine("CONFIGURATION PAGE 1", NamedColors::GREEN)});
   ADD_SCREEN_WITH_COLORED_TEXT(ConfigurationSubmenu2, ConfigurationSubmenu2, {ColoredTextLine("CONFIGURATION PAGE 2", NamedColors::GREEN)});
   ADD_SCREEN_WITH_COLORED_TEXT(ConfigurationSubmenu3, ConfigurationSubmenu3, {ColoredTextLine("CONFIGURATION PAGE 3", NamedColors::GREEN)});
-  ADD_SCREEN_WITH_COLORED_TEXT(DisableAutoUpdates, DisableAutoUpdates, {ColoredTextLine(checkAutoUpdatesOn() ? "DISABLE UPDATES?" : "ENABLE UPDATES?", NamedColors::GREEN)});
-  ADD_SCREEN_WITH_COLORED_TEXT(SleepSettings, SleepSettings, {ColoredTextLine("SLEEP SETTINGS", NamedColors::CYAN)});
-  ADD_SCREEN_WITH_COLORED_TEXT(DTTBRandomEyes, DTTBRandomEyes, {ColoredTextLine("TOGGLE DTTB EYES?", NamedColors::YELLOW)});
-  ADD_SCREEN_WITH_COLORED_TEXT(OldNewAlexa, OldNewAlexa, {ColoredTextLine(_classicAlexa ? "USE MODERN ALEXA?" : "USE BETA ALEXA?", NamedColors::GREEN)});
-  ADD_SCREEN_WITH_COLORED_TEXT(Reloading, Reloading, {ColoredTextLine("RELOADING...", NamedColors::GREEN)});
-  ADD_SCREEN_WITH_COLORED_TEXT(Reonboarding, Reonboarding, {ColoredTextLine("REONBOARDING...", NamedColors::GREEN)});
-  ADD_SCREEN_WITH_COLORED_TEXT(Reonboard, Reonboard, {ColoredTextLine("REONBOARD?", NamedColors::ORANGE)});
+
+  // CPUfreq
+  ADD_SCREEN_WITH_COLORED_TEXT(SetFrequency, SetFrequency, {ColoredTextLine("SET SPEED TO?", NamedColors::ORANGE)});
+
+  // DTTB
+  ADD_SCREEN_WITH_COLORED_TEXT(DTTBRandomEyes, DTTBRandomEyes, {ColoredTextLine("TOGGLE DTTB EYES?", NamedColors::GREEN)});
+
+  // FPS
+  ADD_SCREEN_WITH_COLORED_TEXT(Toggle30fps, Toggle30fps, {ColoredTextLine(_using30fps() ? "TOGGLE 60 FPS?" : "TOGGLE 30 FPS?", NamedColors::GREEN)});
+
+  // Sleeping
   ADD_SCREEN_WITH_COLORED_TEXT(RTS, RTS, {ColoredTextLine(_disableReactToSound ? "ENABLE RTS?" : "DISABLE RTS?", NamedColors::CYAN)});
   ADD_SCREEN_WITH_COLORED_TEXT(RTP, RTP, {ColoredTextLine(_disablePersonCheck ? "ENABLE RTP?" : "DISABLE RTP?", NamedColors::CYAN)});
-  ADD_SCREEN_WITH_COLORED_TEXT(SetFrequency, SetFrequency, {ColoredTextLine("SET SPEED TO?", NamedColors::ORANGE)});
+  ADD_SCREEN_WITH_COLORED_TEXT(SleepSettings, SleepSettings, {ColoredTextLine("SLEEP SETTINGS", NamedColors::CYAN)});
   ADD_SCREEN_WITH_COLORED_TEXT(Snoring, Snoring, {_snoringDisabled ? "ENABLE SNORING?" : "DISABLE SNORING?", NamedColors::CYAN});
+
+  // Recovery
+  ADD_SCREEN_WITH_COLORED_TEXT(BootRecovery, BootRecovery, {ColoredTextLine("RECOVERY MODE?", NamedColors::ORANGE)});
+
+  // Onboarding
+  ADD_SCREEN_WITH_COLORED_TEXT(Reonboard, Reonboard, {ColoredTextLine("REONBOARD?", NamedColors::ORANGE)});
   ADD_SCREEN_WITH_COLORED_TEXT(SkipOnboarding, SkipOnboarding, ColoredTextLine("SKIP ONBOARDING?", NamedColors::GREEN))
+
+  // Switch slot
   ADD_SCREEN_WITH_COLORED_TEXT(SwitchSlot, SwitchSlot, {ColoredTextLine("SWAP SYS SLOT?", NamedColors::ORANGE)});
+
+  // Transitions
+  ADD_SCREEN_WITH_COLORED_TEXT(Reloading, Reloading, {ColoredTextLine("RELOADING...", NamedColors::GREEN)});
+  ADD_SCREEN_WITH_COLORED_TEXT(Reonboarding, Reonboarding, {ColoredTextLine("REONBOARDING...", NamedColors::GREEN)});
   ADD_SCREEN_WITH_COLORED_TEXT(SwitchSlotReboot, SwitchSlotReboot, {ColoredTextLine("SWITCHING SLOT...", NamedColors::ORANGE)});
-  ADD_SCREEN_WITH_COLORED_TEXT(Toggle30fps, Toggle30fps, {ColoredTextLine(_using30fps() ? "TOGGLE 60 FPS?" : "TOGGLE 30 FPS?", NamedColors::GREEN)});
+
+  // TTS
+  ADD_SCREEN_WITH_COLORED_TEXT(ClassicVectorTTS, ClassicVectorTTS, {ColoredTextLine(_classicVectorTTS ? "USE MODERN TTS?" : "USE 0.11 TTS?", NamedColors::GREEN)});
+
+  // Update related things
+  ADD_SCREEN_WITH_COLORED_TEXT(AutoUpdates, AutoUpdates, {ColoredTextLine("UPDATE SETTINGS", NamedColors::GREEN)});
+  ADD_SCREEN_WITH_COLORED_TEXT(DisableAutoUpdates, DisableAutoUpdates, {ColoredTextLine(checkAutoUpdatesOn() ? "DISABLE UPDATES?" : "ENABLE UPDATES?", NamedColors::GREEN)});
   ADD_SCREEN(UpdateRebuild, UpdateRebuild);
   ADD_SCREEN(Updating, Updating);
-  ADD_SCREEN_WITH_COLORED_TEXT(UserDataSubmenu, UserDataSubmenu, ColoredTextLine("DATA OPTIONS", NamedColors::GREEN));
   // end rebuild custom screens
+
+  // Is custom but like eh, not part of the config menus
+  ADD_SCREEN_WITH_COLORED_TEXT(UserDataSubmenu, UserDataSubmenu, ColoredTextLine("DATA OPTIONS", NamedColors::GREEN));
 
   ADD_SCREEN_WITH_COLORED_TEXT(ClearUserData, Main, {ColoredTextLine("CLEAR USER DATA?", NamedColors::RED)});
   ADD_SCREEN_WITH_COLORED_TEXT(ClearUserDataFail, Main, {ColoredTextLine("CLEAR USER DATA FAILED", NamedColors::RED)});
