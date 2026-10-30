@@ -364,7 +364,7 @@ fi
 
 # Set protobuf location
 HOST=`uname -a | awk '{print tolower($1);}' | sed -e 's/darwin/mac/'`
-if [[ `uname -a` == *"aarch64"* && $HOST == "linux" ]] || [[ "$(uname -a)" == *"arm64"* && "$(uname -a)" == *"Darwin"* ]]; then
+if [[ "$(uname -m)" == "aarch64" || "$(uname -m)" == "arm64" ]]; then
 	HOST+="-arm64"
 fi
 echo "Protobuf platform: $HOST"
