@@ -33,6 +33,7 @@
 #include "engine/components/rebuildConfig.h"
 
 #include "clad/audio/audioEventTypes.h"
+#include <chrono>
 
 namespace Anki {
 namespace Vector {
@@ -62,8 +63,10 @@ BehaviorSnakeGame::~BehaviorSnakeGame()
 bool BehaviorSnakeGame::WantsToBeActivatedBehavior() const
 {
   UserIntentComponent& uic = GetBehaviorComp<UserIntentComponent>();
-  srand(BaseStationTimer::getInstance()->GetCurrentTimeInSeconds());
-  return (rand() % 10 <= 4) || uic.IsUserIntentPending(USER_INTENT(snake_victor_score));
+  auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+  unsigned int randSeed = static_cast<unsigned int>(milliseconds);
+  srand(randSeed);
+  return (rand() % 10 <= 3) || uic.IsUserIntentPending(USER_INTENT(snake_victor_score));
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

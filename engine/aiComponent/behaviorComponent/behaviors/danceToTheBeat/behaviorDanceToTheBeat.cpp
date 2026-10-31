@@ -36,7 +36,7 @@
 #include "util/random/randomGenerator.h"
 #include "util/time/universalTime.h"
 #include <cstdlib>
-#include <string>
+#include <chrono>
 
 namespace Anki {
 namespace Vector {
@@ -341,7 +341,9 @@ void BehaviorDanceToTheBeat::PlayNextDanceAnim()
   std::string satVal;
 
   if (eyeColorRandomizer) {
-    srand(time(0));
+    auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+    unsigned int randSeed = static_cast<unsigned int>(milliseconds);
+    srand(randSeed);
     int nextEyeColor = rand() % 7;
 
     hueVal = "curl 'localhost:8889/consolevarset?key=ProcFace_Hue&value="

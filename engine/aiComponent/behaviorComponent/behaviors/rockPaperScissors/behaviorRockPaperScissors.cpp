@@ -23,7 +23,7 @@
 #include "engine/aiComponent/behaviorComponent/userIntents.h"
 #include "engine/components/localeComponent.h"
 #include "engine/components/rebuildConfig.h"
-#include <string>
+#include <chrono>
 
 namespace Anki {
 namespace Vector {
@@ -239,8 +239,9 @@ void BehaviorRockPaperScissors::RockPaperOrScissorsVectorSearch()
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BehaviorRockPaperScissors::RockPaperOrScissorsVector()
 {
-
-  srand(BaseStationTimer::getInstance()->GetCurrentTimeInSeconds());
+  auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+  unsigned int randSeed = static_cast<unsigned int>(milliseconds);
+  srand(randSeed);
   _dVars.whatdidvectorchoose = rand() % 3;
   const auto & localeComponent = GetBEI().GetRobotInfo().GetLocaleComponent();
 

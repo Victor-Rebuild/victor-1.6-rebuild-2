@@ -871,7 +871,9 @@ namespace Anki
 
           return true;
         } else if (eyeColorName == mysteryEyesStr) {
-          std::srand(std::time(nullptr));
+          auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+          unsigned int randSeed = static_cast<unsigned int>(milliseconds);
+          std::srand(randSeed);
 
           hue = (std::rand() / (double)RAND_MAX) * 1.0;
           saturation = (std::rand() / (double)RAND_MAX) * 2.0;

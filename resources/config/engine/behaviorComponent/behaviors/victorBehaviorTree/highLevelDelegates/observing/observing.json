@@ -52,7 +52,7 @@
         },
         {
           // I want snakegame to be rare, so that when it happens it's a special moment.
-          // That's why there's also a very low probability bool in the c++ code (rand() % 10 <= 2)
+          // That's why there's also a very low probability bool in the c++ code (rand() % 10 <= 3)
           "behavior": "SnakeGame",
           "cooldown_s": 2000.0
         }
