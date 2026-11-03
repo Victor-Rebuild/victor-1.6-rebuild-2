@@ -55,8 +55,20 @@ Contains a few options related to updating Vector
 
 ### CHANGE PERF PROFILE
 Vector has 3 performance profiles provided by Wired. `REGULAR`, `BALANCED`, and `PERFORMANCE`. This is a quick option that sends web requests to wired and tell it to change the performance profile if you don't have a device on hand or your network is too slow to load Wired.
+- PERFORMANCE
+    - 1.26 GHz CPU
+    - 800 MHz RAM
+- BALANCED
+    - 729 MHz CPU
+    - 400 MHz RAM
+- REGULAR
+    - 533 MHz CPU
+    - 400 MHz RAM
 
 ## CONFIGURATION PAGE 3
+
+### USE 0.11 TTS / USE MODERN TTS
+Switch between the TTS voice from Vector software version 0.11, or the familiar modern TTS.
 
 ### USE BETA ALEXA / USE MODERN ALEXA
 Old beta Alexa actually had it's voice run through the stock Vector voice filter instead of having it's own unfiltered channel. This restores that behavior.

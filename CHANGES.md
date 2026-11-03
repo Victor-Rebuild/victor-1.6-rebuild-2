@@ -55,7 +55,6 @@
 - You can now play rock paper scissors with Vector! Ask "Play rock paper scissors" to play!
 - Vector can either explore or socialize if he leaves the charger to try and dance to the beat
 - Fistbump voice command looks for faces
-- Gaze direction is enabled, this means that Vector occasionally looks at you, and then looks to face the direction you're currently looking
 
 ## Cloud changes
 - vic-cloud that works with wirepod and regular servers from WireOS
@@ -67,7 +66,7 @@
 - Improved Japanese, French and German TTS voices
 - Proper translations for each language
 - Upped temprature limit for Vector 2.0
-- Support for DVT bodyboards
+- Support for DVT bodyboards (Code used from WireOS)
 - Compiling with -O2 and fast math
 - Picovoice 1.5 for customizable wakeword (Code used from WireOS)
 - C++ upgrade engine from WireOS
@@ -96,3 +95,4 @@ All of these are available under the `CONF` or `CONFIGURATION` menu in CCIS:
 - Dance To The Beat random eye colors
 - Beta Alexa
 - vic-cloudless so Vector can process STT locally
+- and soon to be more
