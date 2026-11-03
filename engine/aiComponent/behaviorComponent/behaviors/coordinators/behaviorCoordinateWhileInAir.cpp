@@ -44,6 +44,7 @@ static const std::set<BehaviorID> kBehaviorStatesToNotLockTracks =
   {{
     BEHAVIOR_ID(WhatsMyNameVoiceCommand),
     BEHAVIOR_ID(MeetVictor),
+    BEHAVIOR_ID(ReactToPlacedOnSlope),
     // Gohome behaviors
     BEHAVIOR_ID(AcknowledgeCharger),
     BEHAVIOR_ID(ClearChargerArea),
