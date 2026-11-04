@@ -266,6 +266,7 @@ private:
   const bool _snoringDisabled = RebuildToggles::GetBool("snoringDisabled");
   const bool _disablePersonCheck = RebuildToggles::GetBool("disablePersonCheck");
   const bool _disableReactToSound = RebuildToggles::GetBool("disableReactToSound");
+  const bool _disableTTSProcessing = RebuildToggles::GetBool("disableTTSProcessing");
 
   std::string _sysconVersion = "";
   

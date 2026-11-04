@@ -78,6 +78,7 @@ enum class ScreenName : uint8_t {
   ConfigurationSubmenu2, // ^
   ConfigurationSubmenu3, // ^^
   DisableAutoUpdates,
+  DisableTTSProcessing,
   DTTBRandomEyes,
   OldNewAlexa,
   Reloading,
@@ -89,6 +90,7 @@ enum class ScreenName : uint8_t {
   ServerInformation,
   SetFrequency,
   Toggle30fps,
+  TTS,
   UpdateRebuild,
   Updating,
   UserDataSubmenu,

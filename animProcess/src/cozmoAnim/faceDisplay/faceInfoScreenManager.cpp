@@ -366,6 +366,8 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   ADD_SCREEN_WITH_COLORED_TEXT(SwitchSlotReboot, SwitchSlotReboot, {ColoredTextLine("SWITCHING SLOT...", NamedColors::ORANGE)});
 
   // TTS
+  ADD_SCREEN_WITH_COLORED_TEXT(TTS, TTS, {ColoredTextLine("TTS SETTINGS", NamedColors::GREEN)});
+  ADD_SCREEN_WITH_COLORED_TEXT(DisableTTSProcessing, DisableTTSProcessing, {ColoredTextLine(_disableTTSProcessing ? "ENABLE TTS PROC?" : "DISABLE TTS PROC?", NamedColors::GREEN)});
   ADD_SCREEN_WITH_COLORED_TEXT(ClassicVectorTTS, ClassicVectorTTS, {ColoredTextLine(_classicVectorTTS ? "USE MODERN TTS?" : "USE 0.11 TTS?", NamedColors::GREEN)});
 
   // Update related things
@@ -375,13 +377,13 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   ADD_SCREEN(Updating, Updating);
   // end rebuild custom screens
 
-  // Is custom but like eh, not part of the config menus
   ADD_SCREEN_WITH_COLORED_TEXT(UserDataSubmenu, UserDataSubmenu, ColoredTextLine("DATA OPTIONS", NamedColors::GREEN));
-
   ADD_SCREEN_WITH_COLORED_TEXT(ClearUserData, Main, {ColoredTextLine("CLEAR USER DATA?", NamedColors::RED)});
   ADD_SCREEN_WITH_COLORED_TEXT(ClearUserDataFail, Main, {ColoredTextLine("CLEAR USER DATA FAILED", NamedColors::RED)});
   ADD_SCREEN_WITH_COLORED_TEXT(Rebooting, Rebooting, {ColoredTextLine("REBOOTING...", NamedColors::GREEN)});
+
   ADD_SCREEN_WITH_COLORED_TEXT(SelfTest, Main, {ColoredTextLine("START SELF TEST?", NamedColors::GREEN)});
+
   ADD_SCREEN(SelfTestRunning, SelfTestRunning)
   ADD_SCREEN(Network, SensorInfo);
   ADD_SCREEN(SensorInfo, IMUInfo);
@@ -576,7 +578,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
 
   // === Screen 3 ===
   ADD_MENU_ITEM(ConfigurationSubmenu3, "EXIT", Main);
-  ADD_MENU_ITEM(ConfigurationSubmenu3, _classicVectorTTS ? "USE MODERN TTS" : "USE 0.11 TTS", ClassicVectorTTS);
+  ADD_MENU_ITEM(ConfigurationSubmenu3, "TTS SETTINGS", TTS)
   ADD_MENU_ITEM(ConfigurationSubmenu3, _classicAlexa ? "USE MODERN ALEXA" : "USE BETA ALEXA", OldNewAlexa);
   ADD_MENU_ITEM(ConfigurationSubmenu3, "DTTB RANDOM EYES", DTTBRandomEyes);
   if (Util::FileUtils::DirectoryExists("/anki/data/cloudswitch/")) {
@@ -788,16 +790,31 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   ADD_MENU_ITEM(DTTBRandomEyes, "BACK", ConfigurationSubmenu3);
   ADD_MENU_ITEM_WITH_ACTION(DTTBRandomEyes, "CONFIRM", confirmToggleDTTBEyes);
 
+  // TTS settings
+  ADD_MENU_ITEM(TTS, _disableTTSProcessing ? "ENABLE TTS PROC?" : "DISABLE TTS PROC?", DisableTTSProcessing);
+  ADD_MENU_ITEM(TTS, _classicVectorTTS ? "USE MODERN TTS" : "USE 0.11 TTS", ClassicVectorTTS);
+
   // === Old/New TTS screen ===
   FaceInfoScreen::MenuItemAction confirmOldNewTTS = [this] {
-    LOG_INFO("FaceInfoScreenManager.OldNewAlexa.Confirmed", "");
+    LOG_INFO("FaceInfoScreenManager.OldNewTTS.Confirmed", "");
     RebuildToggles::SetBool(_context->GetDataPlatform(), "classicVectorTTS", !_classicVectorTTS);
     isRestartRequired = true;
 
-    return ScreenName::ConfigurationSubmenu3;
+    return ScreenName::TTS;
   };
-  ADD_MENU_ITEM(ClassicVectorTTS, "BACK", ConfigurationSubmenu3);
+  ADD_MENU_ITEM(ClassicVectorTTS, "BACK", TTS);
   ADD_MENU_ITEM_WITH_ACTION(ClassicVectorTTS, "CONFIRM", confirmOldNewTTS);
+
+  // === Enable/Disable TTS processing screen ===
+  FaceInfoScreen::MenuItemAction confirmEnableDisableTTSProc = [this] {
+    LOG_INFO("FaceInfoScreenManager.EnableDisableTTSProc.Confirmed", "");
+    RebuildToggles::SetBool(_context->GetDataPlatform(), "disableTTSProcessing", !_disableTTSProcessing);
+    isRestartRequired = true;
+
+    return ScreenName::TTS;
+  };
+  ADD_MENU_ITEM(DisableTTSProcessing, "BACK", TTS);
+  ADD_MENU_ITEM_WITH_ACTION(DisableTTSProcessing, "CONFIRM", confirmOldNewTTS);
 
   // === Old/New alexa screen ===
   FaceInfoScreen::MenuItemAction confirmOldNewAlexa = [this] {

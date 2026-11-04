@@ -164,7 +164,7 @@ const uint8_t TextToSpeechCoordinator::CreateUtterance(const std::string& uttera
   // Compose a request to prepare TTS audio
   const uint8_t utteranceID = GetNextID();
   msg.ttsID = utteranceID;
-  msg.style = Anki::Vector::RebuildToggles::GetBool("classicVectorTTS") ? AudioTtsProcessingStyle::Unprocessed : style;
+  msg.style = Anki::Vector::RebuildToggles::GetBool("disableTTSProcessing") ? AudioTtsProcessingStyle::Unprocessed : style;
   msg.triggerMode = GetTriggerMode(triggerType);
   msg.durationScalar = durationScalar;
   msg.pitchScalar = pitchScalar;
