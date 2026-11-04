@@ -28,6 +28,7 @@ enum int_32 ObjectType {
   Block_LIGHTCUBE1 = 1, // value is specified here for SDK backward compatibility
   Block_LIGHTCUBE2,
   Block_LIGHTCUBE3,
+  Block_LIGHTCUBE4,
 
   Block_LIGHTCUBE_GHOST,
 
