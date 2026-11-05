@@ -791,8 +791,9 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   ADD_MENU_ITEM_WITH_ACTION(DTTBRandomEyes, "CONFIRM", confirmToggleDTTBEyes);
 
   // TTS settings
-  ADD_MENU_ITEM(TTS, _disableTTSProcessing ? "ENABLE TTS PROC?" : "DISABLE TTS PROC?", DisableTTSProcessing);
+  ADD_MENU_ITEM(TTS, "BACK", ConfigurationSubmenu3);
   ADD_MENU_ITEM(TTS, _classicVectorTTS ? "USE MODERN TTS" : "USE 0.11 TTS", ClassicVectorTTS);
+  ADD_MENU_ITEM(TTS, _disableTTSProcessing ? "ENABLE TTS PROC?" : "DISABLE TTS PROC?", DisableTTSProcessing);
 
   // === Old/New TTS screen ===
   FaceInfoScreen::MenuItemAction confirmOldNewTTS = [this] {
@@ -814,7 +815,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
     return ScreenName::TTS;
   };
   ADD_MENU_ITEM(DisableTTSProcessing, "BACK", TTS);
-  ADD_MENU_ITEM_WITH_ACTION(DisableTTSProcessing, "CONFIRM", confirmOldNewTTS);
+  ADD_MENU_ITEM_WITH_ACTION(DisableTTSProcessing, "CONFIRM", confirmEnableDisableTTSProc);
 
   // === Old/New alexa screen ===
   FaceInfoScreen::MenuItemAction confirmOldNewAlexa = [this] {
@@ -2585,6 +2586,7 @@ void FaceInfoScreenManager::DrawScratch()
       _currScreen == GetScreen(ScreenName::DisableAutoUpdates) ||
       _currScreen == GetScreen(ScreenName::SleepSettings) ||
       _currScreen == GetScreen(ScreenName::SetFrequency) ||
+      _currScreen == GetScreen(ScreenName::TTS) ||
       _currScreen == GetScreen(ScreenName::UserDataSubmenu))
   {
     _currScreen->DrawMenuVertical(*_scratchDrawingImg);
