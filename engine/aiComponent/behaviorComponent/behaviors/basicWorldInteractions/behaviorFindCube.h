@@ -34,6 +34,8 @@ public:
 
   ObjectID GetFoundCubeID() { return _dVars.cubeID; }
 
+  bool PlayedFailureGetOut() const { return _dVars.state == FindCubeState::GetOutFailure; }
+
 protected:
 
   // Enforce creation through BehaviorFactory

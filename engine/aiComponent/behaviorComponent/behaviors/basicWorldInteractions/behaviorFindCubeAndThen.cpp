@@ -157,7 +157,14 @@ void BehaviorFindCubeAndThen::TransitionToFindCube()
         auto* targetCube = GetTargetCube(); 
         if(nullptr != targetCube){
           TransitionToDriveToPredockPose();
-        } //else just exit, the get-out will have been handled by the findCubeBehavior since it didn't find anything
+        }
+        else if(!_iConfig.findCubeBehavior->PlayedFailureGetOut()){
+          // FindCube reported success, but the cube was removed before we could use it.
+          LOG_WARNING("BehaviorFindCubeAndThen.FindCube.CubeLostAfterFound",
+                      "FindCube succeeded but cube %d is no longer in BlockWorld",
+                      _dVars.cubeID.GetValue());
+          TransitionToGetOutFailure();
+        } //else just exit, the get-out was already handled by the findCubeBehavior since it didn't find anything
       });
   }
 }
