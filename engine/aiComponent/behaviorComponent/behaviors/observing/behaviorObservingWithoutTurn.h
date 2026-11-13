@@ -33,7 +33,6 @@ protected:
 
   virtual void GetBehaviorOperationModifiers(BehaviorOperationModifiers& modifiers) const override{
     modifiers.wantsToBeActivatedWhenOnCharger = true;
-    modifiers.wantsToBeActivatedWhenOffTreads = true;
     
     modifiers.visionModesForActiveScope->insert({ VisionMode::Faces, EVisionUpdateFrequency::Standard});
   }

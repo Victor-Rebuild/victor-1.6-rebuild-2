@@ -4,6 +4,6 @@
 
   "associatedActiveFeature": "NoFeature",
 
-  "numImageCompositingCyclesToWaitFor": 1,
+  "numImageCompositingCyclesToWaitFor": 2,
   "numCyclingExposureCyclesToWaitFor": 1
 }

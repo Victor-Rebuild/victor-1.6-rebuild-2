@@ -33,7 +33,7 @@ private:
   mutable double _lastPickedUpTime = 0.0;
 
   // pitch angle thresholds between which robot is considered "OnIncline"
-  const float _kOnInclinePitchThresholdLow_deg = 5.f;
+  const float _kOnInclinePitchThresholdLow_deg = 10.f;
   const float _kOnInclinePitchThresholdHigh_deg = 70.f;
 
   // if any gyro reading is above this threshold, robot is considered "moving"
