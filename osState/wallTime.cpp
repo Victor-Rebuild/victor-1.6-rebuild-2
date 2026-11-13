@@ -27,10 +27,10 @@ namespace Vector {
 namespace {
 
 // while we think we're synced, re-check every so often
-static const float kSyncCheckPeriodWhenSynced_s = 60.0f * 60.0f;
+// static const float kSyncCheckPeriodWhenSynced_s = 60.0f * 60.0f;
 
 // check more often if we aren't synced (so we get the accurate time after a sync)
-static const float kSyncCheckPeriodWhenNotSynced_s = 1.0f;
+// static const float kSyncCheckPeriodWhenNotSynced_s = 1.0f;
 
 #if REMOTE_CONSOLE_ENABLED
 
@@ -138,9 +138,9 @@ WallTime::~WallTime()
 
 bool WallTime::GetLocalTime(struct tm& localTime)
 {
-  // if( !IsTimeSynced() ) {
-  //   return false;
-  // }
+  if( !IsTimeSynced() ) {
+    return false;
+  }
 
   const bool timeOK = WallTime::GetApproximateLocalTime(localTime);
   return timeOK;
@@ -183,7 +183,7 @@ bool WallTime::GetApproximateLocalTime(struct tm& localTime)
   }
 
   PRINT_NAMED_ERROR("WallTime.Local.Invalid",
-                    "localtime returned null. Erro`r: %s",
+                    "localtime returned null. Error: %s",
                     strerror(errno));
   return false;
 }
@@ -232,14 +232,14 @@ bool WallTime::IsTimeSynced()
 
   // Use base station timer because it's cheap and good enough here, goal is just to not hit the syscall too
   // frequently if this function is called often
-  const float currTime_s = BaseStationTimer::getInstance()->GetCurrentTimeInSeconds();
+  // const float currTime_s = BaseStationTimer::getInstance()->GetCurrentTimeInSeconds();
 
-  const float checkPeriod_s = _wasSynced ? kSyncCheckPeriodWhenSynced_s : kSyncCheckPeriodWhenNotSynced_s;
-  if( _lastSyncCheckTime < 0 ||
-      _lastSyncCheckTime + checkPeriod_s <= currTime_s ) {
-    _wasSynced = OSState::getInstance()->IsWallTimeSynced();
-    _lastSyncCheckTime = currTime_s;
-  }
+  // const float checkPeriod_s = _wasSynced ? kSyncCheckPeriodWhenSynced_s : kSyncCheckPeriodWhenNotSynced_s;
+  // if( _lastSyncCheckTime < 0 ||
+  //     _lastSyncCheckTime + checkPeriod_s <= currTime_s ) {
+       _wasSynced = OSState::getInstance()->IsWallTimeSynced();
+  //   _lastSyncCheckTime = currTime_s;
+  // }
 
   return _wasSynced;
 }
