@@ -1,3 +1,4 @@
+//go:build linux
 // +build linux
 
 package main
@@ -13,6 +14,7 @@ import (
 
 const (
 	Port       = 443
+	SimPort    = 8443
 	SocketPath = "/dev/socket/"
 	IsOnRobot  = true
 )

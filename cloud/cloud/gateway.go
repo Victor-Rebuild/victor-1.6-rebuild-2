@@ -138,6 +138,12 @@ func cleanExit() {
 }
 
 func mainGateway() {
+
+	FinalPort := SimPort
+	if hasSwitchboard {
+		FinalPort = Port
+	}
+
 	if _, err := os.Stat(robot.GatewayCert); os.IsNotExist(err) {
 		log.Println("Cannot find cert:", robot.GatewayCert)
 		os.Exit(1)
@@ -164,7 +170,7 @@ func mainGateway() {
 		log.Println("Error: Bad certificates.")
 		panic("Bad certificates.")
 	}
-	addr := fmt.Sprintf("localhost:%d", Port)
+	addr := fmt.Sprintf("localhost:%d", FinalPort)
 
 	engineCladManager.Init()
 	defer engineCladManager.Close()
@@ -252,7 +258,7 @@ func mainGateway() {
 		os.Exit(1)
 	}
 
-	conn, err := net.Listen("tcp", fmt.Sprintf(":%d", Port))
+	conn, err := net.Listen("tcp", fmt.Sprintf(":%d", FinalPort))
 	if err != nil {
 		log.Println("Error during Listen:", err)
 		panic(err)
@@ -281,7 +287,7 @@ func mainGateway() {
 		go tokenManager.StartUpdateListener()
 	}
 
-	log.Println("Listening on Port:", Port)
+	log.Println("Listening on Port:", FinalPort)
 	err = srv.Serve(tls.NewListener(conn, srv.TLSConfig))
 
 	if err != http.ErrServerClosed {
