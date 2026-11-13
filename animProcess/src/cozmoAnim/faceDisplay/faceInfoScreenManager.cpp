@@ -583,8 +583,6 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   ADD_MENU_ITEM(ConfigurationSubmenu3, "DTTB RANDOM EYES", DTTBRandomEyes);
   if (Util::FileUtils::DirectoryExists("/anki/data/cloudswitch/")) {
     ADD_MENU_ITEM(ConfigurationSubmenu3, _cloudlessEnabled ? "USE NORMAL CLOUD" : "USE VIC-CLOUDLESS", Cloudless);
-  } else {
-    ADD_MENU_ITEM(ConfigurationSubmenu3, "NO CLOUDLESS", Main);
   }
   DISABLE_TIMEOUT(ConfigurationSubmenu3)
 
