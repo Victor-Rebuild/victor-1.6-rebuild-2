@@ -45,9 +45,6 @@ namespace Anki
     {
       static const char *kConfigDefaultValueKey = "defaultValue";
       static const char *kConfigUpdateCloudOnChangeKey = "updateCloudOnChange";
-      static const char* kCustomEyeColorEnabledKey = "enabled";
-      static const char* kCustomEyeColorHueKey = "hue";
-      static const char* kCustomEyeColorSaturationKey = "saturation";
 
       const size_t kMaxTicksToClear = 3;
 
@@ -709,7 +706,7 @@ namespace Anki
 
       const std::string rainbowEyesStr = "RAINBOW_EYES";
       const std::string rebuildEyesStr = "REBUILD_EYES";
-      const std::string mysteryEyesStr   = "MYSTERY_EYES";
+      const std::string mysteryEyesStr = "MYSTERY_EYES";
       const auto &value = _currentSettings[key].asUInt();
       const auto &eyeColorName = EyeColor_Name(static_cast<external_interface::EyeColor>(value));
       LOG_INFO("SettingsManager.ApplySettingEyeColor.Apply", "Setting robot eye color to %s", eyeColorName.c_str());

@@ -48,9 +48,6 @@ namespace
   static const char* kConsoleGroupAccountSettings = "AccountSettings";
   static const char* kConsoleGroupUserEntitlements = "UserEntitlements";
 
-  static const char* kCustomEyeColorEnabledKey = "enabled";
-  static const char* kCustomEyeColorHueKey = "hue";
-  static const char* kCustomEyeColorSaturationKey = "saturation";
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   // ROBOT SETTINGS console vars and functions:
 
