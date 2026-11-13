@@ -320,7 +320,7 @@ namespace Anki
       // Register the actual setting application methods, for those settings that want to execute code when changed:
       _settingSetters[external_interface::RobotSetting::master_volume] = {false, &SettingsManager::ValidateSettingMasterVolume, &SettingsManager::ApplySettingMasterVolume};
       _settingSetters[external_interface::RobotSetting::eye_color] = {true, &SettingsManager::ValidateSettingEyeColor, &SettingsManager::ApplySettingEyeColor};
-      _settingSetters[external_interface::RobotSetting::custom_eye_color] = {true, &SettingsManager::ValidateSettingEyeColor, &SettingsManager::ApplySettingEyeColor};
+      _settingSetters[external_interface::RobotSetting::custom_eye_color] = {true, &SettingsManager::ValidateSettingEyeColor, &SettingsManager::ApplySettingCustomEyeColor};
       _settingSetters[external_interface::RobotSetting::locale] = {false, &SettingsManager::ValidateSettingLocale, &SettingsManager::ApplySettingLocale};
       _settingSetters[external_interface::RobotSetting::time_zone] = {false, nullptr, &SettingsManager::ApplySettingTimeZone};
       _settingSetters[external_interface::RobotSetting::default_location] = {false, &SettingsManager::ValidateSettingDefaultLocation, nullptr};
@@ -665,19 +665,29 @@ namespace Anki
       return true;
     }
 
-    // Wire (kercre123) - Rainbow Eyes
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    bool SettingsManager::ApplySettingCustomEyeColor()
+    {
+      static const std::string &customEyeColorKey = RobotSetting_Name(external_interface::RobotSetting::custom_eye_color);
+      const Json::Value customEyeColor = _currentSettings[customEyeColorKey];
+      const auto &isUsingCustomColor = customEyeColor[kCustomEyeColorEnabledKey].asBool();
+      float hue, saturation;
+      if (isUsingCustomColor) {
+        hue = customEyeColor[kCustomEyeColorHueKey].asFloat();
+        saturation = customEyeColor[kCustomEyeColorSaturationKey].asFloat();
+        LOG_INFO("SettingsManager.ApplySettingEyeColor.Apply", "Setting custom eye color to Hue: %f, Sat: %f", hue, saturation);
+        _robot->SendRobotMessage<RobotInterface::SetFaceHue>(hue);
+        _robot->SendRobotMessage<RobotInterface::SetFaceSaturation>(saturation);
+      }
+      return true;
+    }
 
     bool SettingsManager::ApplySettingEyeColor()
     {
       static const std::string &key = RobotSetting_Name(external_interface::RobotSetting::eye_color);
-      static const std::string &customEyeColorKey = RobotSetting_Name(external_interface::RobotSetting::custom_eye_color);
-      const Json::Value customEyeColor = _currentSettings[customEyeColorKey];
-      const auto &isUsingCustomColor = customEyeColor[kCustomEyeColorEnabledKey].asBool();
 
       float hue, saturation;
 
-      // stop the rainbow thread if it's active
+      // stop the rainbow eyes thread if it's active
       if (_rainbowEyeThread.joinable())
       {
         _stopRainbowEyeThread.store(true, std::memory_order_release);
@@ -687,6 +697,7 @@ namespace Anki
         _stopRainbowEyeThread.store(false, std::memory_order_release); // Reset the flag for future use
       }
 
+      // stop the rebuild eyes thread if it's active
       if (_rebuildEyeThread.joinable())
       {
         _stopRebuildEyeThread.store(true, std::memory_order_release);
@@ -696,210 +707,202 @@ namespace Anki
         _stopRebuildEyeThread.store(false, std::memory_order_release); // Reset the flag for future use
       }
 
-      if (!isUsingCustomColor)
+      const std::string rainbowEyesStr = "RAINBOW_EYES";
+      const std::string rebuildEyesStr = "REBUILD_EYES";
+      const std::string mysteryEyesStr   = "MYSTERY_EYES";
+      const auto &value = _currentSettings[key].asUInt();
+      const auto &eyeColorName = EyeColor_Name(static_cast<external_interface::EyeColor>(value));
+      LOG_INFO("SettingsManager.ApplySettingEyeColor.Apply", "Setting robot eye color to %s", eyeColorName.c_str());
+
+      // Start custom dynamic eye color functions
+
+      // Wire - Rainbow Eyes
+      // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+      if (eyeColorName == rainbowEyesStr)
       {
-        const std::string rainbowEyesStr = "RAINBOW_EYES";
-        const std::string rebuildEyesStr = "REBUILD_EYES";
-        const std::string mysteryEyesStr   = "MYSTERY_EYES";
-        const auto &value = _currentSettings[key].asUInt();
-        const auto &eyeColorName = EyeColor_Name(static_cast<external_interface::EyeColor>(value));
-        LOG_INFO("SettingsManager.ApplySettingEyeColor.Apply", "Setting robot eye color to %s", eyeColorName.c_str());
+        LOG_INFO("SettingsManager.ApplySettingEyeColor.Apply", "Starting Rainbow Eyes thread");
 
-        // Start custom dynamic eye color functions
-
-        // Wire - Rainbow Eyes
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        if (eyeColorName == rainbowEyesStr)
+        // only start the thread if it's not already running
+        if (!_rainbowEyeThread.joinable())
         {
-          LOG_INFO("SettingsManager.ApplySettingEyeColor.Apply", "Starting Rainbow Eyes thread");
-
-          // only start the thread if it's not already running
-          if (!_rainbowEyeThread.joinable())
+          _robot->SendRobotMessage<RobotInterface::SetFaceSaturation>(1.00);
+          _rainbowEyeThread = std::thread([this]()
           {
-            _robot->SendRobotMessage<RobotInterface::SetFaceSaturation>(1.00);
-            _rainbowEyeThread = std::thread([this]()
+            float hue = 0.0f;
+            while (!_stopRainbowEyeThread.load(std::memory_order_acquire))
             {
-              float hue = 0.0f;
-              while (!_stopRainbowEyeThread.load(std::memory_order_acquire))
+              _robot->SendRobotMessage<RobotInterface::SetFaceHue>(hue);
+              hue += 0.001f;
+              if (hue > 1.0f)
               {
-                _robot->SendRobotMessage<RobotInterface::SetFaceHue>(hue);
-                hue += 0.001f;
-                if (hue > 1.0f)
-                {
-                  hue = 0.0f;
-                }
-                std::unique_lock<std::mutex> lock(_rainbowEyeMutex);
-                _rainbowEyeCV.wait_for(lock, std::chrono::milliseconds(15), [this]() {
-                  return _stopRainbowEyeThread.load(std::memory_order_acquire);
-                });
-
-                // Check if "RAINBOW_EYES" is still active by checking the setting
-                const std::string rainbowEyesStrInTh = "RAINBOW_EYES";
-                const auto& eyeval = _currentSettings[key].asUInt();
-                const auto& currentHueKey = EyeColor_Name(static_cast<external_interface::EyeColor>(eyeval));
-                if (currentHueKey != rainbowEyesStrInTh)
-                {
-                  LOG_INFO("SettingsManager.ApplySettingEyeColor.Apply", "Stopping Rainbow Eyes thread");
-                  _stopRainbowEyeThread.store(true, std::memory_order_release);
-                  break;
-                }
+                hue = 0.0f;
               }
-            });
-          }
+              std::unique_lock<std::mutex> lock(_rainbowEyeMutex);
+              _rainbowEyeCV.wait_for(lock, std::chrono::milliseconds(15), [this]() {
+                return _stopRainbowEyeThread.load(std::memory_order_acquire);
+              });
 
-          return true;
+              // Check if "RAINBOW_EYES" is still active by checking the setting
+              const std::string rainbowEyesStrInTh = "RAINBOW_EYES";
+              const auto& eyeval = _currentSettings[key].asUInt();
+              const auto& currentHueKey = EyeColor_Name(static_cast<external_interface::EyeColor>(eyeval));
+              if (currentHueKey != rainbowEyesStrInTh)
+              {
+                LOG_INFO("SettingsManager.ApplySettingEyeColor.Apply", "Stopping Rainbow Eyes thread");
+                _stopRainbowEyeThread.store(true, std::memory_order_release);
+                break;
+              }
+            }
+          });
         }
 
-        // Emily - Rebuild Eyes (XMB eyes) :D
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        else if (eyeColorName == rebuildEyesStr)
+        return true;
+      }
+
+      // Emily - Rebuild Eyes (XMB eyes) :D
+      // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+      else if (eyeColorName == rebuildEyesStr)
+      {
+        LOG_INFO("SettingsManager.ApplySettingEyeColor.Apply", "Starting Rebuild Eyes thread");
+
+        // only start the thread if it's not already running
+        if (!_rebuildEyeThread.joinable())
         {
-          LOG_INFO("SettingsManager.ApplySettingEyeColor.Apply", "Starting Rebuild Eyes thread");
-
-          // only start the thread if it's not already running
-          if (!_rebuildEyeThread.joinable())
+          _rebuildEyeThread = std::thread([this]()
           {
-            _rebuildEyeThread = std::thread([this]()
+            int nextThirdHour = -1;
+            bool gotTime = false;
+            while (!_stopRebuildEyeThread.load(std::memory_order_acquire))
             {
-              int nextThirdHour = -1;
-              bool gotTime = false;
-              while (!_stopRebuildEyeThread.load(std::memory_order_acquire))
-              {
-                // Check if we have date/time yet or no
-                if (!gotTime) {
-                  gotTime = OSState::getInstance()->IsWallTimeSynced();
+              // Check if we have date/time yet or no
+              if (!gotTime) {
+                gotTime = OSState::getInstance()->IsWallTimeSynced();
+              }
+
+              const std::string hueName = "rebuildEyesHue";
+              const std::string satName = "rebuildEyesSaturation";
+
+              if ((RebuildToggles::GetFloat(hueName) == -1.f) && (RebuildToggles::GetFloat(satName) == -1.f)) {
+                LOG_INFO("SettingsManager.RebuildEyes.CreateInitalFiles", "Creating inital files");
+                RebuildToggles::SetFloat(nullptr, hueName, 0.1f);
+                RebuildToggles::SetFloat(nullptr, satName, 0.1f);
+                if ((RebuildToggles::GetFloat(hueName) != -1.f) &&
+                    (RebuildToggles::GetFloat(satName) != -1.f)) {
+                  LOG_INFO("SettingsManager.RebuildEyes.CreateInitalFiles", "Inital files created");
+                } else {
+                  LOG_ERROR("SettingsManager.RebuildEyes.CreateInitalFiles", "Failed to create inital files");
+                }
+              }
+
+              const std::string eyesSaveFailed = "Failed to save values";
+              const std::string eyesSaveSaving = "Saving rebuild eye colors";
+              const std::string eyesSaveSuccess = "Current values saved";
+              float adjustedSaturation;
+              RebuildXMBColor color;
+
+              if (gotTime) {
+                // Get current date and time
+                time_t now = time(nullptr);
+                struct tm* timeinfo = localtime(&now);
+
+                int month = timeinfo->tm_mon + 1;  // 1-12
+                int day = timeinfo->tm_mday;       // 1-31
+                int hour = timeinfo->tm_hour;      // 0-23
+                int minute = timeinfo->tm_min;     // 0-59
+
+                // Get XMB color for current date/time
+                color = GetInterpolatedRebuildXMBColor(month, day, hour, minute);
+
+                // Apply brightness to saturation (lower brightness = lower saturation)
+                adjustedSaturation = color.saturation * GetRebuildXMBBrightnessForHour(hour, minute);;
+
+                if (IsXray()) {
+                  adjustedSaturation = adjustedSaturation + 0.15;
                 }
 
-                const std::string hueName = "rebuildEyesHue";
-                const std::string satName = "rebuildEyesSaturation";
-
-                if ((RebuildToggles::GetFloat(hueName) == -1.f) && (RebuildToggles::GetFloat(satName) == -1.f)) {
-                  LOG_INFO("SettingsManager.RebuildEyes.CreateInitalFiles", "Creating inital files");
-                  RebuildToggles::SetFloat(nullptr, hueName, 0.1f);
-                  RebuildToggles::SetFloat(nullptr, satName, 0.1f);
-                  if ((RebuildToggles::GetFloat(hueName) != -1.f) &&
-                      (RebuildToggles::GetFloat(satName) != -1.f)) {
-                    LOG_INFO("SettingsManager.RebuildEyes.CreateInitalFiles", "Inital files created");
-                  } else {
-                    LOG_ERROR("SettingsManager.RebuildEyes.CreateInitalFiles", "Failed to create inital files");
-                  }
+                if (nextThirdHour < 0) {
+                  nextThirdHour = (hour + 3) % 24;
                 }
 
-                const std::string eyesSaveFailed = "Failed to save values";
-                const std::string eyesSaveSaving = "Saving rebuild eye colors";
-                const std::string eyesSaveSuccess = "Current values saved";
-                float adjustedSaturation;
-                RebuildXMBColor color;
-
-                if (gotTime) {
-                  // Get current date and time
-                  time_t now = time(nullptr);
-                  struct tm* timeinfo = localtime(&now);
-
-                  int month = timeinfo->tm_mon + 1;  // 1-12
-                  int day = timeinfo->tm_mday;       // 1-31
-                  int hour = timeinfo->tm_hour;      // 0-23
-                  int minute = timeinfo->tm_min;     // 0-59
-
-                  // Get XMB color for current date/time
-                  color = GetInterpolatedRebuildXMBColor(month, day, hour, minute);
-
-                  // Apply brightness to saturation (lower brightness = lower saturation)
-                  adjustedSaturation = color.saturation * GetRebuildXMBBrightnessForHour(hour, minute);;
-
-                  if (IsXray()) {
-                    adjustedSaturation = adjustedSaturation + 0.15;
-                  }
-
-                  if (nextThirdHour < 0) {
-                    nextThirdHour = (hour + 3) % 24;
-                  }
-
-                  if (nextThirdHour == hour &&
-                    (RebuildToggles::GetFloat(hueName) != color.hue) &&
-                    (RebuildToggles::GetFloat(satName) != adjustedSaturation))
-                  {
-                    LOG_INFO("SettingsManager.RebuildEyes.3HourlySave", "%s", eyesSaveSaving.c_str());
-                    nextThirdHour = (hour + 3) % 24;
-                    RebuildToggles::SetFloat(nullptr, hueName, color.hue);
-                    RebuildToggles::SetFloat(nullptr, satName, adjustedSaturation);
-                    if ((RebuildToggles::GetFloat(hueName) == color.hue) &&
-                        (RebuildToggles::GetFloat(satName) == adjustedSaturation)) {
-                      LOG_INFO("SettingsManager.RebuildEyes.3HourlySave", "%s", eyesSaveSuccess.c_str());
-                    } else {
-                      LOG_ERROR("SettingsManager.RebuildEyes.3HourlySave", "%s", eyesSaveFailed.c_str());
-                    }
-                  }
-                }
-
-                if (!gotTime &&
-                  (RebuildToggles::GetFloat(hueName) != -1.f) &&
-                  (RebuildToggles::GetFloat(satName) != -1.f))
+                if (nextThirdHour == hour &&
+                  (RebuildToggles::GetFloat(hueName) != color.hue) &&
+                  (RebuildToggles::GetFloat(satName) != adjustedSaturation))
                 {
-                  adjustedSaturation = RebuildToggles::GetFloat(hueName);
-                  color.hue = RebuildToggles::GetFloat(satName);
-                  LOG_INFO("SettingsManager.RebuildEyes.Delay", "Doing Delay");
-                }
-
-                // Set the face color
-                _robot->SendRobotMessage<RobotInterface::SetFaceSaturation>(adjustedSaturation);
-                _robot->SendRobotMessage<RobotInterface::SetFaceHue>(color.hue);
-
-                // Check if "REBUILD_EYES" is still active by checking the setting
-                const std::string rebuildEyesStrInTh = "REBUILD_EYES";
-                const auto& eyeval = _currentSettings[key].asUInt();
-                const auto& currentHueKey = EyeColor_Name(static_cast<external_interface::EyeColor>(eyeval));
-                if (currentHueKey != rebuildEyesStrInTh)
-                {
-                  LOG_INFO("SettingsManager.ApplySettingEyeColor.Apply", "Stopping Rebuild Eyes thread");
-                  LOG_INFO("SettingsManager.RebuildEyes.SaveValues", "%s", eyesSaveSaving.c_str());
+                  LOG_INFO("SettingsManager.RebuildEyes.3HourlySave", "%s", eyesSaveSaving.c_str());
+                  nextThirdHour = (hour + 3) % 24;
                   RebuildToggles::SetFloat(nullptr, hueName, color.hue);
                   RebuildToggles::SetFloat(nullptr, satName, adjustedSaturation);
                   if ((RebuildToggles::GetFloat(hueName) == color.hue) &&
                       (RebuildToggles::GetFloat(satName) == adjustedSaturation)) {
-                    LOG_INFO("SettingsManager.RebuildEyes.SaveValues", "%s", eyesSaveSuccess.c_str());
+                    LOG_INFO("SettingsManager.RebuildEyes.3HourlySave", "%s", eyesSaveSuccess.c_str());
                   } else {
-                    LOG_ERROR("SettingsManager.RebuildEyes.SaveValues", "%s", eyesSaveFailed.c_str());
+                    LOG_ERROR("SettingsManager.RebuildEyes.3HourlySave", "%s", eyesSaveFailed.c_str());
                   }
-                  _stopRebuildEyeThread.store(true, std::memory_order_release);
-                  break;
                 }
-                // Refresh every 30 seconds
-                std::unique_lock<std::mutex> lock(_rebuildEyeMutex);
-                _rebuildEyeCV.wait_for(lock, std::chrono::seconds(30), [this]() {
-                  return _stopRebuildEyeThread.load(std::memory_order_acquire);
-                });
               }
-            });
-          }
 
-          return true;
-        } else if (eyeColorName == mysteryEyesStr) {
-          auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-          unsigned int randSeed = static_cast<unsigned int>(milliseconds);
-          std::srand(randSeed);
+              if (!gotTime &&
+                (RebuildToggles::GetFloat(hueName) != -1.f) &&
+                (RebuildToggles::GetFloat(satName) != -1.f))
+              {
+                adjustedSaturation = RebuildToggles::GetFloat(hueName);
+                color.hue = RebuildToggles::GetFloat(satName);
+                LOG_INFO("SettingsManager.RebuildEyes.Delay", "Doing Delay");
+              }
 
-          hue = (std::rand() / (double)RAND_MAX) * 1.0;
-          saturation = (std::rand() / (double)RAND_MAX) * 2.0;
+              // Set the face color
+              _robot->SendRobotMessage<RobotInterface::SetFaceSaturation>(adjustedSaturation);
+              _robot->SendRobotMessage<RobotInterface::SetFaceHue>(color.hue);
+
+              // Check if "REBUILD_EYES" is still active by checking the setting
+              const std::string rebuildEyesStrInTh = "REBUILD_EYES";
+              const auto& eyeval = _currentSettings[key].asUInt();
+              const auto& currentHueKey = EyeColor_Name(static_cast<external_interface::EyeColor>(eyeval));
+              if (currentHueKey != rebuildEyesStrInTh)
+              {
+                LOG_INFO("SettingsManager.ApplySettingEyeColor.Apply", "Stopping Rebuild Eyes thread");
+                LOG_INFO("SettingsManager.RebuildEyes.SaveValues", "%s", eyesSaveSaving.c_str());
+                RebuildToggles::SetFloat(nullptr, hueName, color.hue);
+                RebuildToggles::SetFloat(nullptr, satName, adjustedSaturation);
+                if ((RebuildToggles::GetFloat(hueName) == color.hue) &&
+                    (RebuildToggles::GetFloat(satName) == adjustedSaturation)) {
+                  LOG_INFO("SettingsManager.RebuildEyes.SaveValues", "%s", eyesSaveSuccess.c_str());
+                } else {
+                  LOG_ERROR("SettingsManager.RebuildEyes.SaveValues", "%s", eyesSaveFailed.c_str());
+                }
+                _stopRebuildEyeThread.store(true, std::memory_order_release);
+                break;
+              }
+              // Refresh every 30 seconds
+              std::unique_lock<std::mutex> lock(_rebuildEyeMutex);
+              _rebuildEyeCV.wait_for(lock, std::chrono::seconds(30), [this]() {
+                return _stopRebuildEyeThread.load(std::memory_order_acquire);
+              });
+            }
+          });
         }
-        // End custom dynamic eye colors
-        else
-        {
-          LOG_INFO("SettingsManager.ApplySettingEyeColor.Apply", "Setting robot eye color to %s", eyeColorName.c_str());
 
-          const auto &config = _robot->GetContext()->GetDataLoader()->GetEyeColorConfig();
-          const auto &eyeColorData = config[eyeColorName];
-          hue = eyeColorData["Hue"].asFloat();
-          saturation = eyeColorData["Saturation"].asFloat();
-          if (IsXray()) {
-            saturation = saturation + 0.2;
-          }
-        }
+        return true;
+      } else if (eyeColorName == mysteryEyesStr) {
+        auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+        unsigned int randSeed = static_cast<unsigned int>(milliseconds);
+        std::srand(randSeed);
+
+        hue = (std::rand() / (double)RAND_MAX) * 1.0;
+        saturation = (std::rand() / (double)RAND_MAX) * 2.0;
       }
+      // End custom dynamic eye colors
       else
       {
-        hue = customEyeColor[kCustomEyeColorHueKey].asFloat();
-        saturation = customEyeColor[kCustomEyeColorSaturationKey].asFloat();
+        LOG_INFO("SettingsManager.ApplySettingEyeColor.Apply", "Setting robot eye color to %s", eyeColorName.c_str());
+
+        const auto &config = _robot->GetContext()->GetDataLoader()->GetEyeColorConfig();
+        const auto &eyeColorData = config[eyeColorName];
+        hue = eyeColorData["Hue"].asFloat();
+        saturation = eyeColorData["Saturation"].asFloat();
+        if (IsXray()) {
+          saturation = saturation + 0.2;
+        }
       }
 
       _robot->SendRobotMessage<RobotInterface::SetFaceHue>(hue);
